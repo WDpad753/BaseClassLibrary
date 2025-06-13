@@ -13,6 +13,7 @@ namespace BaseLogger
         string logtext;
         private ExeConfigurationFileMap _fileMap;
         private int? loggingLvl;
+        private int? debugState;
         private string? appName;
         private string? logFilePath;
 
@@ -25,6 +26,7 @@ namespace BaseLogger
 
             appName = (string?)SetupConfigReader(typeof(string), "AppName");
             loggingLvl = (int?)SetupConfigReader(typeof(int), "LoggingLevel");
+            debugState = (int?)SetupConfigReader(typeof(int), "DebugState");
             logFilePath=logfilePath;
 
             using (FileSystemWatcher watcher = new FileSystemWatcher())
@@ -41,6 +43,7 @@ namespace BaseLogger
         {
             appName = (string?)SetupConfigReader(typeof(string), "AppName");
             loggingLvl = (int?)SetupConfigReader(typeof(int), "LoggingLevel");
+            debugState = (int?)SetupConfigReader(typeof(int), "DebugState");
         }
 
         public void LogWrite(string message, string appbase, string func, MessageLevels Messagelvl, DebugState debugLevel = 0)
@@ -89,7 +92,7 @@ namespace BaseLogger
                     return;
                 }
 
-                if (debugLevel == 0)
+                if (debugState == 0)
                 {
                     logtext = $"{appName}: {datetimenw} Installation: local Level{Messagelvl.ToString().Substring(0, 1)}: {appbase}::{func} - {message}";
 
