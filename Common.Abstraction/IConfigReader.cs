@@ -8,7 +8,7 @@ namespace Common.Abstractions
 {
     public interface IConfigReader
     {
-        void SaveInfo(string data, string path, string? section);
-        string ReadInfo(string path, string? section);
+        //void SaveInfo(string data, string path, string? section = null);
+        //string? ReadInfo(string path, string? section = null);
     }
 }

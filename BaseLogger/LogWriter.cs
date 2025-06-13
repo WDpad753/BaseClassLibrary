@@ -1,5 +1,6 @@
-﻿using Common.Abstractions;
-using Common.Abstractions.Models;
+﻿//using Common.Abstractions;
+//using Common.Abstractions.Models;
+using BaseLogger.Models;
 using System.Configuration;
 using System.Diagnostics;
 using System.Globalization;
@@ -8,7 +9,7 @@ using System.Text;
 
 namespace BaseLogger
 {
-    public class LogWriter : ILogWriter
+    public class LogWriter
     {
         string logtext;
         private ExeConfigurationFileMap _fileMap;
@@ -129,7 +130,7 @@ namespace BaseLogger
 
         private object SetupConfigReader(Type expectedType, string path)
         {
-            Configuration config = System.Configuration.ConfigurationManager.OpenMappedExeConfiguration(_fileMap, ConfigurationUserLevel.None);
+            Configuration config = ConfigurationManager.OpenMappedExeConfiguration(_fileMap, ConfigurationUserLevel.None);
 
             string value = config.AppSettings.Settings[path].Value;
 

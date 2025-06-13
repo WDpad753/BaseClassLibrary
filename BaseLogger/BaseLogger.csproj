@@ -10,8 +10,4 @@
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.6" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Common.Abstraction\Common.Abstraction.csproj" />
-  </ItemGroup>
-
 </Project>

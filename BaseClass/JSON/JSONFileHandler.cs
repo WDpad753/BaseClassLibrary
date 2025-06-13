@@ -1,5 +1,8 @@
-﻿using Common.Abstractions;
-using Common.Abstractions.Models;
+﻿using BaseLogger;
+using BaseLogger.Models;
+
+//using Common.Abstractions;
+//using Common.Abstractions.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -14,13 +17,13 @@ namespace BaseClass.JSON
 {
     public class JSONFileHandler
     {
-        private readonly ILogWriter _logWriter;
-        private DebugState _debugState;
+        //private readonly ILogWriter _logWriter;
+        //private DebugState _debugState;
         private string? NameSpace = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
+        private LogWriter _logWriter;
 
-        public JSONFileHandler(DebugState state) 
+        public JSONFileHandler() 
         { 
-            _debugState = state;
         }
 
         public void SaveJson<T>(T json, string targetfilepath)

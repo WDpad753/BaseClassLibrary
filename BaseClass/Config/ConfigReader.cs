@@ -1,51 +1,49 @@
-﻿using System;
+﻿using BaseClass.JSON;
+using BaseLogger;
+using BaseLogger.Models;
+
+//using Common.Abstractions;
+//using Common.Abstractions.Models;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
-using Common.Abstractions.Models;
-using Common.Abstractions;
 using UtilityClass = BaseClass.MethodNameExtractor.FuncNameExtractor;
 
 namespace BaseClass.Config
 {
-    public class ConfigReader : IConfigReader
+    public class ConfigReader
     {
         private string configPath;
         private ExeConfigurationFileMap _fileMap;
         private string? _filepath;
-        //private LogWriter _logWriter;
-        private readonly ILogWriter _logWriter;
-        //private connectionStringsSection _configConnSection;
+        //private ILogWriter _logWriter;
+        private LogWriter _logWriter;
         private AppSettingsSection _configAppSettingsSection;
         public bool _ConfigRead = false;
-        private DebugState _debugState;
+        private JSONFileHandler _fileHandler;
 
-        public ConfigReader(string? filepath, DebugState state = 0)
+        public ConfigReader(string? filepath, LogWriter Logger)
         {
             _filepath = filepath;
-            _debugState = state;
+            _logWriter = Logger;
 
-            //_logWriter = new LogWriter();
             _fileMap = new ExeConfigurationFileMap
             {
                 ExeConfigFilename = filepath,
             };
         }
 
-        public void SaveInfo(string data, string path, string? section)
+        public void SaveInfo(string data, string path, string? section = null)
         {
             try
             {
-                Configuration config = System.Configuration.ConfigurationManager.OpenMappedExeConfiguration(_fileMap, ConfigurationUserLevel.None);
+                Configuration config = ConfigurationManager.OpenMappedExeConfiguration(_fileMap, ConfigurationUserLevel.None);
 
-                if (section != null && section.ToString().Contains("connectionStringsSection"))
-                {
-                    //_configConnSection = (connectionStringsSection)config.GetSection(section);
-                }
-                else if (section != null && section.ToString().Contains("appSettings"))
+                if (section == null || section.ToString().Contains("appSettings"))
                 {
                     _configAppSettingsSection = (AppSettingsSection)config.GetSection(section);
                 }
@@ -53,53 +51,22 @@ namespace BaseClass.Config
                 {
                     _ConfigRead = false;
                     _logWriter.LogWrite("Unknown Config Section", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
+                    return;
                 }
 
-                //if (_configConnSection != null && section.Contains("Conn", StringComparison.OrdinalIgnoreCase))
-                //{
-                //    _logWriter.LogWrite("There is/are connection strings in the Configuration file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Warning);
+                if (_configAppSettingsSection != null)
+                {
+                    _configAppSettingsSection.CurrentConfiguration.AppSettings.Settings[path].Value = data;
 
-                //    var keyval = _configConnSection.ConnectionStringItems.Cast<connectionStringSectionElement>().FirstOrDefault(e => e.Key == path);
+                    // Save the modified configuration
+                    config.Save(ConfigurationSaveMode.Modified);
 
-                //    if (keyval != null)
-                //    {
-                //        keyval.Value = data;
-
-                //        config.Save(ConfigurationSaveMode.Modified);
-
-                //        // Refresh the section
-                //        ConfigurationManager.RefreshSection(section);
-                //    }
-                //    else
-                //    {
-                //        _logWriter.LogWrite("Element does not exist in file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
-                //    }
-                //}
-                //else if (_configServSection != null && section.Contains("Serv", StringComparison.OrdinalIgnoreCase))
-                //{
-                //    _logWriter.LogWrite("There is/are Service Settings in the Configuration file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Warning);
-
-                //    var keyval = _configServSection.ServiceSettingsItems.Cast<serviceSectionElement>().FirstOrDefault(e => e.Key == path);
-
-                //    if (keyval != null)
-                //    {
-                //        keyval.Value = data;
-
-                //        config.Save(ConfigurationSaveMode.Modified);
-
-                //        // Refresh the section
-                //        ConfigurationManager.RefreshSection(section);
-                //    }
-                //    else
-                //    {
-                //        _logWriter.LogWrite("Element does not exist in file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
-                //    }
-                //}
-                //else
-                //{
-                //    _logWriter.LogWrite("There are no connection string/s in the Configuration file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Warning);
-                //}
-                //return null;
+                    _logWriter.LogWrite($"{data} was saved in {path} Key in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
+                }
+                else
+                {
+                    _logWriter.LogWrite("Unable to save the data in the config file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
+                }
             }
             catch (Exception ex)
             {
@@ -107,63 +74,35 @@ namespace BaseClass.Config
             }
         }
 
-        public string ReadInfo(string path, string? section)
+        public string? ReadInfo(string path, string? section = null)
         {
             try
             {
-                Configuration config = System.Configuration.ConfigurationManager.OpenMappedExeConfiguration(_fileMap, ConfigurationUserLevel.None);
+                Configuration config = ConfigurationManager.OpenMappedExeConfiguration(_fileMap, ConfigurationUserLevel.None);
 
-                //if (section != null && section.ToString().Contains("connectionStringsSection"))
-                //{
-                //    _configConnSection = (connectionStringsSection)config.GetSection(section);
-                //}
-                //else if (section != null && section.ToString().Contains("serviceSection"))
-                //{
-                //    _configServSection = (serviceSection)config.GetSection(section);
-                //}
-                //else
-                //{
-                //    _logWriter.LogWrite("Unknown Config Section", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
-                //}
+                if (section == null || section.ToString().Contains("appSettings"))
+                {
+                    _configAppSettingsSection = (AppSettingsSection)config.GetSection("appSettings");
+                }
+                else
+                {
+                    _logWriter.LogWrite("Unknown Config Section", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
+                    return null;
+                }
 
-                //if (_configConnSection != null)
-                //{
-                //    _logWriter.LogWrite("There is/are connection strings in the Configuration file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
+                if (_configAppSettingsSection != null)
+                {
+                    string data = _configAppSettingsSection.CurrentConfiguration.AppSettings.Settings[path].Value;
 
-                //    var keyval = _configConnSection.ConnectionStringItems.Cast<connectionStringSectionElement>().FirstOrDefault(e => e.Key == path);
+                    _logWriter.LogWrite($"{data} was collected from {path} Key in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
 
-                //    if (keyval != null)
-                //    {
-                //        return keyval.Value.ToString();
-                //    }
-                //    else
-                //    {
-                //        _logWriter.LogWrite("Element does not exist in file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
-                //        return null;
-                //    }
-                //}
-                //else if (_configServSection != null)
-                //{
-                //    _logWriter.LogWrite("There is/are connection strings in the Configuration file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
-
-                //    var keyval = _configServSection.ServiceSettingsItems.Cast<serviceSectionElement>().FirstOrDefault(e => e.Key == path);
-
-                //    if (keyval != null)
-                //    {
-                //        return keyval.Value.ToString();
-                //    }
-                //    else
-                //    {
-                //        _logWriter.LogWrite("Element does not exist in file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
-                //        return null;
-                //    }
-                //}
-                //else
-                //{
-                //    _logWriter.LogWrite("There are no connection string/s in the Configuration file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Trace);
-                //    return null;
-                //}
-                return null;
+                    return data;
+                }
+                else
+                {
+                    _logWriter.LogWrite("Unable to save the data in the config file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
+                    return null;
+                }
             }
             catch (Exception ex)
             {
