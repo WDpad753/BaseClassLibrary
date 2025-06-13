@@ -45,7 +45,7 @@ namespace BaseClass.Config
 
                 if (section == null || section.ToString().Contains("appSettings"))
                 {
-                    _configAppSettingsSection = (AppSettingsSection)config.GetSection(section);
+                    _configAppSettingsSection = (AppSettingsSection)config.GetSection("appSettings");
                 }
                 else
                 {
