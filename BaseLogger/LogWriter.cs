@@ -26,7 +26,6 @@ namespace BaseLogger
 
             appName = (string?)SetupConfigReader(typeof(string), "AppName");
             loggingLvl = (int?)SetupConfigReader(typeof(int), "LoggingLevel");
-            debugState = (int?)SetupConfigReader(typeof(int), "DebugState");
             logFilePath=logfilePath;
 
             using (FileSystemWatcher watcher = new FileSystemWatcher())
@@ -43,7 +42,6 @@ namespace BaseLogger
         {
             appName = (string?)SetupConfigReader(typeof(string), "AppName");
             loggingLvl = (int?)SetupConfigReader(typeof(int), "LoggingLevel");
-            debugState = (int?)SetupConfigReader(typeof(int), "DebugState");
         }
 
         public void LogWrite(string message, string appbase, string func, MessageLevels Messagelvl, DebugState debugLevel = 0)
@@ -63,7 +61,7 @@ namespace BaseLogger
             int LoggingState = 0;
             loggingLvl = loggingLvl != null ? loggingLvl : 1;
 
-            if ((int)Messagelvl > loggingLvl && debugLevel == 0)
+            if ((int)Messagelvl > loggingLvl && (int)debugLevel == 0)
                 return;
             else if ((int)Messagelvl > loggingLvl && (int)debugLevel == 1)
             {
