@@ -47,7 +47,7 @@ namespace BaseClass.JSON
                 //    eventLog.WriteEntry(ex.ToString(), EventLogEntryType.Error);
                 //}
 
-                _logWriter.LogWrite("Error saving data to file: " + ex.Message, NameSpace, UtilityClass.GetMethodName(), MessageLevels.Fatal, _debugState);
+                _logWriter.LogWrite("Error saving data to file: " + ex.Message, NameSpace, UtilityClass.GetMethodName(), MessageLevels.Fatal);
                 return;
             }
         }
@@ -81,7 +81,7 @@ namespace BaseClass.JSON
                 //    eventLog.WriteEntry(ex.ToString(), EventLogEntryType.Error);
                 //}
 
-                _logWriter.LogWrite("Error reading data to file: " + ex.Message, NameSpace, UtilityClass.GetMethodName(), MessageLevels.Fatal, _debugState);
+                _logWriter.LogWrite("Error reading data to file: " + ex.Message, NameSpace, UtilityClass.GetMethodName(), MessageLevels.Fatal);
                 return null;
             }
         }

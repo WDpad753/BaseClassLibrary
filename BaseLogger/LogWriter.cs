@@ -26,7 +26,18 @@ namespace BaseLogger
 
             appName = (string?)SetupConfigReader(typeof(string), "AppName");
             loggingLvl = (int?)SetupConfigReader(typeof(int), "LoggingLevel");
-            logFilePath=logfilePath;
+            debugState = (int?)SetupConfigReader(typeof(int), "DebugState");
+            
+            if (Directory.Exists(logfilePath) == false)
+            {
+                Directory.CreateDirectory(logfilePath);
+                logFilePath=logfilePath;
+                LogWrite("Log directory does not exist, created directory to save log files.", this.GetType().Name, nameof(LogWriter), MessageLevels.Trace);
+            }
+            else
+            {
+                logFilePath=logfilePath;
+            }
 
             using (FileSystemWatcher watcher = new FileSystemWatcher())
             {
@@ -42,13 +53,15 @@ namespace BaseLogger
         {
             appName = (string?)SetupConfigReader(typeof(string), "AppName");
             loggingLvl = (int?)SetupConfigReader(typeof(int), "LoggingLevel");
+            debugState = (int?)SetupConfigReader(typeof(int), "DebugState");
         }
 
-        public void LogWrite(string message, string appbase, string func, MessageLevels Messagelvl, DebugState debugLevel = 0)
+        public void LogWrite(string message, string appbase, string func, MessageLevels Messagelvl)
         {
             // Initialising variables:
             string filename = $"{appName}";
             string? filenamepath = logFilePath;
+            DebugState debugLevel = debugState != null ? (DebugState)debugState : DebugState.Inactive;
 
             if (filenamepath == null)
             {
@@ -79,7 +92,7 @@ namespace BaseLogger
                 if (loggingLvl > (int)Enum.GetValues(typeof(MessageLevels)).Cast<MessageLevels>().Last())
                 {
 
-                    logtext = $"{appName}: {datetimenw} Installation: local LevelX: {appbase}::{func} - Unknown Log Level, Please change the log level.";
+                    logtext = $"{appName}: {datetimenw} LevelX: {appbase}::{func} - Unknown Log Level, Please change the log level.";
 
                     sb.Append(logtext);
 
@@ -92,7 +105,7 @@ namespace BaseLogger
 
                 if (debugState == 0)
                 {
-                    logtext = $"{appName}: {datetimenw} Installation: local Level{Messagelvl.ToString().Substring(0, 1)}: {appbase}::{func} - {message}";
+                    logtext = $"{appName}: {datetimenw} Level{Messagelvl.ToString().Substring(0, 1)}: {appbase}::{func} - {message}";
 
                     sb.Append(logtext);
 
@@ -102,7 +115,7 @@ namespace BaseLogger
                 }
                 else
                 {
-                    logtext = $"{appName}: {datetimenw} Installation: local Level{Messagelvl.ToString().Substring(0, 1)}: {appbase}::{func} - {message}";
+                    logtext = $"{appName}: {datetimenw} Level{Messagelvl.ToString().Substring(0, 1)}: {appbase}::{func} - {message}";
 
                     sb.Append(logtext);
 

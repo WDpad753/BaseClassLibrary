@@ -52,12 +52,12 @@ namespace BaseClass.Config
                 else
                 {
                     _ConfigRead = false;
-                    _logWriter.LogWrite("Unknown Config Section", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal, _debugState);
+                    _logWriter.LogWrite("Unknown Config Section", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
                 }
 
                 //if (_configConnSection != null && section.Contains("Conn", StringComparison.OrdinalIgnoreCase))
                 //{
-                //    _logWriter.LogWrite("There is/are connection strings in the Configuration file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Warning, _debugState);
+                //    _logWriter.LogWrite("There is/are connection strings in the Configuration file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Warning);
 
                 //    var keyval = _configConnSection.ConnectionStringItems.Cast<connectionStringSectionElement>().FirstOrDefault(e => e.Key == path);
 
@@ -77,7 +77,7 @@ namespace BaseClass.Config
                 //}
                 //else if (_configServSection != null && section.Contains("Serv", StringComparison.OrdinalIgnoreCase))
                 //{
-                //    _logWriter.LogWrite("There is/are Service Settings in the Configuration file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Warning, _debugState);
+                //    _logWriter.LogWrite("There is/are Service Settings in the Configuration file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Warning);
 
                 //    var keyval = _configServSection.ServiceSettingsItems.Cast<serviceSectionElement>().FirstOrDefault(e => e.Key == path);
 
@@ -97,13 +97,13 @@ namespace BaseClass.Config
                 //}
                 //else
                 //{
-                //    _logWriter.LogWrite("There are no connection string/s in the Configuration file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Warning, _debugState);
+                //    _logWriter.LogWrite("There are no connection string/s in the Configuration file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Warning);
                 //}
                 //return null;
             }
             catch (Exception ex)
             {
-                _logWriter.LogWrite($"Path does not exist. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal, _debugState);
+                _logWriter.LogWrite($"Path does not exist. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
             }
         }
 
@@ -123,12 +123,12 @@ namespace BaseClass.Config
                 //}
                 //else
                 //{
-                //    _logWriter.LogWrite("Unknown Config Section", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal, _debugState);
+                //    _logWriter.LogWrite("Unknown Config Section", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
                 //}
 
                 //if (_configConnSection != null)
                 //{
-                //    _logWriter.LogWrite("There is/are connection strings in the Configuration file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug, _debugState);
+                //    _logWriter.LogWrite("There is/are connection strings in the Configuration file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
 
                 //    var keyval = _configConnSection.ConnectionStringItems.Cast<connectionStringSectionElement>().FirstOrDefault(e => e.Key == path);
 
@@ -138,13 +138,13 @@ namespace BaseClass.Config
                 //    }
                 //    else
                 //    {
-                //        _logWriter.LogWrite("Element does not exist in file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal, _debugState);
+                //        _logWriter.LogWrite("Element does not exist in file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
                 //        return null;
                 //    }
                 //}
                 //else if (_configServSection != null)
                 //{
-                //    _logWriter.LogWrite("There is/are connection strings in the Configuration file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug, _debugState);
+                //    _logWriter.LogWrite("There is/are connection strings in the Configuration file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
 
                 //    var keyval = _configServSection.ServiceSettingsItems.Cast<serviceSectionElement>().FirstOrDefault(e => e.Key == path);
 
@@ -154,20 +154,20 @@ namespace BaseClass.Config
                 //    }
                 //    else
                 //    {
-                //        _logWriter.LogWrite("Element does not exist in file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal, _debugState);
+                //        _logWriter.LogWrite("Element does not exist in file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
                 //        return null;
                 //    }
                 //}
                 //else
                 //{
-                //    _logWriter.LogWrite("There are no connection string/s in the Configuration file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Trace, _debugState);
+                //    _logWriter.LogWrite("There are no connection string/s in the Configuration file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Trace);
                 //    return null;
                 //}
                 return null;
             }
             catch (Exception ex)
             {
-                _logWriter.LogWrite($"Path does not exist. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal, _debugState);
+                _logWriter.LogWrite($"Path does not exist. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
                 return null;
             }
         }
