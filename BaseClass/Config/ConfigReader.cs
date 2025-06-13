@@ -37,7 +37,7 @@ namespace BaseClass.Config
             };
         }
 
-        public void SaveInfo(string data, string path, string section = null)
+        public void SaveInfo(string data, string path, string? section = null)
         {
             try
             {
