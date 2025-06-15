@@ -14,7 +14,7 @@ namespace BaseClass.API
         private int? timeOut;
         private string? PerAccTok;
 
-        public APIClient(string apiURL, string? personAcc,int? TimeOut) 
+        public APIClient(string apiURL, string? personAcc, int? TimeOut = null) 
         {
             APIURL = apiURL;
             timeOut = TimeOut != null ? TimeOut : 60;

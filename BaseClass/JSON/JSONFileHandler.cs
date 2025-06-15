@@ -19,11 +19,12 @@ namespace BaseClass.JSON
     {
         //private readonly ILogWriter _logWriter;
         //private DebugState _debugState;
-        private string? NameSpace = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
+        //private string? NameSpace = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
         private LogWriter _logWriter;
 
-        public JSONFileHandler() 
-        { 
+        public JSONFileHandler(LogWriter Logger) 
+        {
+            _logWriter = Logger;
         }
 
         public void SaveJson<T>(T json, string targetfilepath)
@@ -50,7 +51,7 @@ namespace BaseClass.JSON
                 //    eventLog.WriteEntry(ex.ToString(), EventLogEntryType.Error);
                 //}
 
-                _logWriter.LogWrite("Error saving data to file: " + ex.Message, NameSpace, UtilityClass.GetMethodName(), MessageLevels.Fatal);
+                _logWriter.LogWrite("Error saving data to file: " + ex.Message, this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
                 return;
             }
         }
@@ -84,7 +85,7 @@ namespace BaseClass.JSON
                 //    eventLog.WriteEntry(ex.ToString(), EventLogEntryType.Error);
                 //}
 
-                _logWriter.LogWrite("Error reading data to file: " + ex.Message, NameSpace, UtilityClass.GetMethodName(), MessageLevels.Fatal);
+                _logWriter.LogWrite("Error reading data to file: " + ex.Message, this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
                 return null;
             }
         }

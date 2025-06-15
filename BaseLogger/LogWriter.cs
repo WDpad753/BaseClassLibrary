@@ -11,14 +11,15 @@ namespace BaseLogger
 {
     public class LogWriter
     {
-        string logtext;
+        string? logtext;
         private ExeConfigurationFileMap _fileMap;
         private int? loggingLvl;
         private int? debugState;
         private string? appName;
-        private string? logFilePath;
+        private string logFilePath;
+        private FileSystemWatcher watcher;
 
-        public LogWriter(string configPath, string? logfilePath)
+        public LogWriter(string configPath, string logfilePath)
         {
             _fileMap = new ExeConfigurationFileMap
             {
@@ -40,29 +41,43 @@ namespace BaseLogger
                 logFilePath=logfilePath;
             }
 
-            using (FileSystemWatcher watcher = new FileSystemWatcher())
+            watcher = new FileSystemWatcher()
             {
-                watcher.Path = Path.GetDirectoryName(configPath);
-                watcher.EnableRaisingEvents = true;
-                watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
-                watcher.Changed += ConfigOnChanged;
-                watcher.Filter = "*.config";
-            }
+                Path = Path.GetDirectoryName(configPath),
+                EnableRaisingEvents = true,
+                NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName,
+                Filter = "*.config"
+                //Filter = Path.GetFileName(configPath)
+            };
+
+            watcher.Changed += ConfigOnChanged;
+            //watcher.Renamed += ConfigOnChanged;
+            //watcher.Created += ConfigOnChanged;
         }
 
         private void ConfigOnChanged(object sender, FileSystemEventArgs e)
         {
-            appName = (string?)SetupConfigReader(typeof(string), "AppName");
-            loggingLvl = (int?)SetupConfigReader(typeof(int), "LoggingLevel");
-            debugState = (int?)SetupConfigReader(typeof(int), "DebugState");
+            try
+            {
+                Debug.WriteLine($"[Watcher] Event: {e.ChangeType} on {e.FullPath} at {DateTime.Now:HH:mm:ss.fff}");
+                // existing reload logic...
+                //appName = (string?)SetupConfigReader(typeof(string), "AppName");
+                loggingLvl = (int?)SetupConfigReader(typeof(int), "LoggingLevel");
+                debugState = (int?)SetupConfigReader(typeof(int), "DebugState");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[Watcher] Exception in handler: {ex}");
+            }
         }
 
-        public void LogWrite(string message, string appbase, string func, MessageLevels Messagelvl)
+        public void LogWrite(string message, string? appbase, string func, MessageLevels Messagelvl)
         {
             // Initialising variables:
             string filename = $"{appName}";
-            string? filenamepath = logFilePath;
+            string? filenamepath = Path.Combine(logFilePath,filename+".log");
             DebugState debugLevel = debugState != null ? (DebugState)debugState : DebugState.Inactive;
+            appbase = appbase == null ? "" : appbase;
 
             if (filenamepath == null)
             {
@@ -72,7 +87,6 @@ namespace BaseLogger
             DateTime datetime = DateTime.Now;
             string datetimenw = datetime.ToString("dddd, yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture);
             StringBuilder sb = new StringBuilder();
-            int LoggingState = 0;
             loggingLvl = loggingLvl != null ? loggingLvl : 1;
 
             if ((int)Messagelvl > loggingLvl && (int)debugLevel == 0)
