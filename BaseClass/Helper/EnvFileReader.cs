@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using UtilityClass = BaseClass.MethodNameExtractor.FuncNameExtractor;
 
 namespace BaseClass.Helper
@@ -36,7 +37,7 @@ namespace BaseClass.Helper
                     data = JsonEnvFileReader(key, mainkey);
                     break;
                 case "env":
-                    data = envEnvFileReader(key, mainkey);
+                    data = envEnvFileReader(key, filepath);
                     break;
                 case "xml":
                     data = XmlEnvFileReader(key, mainkey);
@@ -96,11 +97,36 @@ namespace BaseClass.Helper
             }
         }
 
-        private string? envEnvFileReader(string key, string mainKey)
+        private string? envEnvFileReader(string Key, string filePath)
         {
             try
             {
                 string? res = null;
+
+                if (!File.Exists(filePath))
+                    _writer.LogWrite($"The file '{filePath}' does not exist.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Main);
+
+
+                foreach (var line in File.ReadAllLines(filePath))
+                {
+                    if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#"))
+                        continue; // Skip empty lines and comments
+
+                    var parts = line.Split('=', 2);
+                    if (parts.Length != 2)
+                        continue; // Skip lines that are not key-value pairs
+
+                    var key = parts[0].Trim();
+
+                    if(key.Equals(Key, StringComparison.OrdinalIgnoreCase))
+                    {
+                        res = parts[1].Trim().Replace("\"", ""); // Remove quotes if present
+                        break; // Exit loop once the key is found
+                    }
+                }
+
+                if(res == null)
+                    _writer.LogWrite($"Key '{Key}' not found in the environment file '{filePath}'.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Trace);
 
                 return res;
             }
@@ -116,6 +142,45 @@ namespace BaseClass.Helper
             try
             {
                 string? res = null;
+                bool mainKeyFound = false;
+
+                if (!File.Exists(_filepath))
+                    _writer.LogWrite($"The file '{_filepath}' does not exist.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Main);
+
+                using (XmlReader reader = XmlReader.Create(_filepath))
+                {
+                    
+                    while (reader.Read())
+                    {
+                        if (reader.NodeType == XmlNodeType.Element && reader.Name.Equals(mainKey, StringComparison.OrdinalIgnoreCase))
+                        {
+                            mainKeyFound = true; // Main key found, start looking for the nested key
+                        }
+
+                        if (mainKeyFound && reader.NodeType == XmlNodeType.Element && reader.Name.Equals("add", StringComparison.OrdinalIgnoreCase))
+                        {
+                            //if (reader.Read() && reader.NodeType == XmlNodeType.Text)
+                            //{
+                            //    res = reader.Value;
+                            //}
+
+                            string? keyAttr = reader.GetAttribute("Key");
+                            string? valueAttr = reader.GetAttribute("value");
+
+                            if (keyAttr == key)
+                            {
+                                res = valueAttr;
+                                break;
+                            }
+                        }
+                        else if (mainKeyFound && reader.NodeType == XmlNodeType.Element && reader.Name.Equals(key, StringComparison.OrdinalIgnoreCase))
+                        {
+                            string value = reader.ReadElementContentAsString();
+                            res = value;
+                            break;
+                        }
+                    }
+                }
 
                 return res;
             }
