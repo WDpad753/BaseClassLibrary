@@ -23,6 +23,7 @@ namespace BaseClass.Config
         //private ILogWriter _logWriter;
         private LogWriter _logWriter;
         private AppSettingsSection? _configAppSettingsSection;
+        private loggerSettings? _configLoggerSettingsSection;
         public bool _ConfigRead = false;
         //private JSONFileHandler? _fileHandler;
 
@@ -49,6 +50,10 @@ namespace BaseClass.Config
                 {
                     _configAppSettingsSection = (AppSettingsSection)config.GetSection("appSettings");
                 }
+                else if(section.ToString().Contains("loggerSettings"))
+                {
+                    _configLoggerSettingsSection = (loggerSettings)config.GetSection("loggerSettings");
+                }
                 else
                 {
                     _ConfigRead = false;
@@ -65,6 +70,21 @@ namespace BaseClass.Config
 
                     //Refresh the section
                     ConfigurationManager.RefreshSection("appSettings");
+
+                    _logWriter.LogWrite($"{data} was saved in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Main);
+
+                    _logWriter.LogWrite($"{data} was saved in {path} Key in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
+                }
+
+                else if (_configLoggerSettingsSection != null)
+                {
+                    //_configLoggerSettingsSection.LoggerSettings[path]?.value = data;
+
+                    //// Save the modified configuration
+                    //config.Save(ConfigurationSaveMode.Modified);
+
+                    ////Refresh the section
+                    //ConfigurationManager.RefreshSection("appSettings");
 
                     _logWriter.LogWrite($"{data} was saved in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Main);
 
@@ -91,6 +111,10 @@ namespace BaseClass.Config
                 {
                     _configAppSettingsSection = (AppSettingsSection)config.GetSection("appSettings");
                 }
+                else if (section.ToString().Contains("loggerSettings"))
+                {
+                    _configLoggerSettingsSection = (loggerSettings)config.GetSection("loggerSettings");
+                }
                 else
                 {
                     _logWriter.LogWrite("Unknown Config Section", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
@@ -100,6 +124,14 @@ namespace BaseClass.Config
                 if (_configAppSettingsSection != null)
                 {
                     string data = _configAppSettingsSection.CurrentConfiguration.AppSettings.Settings[path].Value;
+
+                    _logWriter.LogWrite($"{data} was collected from {path} Key in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
+
+                    return data;
+                }
+                else if(_configLoggerSettingsSection != null)
+                {
+                    string data = _configLoggerSettingsSection.LoggerSettings[path]?.value;
 
                     _logWriter.LogWrite($"{data} was collected from {path} Key in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
 

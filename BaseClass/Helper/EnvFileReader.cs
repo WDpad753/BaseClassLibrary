@@ -149,7 +149,6 @@ namespace BaseClass.Helper
 
                 using (XmlReader reader = XmlReader.Create(_filepath))
                 {
-                    
                     while (reader.Read())
                     {
                         if (reader.NodeType == XmlNodeType.Element && reader.Name.Equals(mainKey, StringComparison.OrdinalIgnoreCase))

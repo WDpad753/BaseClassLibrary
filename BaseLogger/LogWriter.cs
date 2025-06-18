@@ -18,6 +18,7 @@ namespace BaseLogger
         private string? appName;
         private string logFilePath;
         private FileSystemWatcher watcher;
+        private loggerSettings? _configLoggerSettingsSection;
 
         public LogWriter(string configPath, string logfilePath)
         {
@@ -146,7 +147,12 @@ namespace BaseLogger
         {
             Configuration config = ConfigurationManager.OpenMappedExeConfiguration(_fileMap, ConfigurationUserLevel.None);
 
-            string value = config.AppSettings.Settings[path].Value;
+            //string value = config.AppSettings.Settings[path].Value;
+
+            _configLoggerSettingsSection = (loggerSettings)config.GetSection("loggerSettings");
+
+
+            string value = _configLoggerSettingsSection.LoggerSettings[path]?.value;
 
             try
             {
