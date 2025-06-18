@@ -104,7 +104,7 @@ namespace BaseClass.Helper
                 string? res = null;
 
                 if (!File.Exists(filePath))
-                    _writer.LogWrite($"The file '{filePath}' does not exist.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Main);
+                    _writer.LogWrite($"The file '{filePath}' does not exist.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Log);
 
 
                 foreach (var line in File.ReadAllLines(filePath))
@@ -126,7 +126,7 @@ namespace BaseClass.Helper
                 }
 
                 if(res == null)
-                    _writer.LogWrite($"Key '{Key}' not found in the environment file '{filePath}'.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Trace);
+                    _writer.LogWrite($"Key '{Key}' not found in the environment file '{filePath}'.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Verbose);
 
                 return res;
             }
@@ -145,7 +145,7 @@ namespace BaseClass.Helper
                 bool mainKeyFound = false;
 
                 if (!File.Exists(_filepath))
-                    _writer.LogWrite($"The file '{_filepath}' does not exist.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Main);
+                    _writer.LogWrite($"The file '{_filepath}' does not exist.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Log);
 
                 using (XmlReader reader = XmlReader.Create(_filepath))
                 {

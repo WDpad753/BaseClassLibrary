@@ -35,7 +35,7 @@ namespace BaseLogger
             {
                 Directory.CreateDirectory(logfilePath);
                 logFilePath=logfilePath;
-                LogWrite("Log directory does not exist, created directory to save log files.", this.GetType().Name, nameof(LogWriter), MessageLevels.Trace);
+                LogWrite("Log directory does not exist, created directory to save log files.", this.GetType().Name, nameof(LogWriter), MessageLevels.Verbose);
             }
             else
             {
@@ -145,14 +145,22 @@ namespace BaseLogger
 
         private object SetupConfigReader(Type expectedType, string path)
         {
+            string? value = null;
+
             Configuration config = ConfigurationManager.OpenMappedExeConfiguration(_fileMap, ConfigurationUserLevel.None);
 
             //string value = config.AppSettings.Settings[path].Value;
 
             _configLoggerSettingsSection = (loggerSettings)config.GetSection("loggerSettings");
 
-
-            string value = _configLoggerSettingsSection.LoggerSettings[path]?.value;
+            if(_configLoggerSettingsSection != null)
+            {
+                value = _configLoggerSettingsSection.LoggerSettings[path]?.value;
+            }
+            else
+            {
+                value = config.AppSettings.Settings[path].Value;
+            }
 
             try
             {

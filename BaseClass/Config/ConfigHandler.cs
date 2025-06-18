@@ -19,12 +19,14 @@ namespace BaseClass.Config
         //private string? configPath;
         private ExeConfigurationFileMap _fileMap;
         private EnvFileReader _envFileReader;
+        private XmlHandler _xmlHandler;
         private string? _filepath;
         //private ILogWriter _logWriter;
         private LogWriter _logWriter;
         private AppSettingsSection? _configAppSettingsSection;
         private loggerSettings? _configLoggerSettingsSection;
         public bool _ConfigRead = false;
+        private string? _targetSection;
         //private JSONFileHandler? _fileHandler;
 
         public ConfigHandler(string? filepath, LogWriter Logger)
@@ -38,6 +40,7 @@ namespace BaseClass.Config
             };
 
             _envFileReader = new(Logger);
+            _xmlHandler = new(Logger, filepath);
         }
 
         public void SaveInfo(string data, string path, string? section = null)
@@ -53,6 +56,7 @@ namespace BaseClass.Config
                 else if(section.ToString().Contains("loggerSettings"))
                 {
                     _configLoggerSettingsSection = (loggerSettings)config.GetSection("loggerSettings");
+                    _targetSection = section;
                 }
                 else
                 {
@@ -71,22 +75,21 @@ namespace BaseClass.Config
                     //Refresh the section
                     ConfigurationManager.RefreshSection("appSettings");
 
-                    _logWriter.LogWrite($"{data} was saved in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Main);
+                    _logWriter.LogWrite($"{data} was saved in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Log);
 
                     _logWriter.LogWrite($"{data} was saved in {path} Key in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
                 }
-
                 else if (_configLoggerSettingsSection != null)
                 {
-                    //_configLoggerSettingsSection.LoggerSettings[path]?.value = data;
+                    _xmlHandler.XmlWrite(_targetSection, path, data);
 
-                    //// Save the modified configuration
+                    // Mark the section as modified and save:
+                    //_configLoggerSettingsSection.SectionInformation.ForceSave = true;
                     //config.Save(ConfigurationSaveMode.Modified);
+                    // Refresh so ConfigurationManager.GetSection sees new values:
+                    ConfigurationManager.RefreshSection("loggerSettings");
 
-                    ////Refresh the section
-                    //ConfigurationManager.RefreshSection("appSettings");
-
-                    _logWriter.LogWrite($"{data} was saved in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Main);
+                    _logWriter.LogWrite($"{data} was saved in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Log);
 
                     _logWriter.LogWrite($"{data} was saved in {path} Key in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
                 }
@@ -110,10 +113,12 @@ namespace BaseClass.Config
                 if (section == null || section.ToString().Contains("appSettings"))
                 {
                     _configAppSettingsSection = (AppSettingsSection)config.GetSection("appSettings");
+                    ConfigurationManager.RefreshSection("appSettings");
                 }
                 else if (section.ToString().Contains("loggerSettings"))
                 {
                     _configLoggerSettingsSection = (loggerSettings)config.GetSection("loggerSettings");
+                    ConfigurationManager.RefreshSection("loggerSettings");
                 }
                 else
                 {
@@ -158,7 +163,7 @@ namespace BaseClass.Config
             {
                 if (string.IsNullOrEmpty(path))
                 {
-                    _logWriter.LogWrite($"Was not able to obtain value from given path.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Trace);
+                    _logWriter.LogWrite($"Was not able to obtain value from given path.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Verbose);
                     _logWriter.LogWrite($"Was not able to obtain value from given path. Submitted path => {path}", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
                     return null;
                 }
@@ -189,7 +194,7 @@ namespace BaseClass.Config
                 }
                 else
                 {
-                    _logWriter.LogWrite($"Obtained following value {data} from given path => {path}.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Main);
+                    _logWriter.LogWrite($"Obtained following value {data} from given path => {path}.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Log);
 
                     return data;
                 }

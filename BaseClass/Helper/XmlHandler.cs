@@ -6,44 +6,120 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Linq;
+using UtilityClass = BaseClass.MethodNameExtractor.FuncNameExtractor;
 
 namespace BaseClass.Helper
 {
     public class XmlHandler
     {
         private LogWriter _logWriter;
-        
-        public XmlHandler(LogWriter Logger) 
+        private string? _filePath;
+
+        public XmlHandler(LogWriter Logger, string? FilePath) 
         {
             _logWriter = Logger;
+            _filePath = FilePath;
         }
 
-        public void XmlWrite(string filepath, string key, string value)
+        public void XmlWrite(string mainKey, string key, string value)
         {
             try
             {
-                XmlDocument doc = new XmlDocument();
-                if (File.Exists(filepath))
+                if (!File.Exists(_filePath))
                 {
-                    doc.Load(filepath);
+                    _logWriter.LogWrite($"XML File does not exist in the given path. Path => {_filePath}", this.GetType().Name, nameof(XmlWrite), MessageLevels.Fatal);
+                }
+
+                XDocument xdoc = XDocument.Load(_filePath);
+
+                XElement targetNode = xdoc.Descendants(mainKey).FirstOrDefault();
+                if (targetNode == null)
+                {
+                    Console.WriteLine($"No element named '{mainKey}' found.");
+                    return;
+                }
+
+                // 2. Under that element, find any descendant element whose 'key' attribute matches
+                XElement found = targetNode
+                    .Descendants()  // all nested elements under mainKey
+                    .FirstOrDefault(el =>
+                        string.Equals(el.Attribute("key")?.Value, key, StringComparison.OrdinalIgnoreCase));
+
+                XElement container = targetNode.Elements().FirstOrDefault(child => child.Elements().Any(el => el.Attribute("key") != null)) ?? 
+                    targetNode;
+
+                if (found != null)
+                {
+                    // Update its 'value' attribute
+                    found.SetAttributeValue("value", value);
+                    Console.WriteLine($"Updated <{found.Name} key=\"{key}\"> under <{mainKey}> to value=\"{value}\".");
                 }
                 else
                 {
-                    XmlDeclaration xmlDeclaration = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
-                    doc.AppendChild(xmlDeclaration);
-                    XmlElement root = doc.CreateElement("root");
-                    doc.AppendChild(root);
+                    // Not found: add a new element under targetNode.
+                    // Decide a tag name for the new element, e.g. <add> or <setting> or something generic like <entry>
+                    XElement newElem = new XElement("add",
+                        new XAttribute("key", key),
+                        new XAttribute("value", value));
+
+                    if(container != null)
+                    {
+                        container.Add(newElem);
+                    }
+                    else
+                    {
+                        targetNode.Add(newElem);
+                    }
+                    Console.WriteLine($"Added <add key=\"{key}\" value=\"{value}\"/> under <{mainKey}>.");
                 }
 
-                XmlNode node = doc.SelectSingleNode($"/root/{key}");
-                if (node == null)
-                {
-                    node = doc.CreateElement(key);
-                    doc.DocumentElement.AppendChild(node);
-                }
+                //XElement targetNode = xdoc.Descendants(mainKey).FirstOrDefault();
+                //if (targetNode == null)
+                //{
+                //    Console.WriteLine($"No element named '{mainKey}' found.");
+                //    return;
+                //}
 
-                node.InnerText = value;
-                doc.Save(filepath);
+                //XElement node = targetNode.Descendants("add").FirstOrDefault(el => string.Equals(el.Attribute("key")?.Value, key,
+                //    StringComparison.OrdinalIgnoreCase));
+
+                //XElement node = xdoc.Descendants()  // all elements anywhere
+                //                     .FirstOrDefault(el => string.Equals(el.Attribute("key")?.Value, key, 
+                //                      StringComparison.OrdinalIgnoreCase));
+
+
+                //if (node != null)
+                //{
+                //    // update existing
+                //    node.SetAttributeValue("value", value);
+                //    xdoc.Save(_filePath);
+                //    _logWriter.LogWrite($"Updated <add key=\"{key}\"> under <{mainKey}>", this.GetType().Name, nameof(XmlWrite), MessageLevels.Log);
+                //}
+                //else
+                //{
+                //    XElement container = xdoc.Root;
+                //    if (container == null)
+                //    {
+                //        _logWriter.LogWrite("XML has no root; cannot add.", this.GetType().Name, nameof(XmlWrite), MessageLevels.Fatal);
+                //        return;
+                //    }
+
+                //    // Example: add directly under root as <entry key="..." value="..."/>
+                //    container.Add(new XElement("entry",
+                //        new XAttribute("key", key),
+                //        new XAttribute("value", value)));
+                //    _logWriter.LogWrite($"Added <entry key=\"{key}\" value=\"{value}\"/> under <{container.Name}>.", this.GetType().Name, nameof(XmlWrite), MessageLevels.Log);
+
+                //    //// add new <add> under targetNode
+                //    //targetNode.Add(new XElement("add",
+                //    //    new XAttribute("key", key),
+                //    //    new XAttribute("value", value)));
+                //    //xdoc.Save(_filePath);
+                //    //Console.WriteLine($"Added <add key=\"{key}\" value=\"{value}\"/> under <{mainKey}>");
+                //}
+
+                xdoc.Save(_filePath);
             }
             catch (Exception ex)
             {
