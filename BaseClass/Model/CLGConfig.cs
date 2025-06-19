@@ -22,5 +22,11 @@ namespace BaseClass.Model
         public string? ConfigFilePath { get; set; }
 
         public string? logfilepath { get; set; }
+
+        public string? JsonFilePath { get; set; }
+
+        public string? runType { get; set; }
+
+        public HttpClient? testClient { get; set; }
     }
 }
