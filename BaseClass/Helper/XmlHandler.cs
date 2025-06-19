@@ -36,32 +36,25 @@ namespace BaseClass.Helper
                 XElement targetNode = xdoc.Descendants(mainKey).FirstOrDefault();
                 if (targetNode == null)
                 {
-                    Console.WriteLine($"No element named '{mainKey}' found.");
+                    _logWriter.LogWrite($"No element named '{mainKey}' found.", this.GetType().Name, nameof(XmlWrite), MessageLevels.Fatal);
                     return;
                 }
 
-                // 2. Under that element, find any descendant element whose 'key' attribute matches
-                XElement found = targetNode
-                    .Descendants()  // all nested elements under mainKey
-                    .FirstOrDefault(el =>
-                        string.Equals(el.Attribute("key")?.Value, key, StringComparison.OrdinalIgnoreCase));
+                XElement found = targetNode.Descendants().FirstOrDefault(el => string.Equals(el.Attribute("key")?.Value, key, StringComparison.OrdinalIgnoreCase));
 
-                XElement container = targetNode.Elements().FirstOrDefault(child => child.Elements().Any(el => el.Attribute("key") != null)) ?? 
-                    targetNode;
+                XElement container = targetNode.Elements().FirstOrDefault(child => child.Elements().Any(el => el.Attribute("key") != null)) ?? targetNode;
 
                 if (found != null)
                 {
                     // Update its 'value' attribute
                     found.SetAttributeValue("value", value);
-                    Console.WriteLine($"Updated <{found.Name} key=\"{key}\"> under <{mainKey}> to value=\"{value}\".");
+                    _logWriter.LogWrite($"Updated <{found.Name} key=\"{key}\"> under <{mainKey}> to value=\"{value}\".", this.GetType().Name, nameof(XmlWrite), MessageLevels.Verbose);
                 }
                 else
                 {
                     // Not found: add a new element under targetNode.
                     // Decide a tag name for the new element, e.g. <add> or <setting> or something generic like <entry>
-                    XElement newElem = new XElement("add",
-                        new XAttribute("key", key),
-                        new XAttribute("value", value));
+                    XElement newElem = new XElement("add", new XAttribute("key", key), new XAttribute("value", value));
 
                     if(container != null)
                     {
@@ -71,7 +64,8 @@ namespace BaseClass.Helper
                     {
                         targetNode.Add(newElem);
                     }
-                    Console.WriteLine($"Added <add key=\"{key}\" value=\"{value}\"/> under <{mainKey}>.");
+
+                    _logWriter.LogWrite($"Added <add key=\"{key}\" value=\"{value}\"/> under <{mainKey}>.", this.GetType().Name, nameof(XmlWrite), MessageLevels.Verbose);
                 }
 
                 //XElement targetNode = xdoc.Descendants(mainKey).FirstOrDefault();
