@@ -25,6 +25,7 @@ namespace BaseClass.Config
         private LogWriter _logWriter;
         private AppSettingsSection? _configAppSettingsSection;
         private loggerSettings? _configLoggerSettingsSection;
+        private changelogSettings? _configChangeLogSettingsSection;
         public bool _ConfigRead = false;
         private string? _targetSection;
         //private JSONFileHandler? _fileHandler;
@@ -56,6 +57,11 @@ namespace BaseClass.Config
                 else if(section.ToString().Contains("loggerSettings"))
                 {
                     _configLoggerSettingsSection = (loggerSettings)config.GetSection("loggerSettings");
+                    _targetSection = section;
+                }
+                else if(section.ToString().Contains("changelogSettings"))
+                {
+                    _configChangeLogSettingsSection = (changelogSettings)config.GetSection("changelogSettings");
                     _targetSection = section;
                 }
                 else
@@ -93,6 +99,20 @@ namespace BaseClass.Config
 
                     _logWriter.LogWrite($"{data} was saved in {path} Key in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
                 }
+                else if (_configChangeLogSettingsSection != null)
+                {
+                    _xmlHandler.XmlWrite(_targetSection, path, data);
+
+                    // Mark the section as modified and save:
+                    //_configLoggerSettingsSection.SectionInformation.ForceSave = true;
+                    //config.Save(ConfigurationSaveMode.Modified);
+                    // Refresh so ConfigurationManager.GetSection sees new values:
+                    ConfigurationManager.RefreshSection("changelogSettings");
+
+                    _logWriter.LogWrite($"{data} was saved in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Log);
+
+                    _logWriter.LogWrite($"{data} was saved in {path} Key in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
+                }
                 else
                 {
                     _logWriter.LogWrite("Unable to save the data in the config file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
@@ -120,6 +140,11 @@ namespace BaseClass.Config
                     _configLoggerSettingsSection = (loggerSettings)config.GetSection("loggerSettings");
                     ConfigurationManager.RefreshSection("loggerSettings");
                 }
+                else if (section.ToString().Contains("changelogSettings"))
+                {
+                    _configChangeLogSettingsSection = (changelogSettings)config.GetSection("changelogSettings");
+                    ConfigurationManager.RefreshSection("changelogSettings");
+                }
                 else
                 {
                     _logWriter.LogWrite("Unknown Config Section", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
@@ -128,7 +153,7 @@ namespace BaseClass.Config
 
                 if (_configAppSettingsSection != null)
                 {
-                    string data = _configAppSettingsSection.CurrentConfiguration.AppSettings.Settings[path].Value;
+                    string? data = _configAppSettingsSection.CurrentConfiguration.AppSettings.Settings[path]?.Value;
 
                     _logWriter.LogWrite($"{data} was collected from {path} Key in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
 
@@ -136,7 +161,15 @@ namespace BaseClass.Config
                 }
                 else if(_configLoggerSettingsSection != null)
                 {
-                    string data = _configLoggerSettingsSection.LoggerSettings[path]?.value;
+                    string? data = _configLoggerSettingsSection.LoggerSettings[path]?.value;
+
+                    _logWriter.LogWrite($"{data} was collected from {path} Key in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
+
+                    return data;
+                }
+                else if(_configChangeLogSettingsSection != null)
+                {
+                    string? data = _configChangeLogSettingsSection.ChangeLogSettings[path]?.value;
 
                     _logWriter.LogWrite($"{data} was collected from {path} Key in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
 

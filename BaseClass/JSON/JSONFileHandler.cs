@@ -31,6 +31,11 @@ namespace BaseClass.JSON
         {
             try
             {
+                if (!Directory.Exists(Path.GetDirectoryName(targetfilepath)))
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(targetfilepath));
+                }
+
                 // serialize JSON to a string and then write string to a file
                 using (StreamWriter file = File.CreateText(targetfilepath))
                 {
