@@ -1,4 +1,5 @@
 ﻿using BaseClass.Model;
+using BaseLogger;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,9 +8,16 @@ using System.Threading.Tasks;
 
 namespace BaseClass.Helper
 {
-    public static class PathCombine
+    public class PathCombine
     {
-        public static string? CombinePath(CombinationType type, params string[] paths)
+        private LogWriter _logger;
+
+        public PathCombine(LogWriter Logger)
+        {
+            _logger = Logger;
+        }
+
+        public string? CombinePath(CombinationType type, params string[] paths)
         {
             string? fullPath = null;
 
@@ -31,13 +39,13 @@ namespace BaseClass.Helper
             return fullPath;
         }
 
-        private static string? CombineFolderPaths(string[] paths)
+        private string? CombineFolderPaths(string[] paths)
         {
             // Combine folder paths using Path.Combine
             return System.IO.Path.Combine(paths);
         }
 
-        private static string? CombineURLPaths(string[] paths)
+        private string? CombineURLPaths(string[] paths)
         {
             // Combine URL paths using string.Join
             // Ensure that each path starts with a '/' and ends with a '/'
