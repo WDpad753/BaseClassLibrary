@@ -28,6 +28,7 @@ namespace BaseClass.Config
         private changelogSettings? _configChangeLogSettingsSection;
         public bool _ConfigRead = false;
         private string? _targetSection;
+        private static readonly Mutex ConfigFileMutex = new Mutex(false, "Global\\MyApp_ConfigFileMutex");
         //private JSONFileHandler? _fileHandler;
 
         public ConfigHandler(string? filepath, LogWriter Logger)
@@ -48,6 +49,8 @@ namespace BaseClass.Config
         {
             try
             {
+                ConfigFileMutex.WaitOne(); // Wait for the mutex to be available
+
                 Configuration config = ConfigurationManager.OpenMappedExeConfiguration(_fileMap, ConfigurationUserLevel.None);
 
                 if (section == null || section.ToString().Contains("appSettings"))
@@ -93,7 +96,7 @@ namespace BaseClass.Config
                     //_configLoggerSettingsSection.SectionInformation.ForceSave = true;
                     //config.Save(ConfigurationSaveMode.Modified);
                     // Refresh so ConfigurationManager.GetSection sees new values:
-                    ConfigurationManager.RefreshSection("loggerSettings");
+                    //ConfigurationManager.RefreshSection("loggerSettings");
 
                     _logWriter.LogWrite($"{data} was saved in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Log);
 
@@ -122,12 +125,18 @@ namespace BaseClass.Config
             {
                 _logWriter.LogWrite($"Path does not exist. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
             }
+            finally
+            {
+                ConfigFileMutex.ReleaseMutex(); // Release the mutex
+            }
         }
 
         public string? ReadInfo(string path, string? section = null)
         {
             try
             {
+                ConfigFileMutex.WaitOne(); // Wait for the mutex to be available
+
                 Configuration config = ConfigurationManager.OpenMappedExeConfiguration(_fileMap, ConfigurationUserLevel.None);
 
                 if (section == null || section.ToString().Contains("appSettings"))
@@ -185,6 +194,10 @@ namespace BaseClass.Config
             {
                 _logWriter.LogWrite($"Path does not exist. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
                 return null;
+            }
+            finally
+            {
+                ConfigFileMutex.ReleaseMutex(); // Release the mutex
             }
         }
 
