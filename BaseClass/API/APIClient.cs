@@ -1,8 +1,11 @@
-﻿using Newtonsoft.Json;
+﻿using BaseClass.Helper;
+using BaseLogger;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,23 +13,35 @@ namespace BaseClass.API
 {
     public class APIClient
     {
-        private string? APIURL;
-        private int? timeOut;
-        private string? PerAccTok;
-        private HttpClient? _testClient;
+        public string? APIURL { get; set; }
+        public int? timeOut {  get; set; }
+        public string? PerAccTok { get; set; }
+        public HttpClient? testClient { get; set; }
 
-        public APIClient(string apiURL, string? personAcc, int? TimeOut = null, HttpClient? testClient = null) 
+        private StringHandler _strHandler;
+        private LogWriter _logWriter;
+
+        //public APIClient(string apiURL, string? personAcc, int? TimeOut = null, HttpClient? testClient = null) 
+        //{
+        //    APIURL = apiURL;
+        //    timeOut = TimeOut != null ? TimeOut : 60;
+        //    PerAccTok = personAcc;
+        //    _testClient = testClient;
+        //    _strHandler = new()
+        //}
+
+        public APIClient(LogWriter Logger)
         {
-            APIURL = apiURL;
-            timeOut = TimeOut != null ? TimeOut : 60;
-            PerAccTok = personAcc;
-            _testClient = testClient;
+            _logWriter = Logger;
+            _strHandler = new(Logger);
         }
 
-        public async Task<T?> Get<T>() where T : class
+        public async Task<T?> Get<T>(string? url = null) where T : class
         {
+            string? apiURL = url == null ? APIURL : url;
+
             // Create HttpClient instance
-            if(_testClient == null)
+            if (testClient == null)
             {
                 using (var client = new HttpClient())
                 {
@@ -44,7 +59,7 @@ namespace BaseClass.API
                     try
                     {
                         // Initiate Get request for the API url:
-                        HttpResponseMessage response = await client.GetAsync(APIURL);
+                        HttpResponseMessage response = await client.GetAsync(apiURL);
 
                         // Check if the request was successful:
                         response.EnsureSuccessStatusCode();
@@ -67,7 +82,7 @@ namespace BaseClass.API
             }
             else
             {
-                using (var client = _testClient)
+                using (var client = testClient)
                 {
                     // Set personal access token in request headers of the baseurl:
                     if (PerAccTok != null)
@@ -83,7 +98,7 @@ namespace BaseClass.API
                     try
                     {
                         // Initiate Get request for the API url:
-                        HttpResponseMessage response = await client.GetAsync(APIURL);
+                        HttpResponseMessage response = await client.GetAsync(apiURL);
 
                         // Check if the request was successful:
                         response.EnsureSuccessStatusCode();

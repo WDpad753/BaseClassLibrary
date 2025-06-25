@@ -70,6 +70,14 @@ namespace BaseClass.JSON
                 {
                     targetfilepath = Regex.Replace(targetfilepath.ToString(), targetfilepath.ToString(), @"\\");
                 }
+
+                if (!File.Exists(targetfilepath))
+                {
+                    // Log or handle missing file gracefully
+                    _logWriter.LogWrite($"File not found: {targetfilepath}", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
+                    return null;  // Return null when file does not exist
+                }
+
                 using (StreamReader file = File.OpenText(targetfilepath))
                 {
                     JsonSerializer serializer = new JsonSerializer();
