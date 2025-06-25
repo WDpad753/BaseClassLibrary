@@ -49,7 +49,7 @@ namespace BaseClass.Helper
         {
             // Combine URL paths using string.Join
             // Ensure that each path starts with a '/' and ends with a '/'
-            return string.Join("/", paths.Select(p => p.Trim('/')));
+            return string.Join("/", paths.Select(p => p.Trim('/')))+"/";
         }
     }
 }
