@@ -122,7 +122,30 @@ namespace BaseClass.API
                         try
                         {
                             // Initiate Get request for the API url:
-                            HttpResponseMessage response = await client.GetAsync(apiURL);
+                            //HttpResponseMessage response = await client.GetAsync(apiURL);
+                            //Task<HttpResponseMessage> taskcol = client.GetAsync(apiURL);
+                            //Task.WaitAll(taskcol);
+                            //if (taskcol.IsFaulted)
+                            //{
+                            //    Console.WriteLine(taskcol.Exception.ToString());
+                            //    System.Diagnostics.Debug.WriteLine($@"Here is the Content of the Error Message: {taskcol.Exception}");
+                            //}
+                            //else
+                            //{
+                            //    //HttpResponseMessage response = client.GetAsync(apiURL).Result;
+
+                            //    // Check if the request was successful:
+                            //    HttpResponseMessage response = taskcol.Result;
+
+                            //    // Get the response content from the request:
+                            //    string responseBody = await response.Content.ReadAsStringAsync();
+
+                            //    // Deserialize the JSON response:
+                            //    T? responseObject = JsonConvert.DeserializeObject<T>(responseBody);
+
+                            //    return responseObject;
+                            //}
+                            HttpResponseMessage response = client.GetAsync(apiURL).Result;
 
                             // Check if the request was successful:
                             response.EnsureSuccessStatusCode();
@@ -134,6 +157,7 @@ namespace BaseClass.API
                             T? responseObject = JsonConvert.DeserializeObject<T>(responseBody);
 
                             return responseObject;
+                            //return null;
                         }
                         catch (Exception ex)
                         {
