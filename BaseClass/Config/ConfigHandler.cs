@@ -53,16 +53,16 @@ namespace BaseClass.Config
 
                 Configuration config = ConfigurationManager.OpenMappedExeConfiguration(_fileMap, ConfigurationUserLevel.None);
 
-                if (section == null || section.ToString().Contains("appSettings".ToLower()))
+                if (section == null || section.ToString().Contains("appSettings") || section.ToString().Contains("appSettings".ToLower()))
                 {
                     _configAppSettingsSection = (AppSettingsSection)config.GetSection("appSettings");
                 }
-                else if(section.ToString().Contains("loggerSettings".ToLower()))
+                else if (section.ToString().Contains("loggerSettings") || section.ToString().Contains("loggerSettings".ToLower()))
                 {
                     _configLoggerSettingsSection = (loggerSettings)config.GetSection("loggerSettings");
                     _targetSection = "loggerSettings";
                 }
-                else if(section.ToString().Contains("changelogSettings".ToLower()))
+                else if (section.ToString().Contains("changelogSettings") || section.ToString().Contains("changelogSettings".ToLower()))
                 {
                     _configChangeLogSettingsSection = (changelogSettings)config.GetSection("changelogSettings");
                     _targetSection = "changelogSettings";
@@ -139,17 +139,17 @@ namespace BaseClass.Config
 
                 Configuration config = ConfigurationManager.OpenMappedExeConfiguration(_fileMap, ConfigurationUserLevel.None);
 
-                if (section == null || section.ToString().Contains("appSettings".ToLower()))
+                if (section == null || section.ToString().Contains("appSettings") || section.ToString().Contains("appSettings".ToLower()))
                 {
                     _configAppSettingsSection = (AppSettingsSection)config.GetSection("appSettings");
                     ConfigurationManager.RefreshSection("appSettings");
                 }
-                else if (section.ToString().Contains("loggerSettings".ToLower()))
+                else if (section.ToString().Contains("loggerSettings") || section.ToString().Contains("loggerSettings".ToLower()))
                 {
                     _configLoggerSettingsSection = (loggerSettings)config.GetSection("loggerSettings");
                     ConfigurationManager.RefreshSection("loggerSettings");
                 }
-                else if (section.ToString().Contains("changelogSettings".ToLower()))
+                else if (section.ToString().Contains("changelogSettings") || section.ToString().Contains("changelogSettings".ToLower()))
                 {
                     _configChangeLogSettingsSection = (changelogSettings)config.GetSection("changelogSettings");
                     ConfigurationManager.RefreshSection("changelogSettings");
