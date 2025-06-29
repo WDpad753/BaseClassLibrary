@@ -19,9 +19,11 @@ namespace BaseClass.API
         private readonly LogWriter _logWriter;
         //private readonly Uri? _uri;
         public bool? testClient { get; set; }
+        public string? clientBase { get; set; }
+        public string? appName { get; set; }
 
 
-        public ClientProvider(LogWriter Logger,WebApplicationFactory<T>? factory = null)
+        public ClientProvider(LogWriter Logger, WebApplicationFactory<T>? factory = null)
         {
             _logWriter = Logger;
             _factory = factory;

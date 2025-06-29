@@ -21,6 +21,7 @@ namespace BaseClass.Config
         private EnvFileReader _envFileReader;
         private XmlHandler _xmlHandler;
         private string? _filepath;
+        //private string? _targetSection;
         //private ILogWriter _logWriter;
         private LogWriter _logWriter;
         private AppSettingsSection? _configAppSettingsSection;
@@ -56,6 +57,7 @@ namespace BaseClass.Config
                 if (section == null || section.ToString().Contains("appSettings") || section.ToString().Contains("appSettings".ToLower()))
                 {
                     _configAppSettingsSection = (AppSettingsSection)config.GetSection("appSettings");
+                    _targetSection = "appSettings";
                 }
                 else if (section.ToString().Contains("loggerSettings") || section.ToString().Contains("loggerSettings".ToLower()))
                 {
@@ -74,7 +76,7 @@ namespace BaseClass.Config
                     return;
                 }
 
-                if (_configAppSettingsSection != null)
+                if (_configAppSettingsSection != null && _targetSection == "appSettings")
                 {
                     _configAppSettingsSection.CurrentConfiguration.AppSettings.Settings[path].Value = data;
 
@@ -88,7 +90,7 @@ namespace BaseClass.Config
 
                     _logWriter.LogWrite($"{data} was saved in {path} Key in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
                 }
-                else if (_configLoggerSettingsSection != null)
+                else if (_configLoggerSettingsSection != null && _targetSection == "loggerSettings")
                 {
                     _xmlHandler.XmlWrite(_targetSection, path, data);
 
@@ -102,7 +104,7 @@ namespace BaseClass.Config
 
                     _logWriter.LogWrite($"{data} was saved in {path} Key in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
                 }
-                else if (_configChangeLogSettingsSection != null)
+                else if (_configChangeLogSettingsSection != null && _targetSection == "changelogSettings")
                 {
                     _xmlHandler.XmlWrite(_targetSection, path, data);
 
@@ -143,16 +145,19 @@ namespace BaseClass.Config
                 {
                     _configAppSettingsSection = (AppSettingsSection)config.GetSection("appSettings");
                     ConfigurationManager.RefreshSection("appSettings");
+                    _targetSection = "appSettings";
                 }
                 else if (section.ToString().Contains("loggerSettings") || section.ToString().Contains("loggerSettings".ToLower()))
                 {
                     _configLoggerSettingsSection = (loggerSettings)config.GetSection("loggerSettings");
                     ConfigurationManager.RefreshSection("loggerSettings");
+                    _targetSection = "loggerSettings";
                 }
                 else if (section.ToString().Contains("changelogSettings") || section.ToString().Contains("changelogSettings".ToLower()))
                 {
                     _configChangeLogSettingsSection = (changelogSettings)config.GetSection("changelogSettings");
                     ConfigurationManager.RefreshSection("changelogSettings");
+                    _targetSection = "changelogSettings";
                 }
                 else
                 {
@@ -160,7 +165,7 @@ namespace BaseClass.Config
                     return null;
                 }
 
-                if (_configAppSettingsSection != null)
+                if (_configAppSettingsSection != null && _targetSection == "appSettings")
                 {
                     string? data = _configAppSettingsSection.CurrentConfiguration.AppSettings.Settings[path]?.Value;
 
@@ -168,7 +173,7 @@ namespace BaseClass.Config
 
                     return data;
                 }
-                else if(_configLoggerSettingsSection != null)
+                else if(_configLoggerSettingsSection != null && _targetSection == "loggerSettings")
                 {
                     string? data = _configLoggerSettingsSection.LoggerSettings[path]?.value;
 
@@ -176,7 +181,7 @@ namespace BaseClass.Config
 
                     return data;
                 }
-                else if(_configChangeLogSettingsSection != null)
+                else if(_configChangeLogSettingsSection != null && _targetSection == "changelogSettings")
                 {
                     string? data = _configChangeLogSettingsSection.ChangeLogSettings[path]?.value;
 
