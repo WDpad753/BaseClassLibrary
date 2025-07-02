@@ -18,7 +18,9 @@ namespace BaseLogger
         private string logFilePath;
         private FileSystemWatcher watcher;
         private loggerSettings? _configLoggerSettingsSection;
-        private string? filenamepath;
+        private StringBuilder sb;
+        private static readonly object _lockObj = new object();
+
 
         public LogWriter(string configPath, string logfilePath)
         {
@@ -30,14 +32,16 @@ namespace BaseLogger
             appName = (string?)SetupConfigReader(typeof(string), "AppName");
             loggingLvl = (int?)SetupConfigReader(typeof(int), "LoggingLevel");
             debugState = (int?)SetupConfigReader(typeof(int), "DebugState");
-
-            //filenamepath = Path.Combine(logFilePath, appName+".log");
-
+            
             if (Directory.Exists(logfilePath) == false)
             {
                 Directory.CreateDirectory(logfilePath);
                 logFilePath=logfilePath;
-                LogWrite("Log directory does not exist, created directory to save log files.", this.GetType().Name, nameof(LogWriter), MessageLevels.Verbose);
+                //filenamepath = Path.Combine(logfilePath, appName+".log");
+                lock(_lockObj)
+                {
+                    LogWrite("Log directory does not exist, created directory to save log files.", this.GetType().Name, nameof(LogWriter), MessageLevels.Verbose);
+                }
             }
             else
             {
@@ -61,12 +65,20 @@ namespace BaseLogger
         {
             try
             {
-                prevAppName = appName;
                 StringBuilder sb = new StringBuilder();
+
+                string filenamepath = Path.Combine(logFilePath, appName+".log");
 
                 Debug.WriteLine($"[Watcher] Event: {e.ChangeType} on {e.FullPath} at {DateTime.Now:HH:mm:ss.fff}");
                 sb.Append($"[Watcher] Event: {e.ChangeType} on {e.FullPath} at {DateTime.Now:HH:mm:ss.fff}");
-                File.AppendAllText(filenamepath, sb.ToString() + Environment.NewLine);
+                //WaitForFileUnlock(filenamepath);
+                lock (_lockObj)
+                {
+                    File.AppendAllText(filenamepath, sb.ToString() + Environment.NewLine);
+                }
+                sb.Clear();
+
+                prevAppName = appName;
 
                 // existing reload logic...
                 appName = (string?)SetupConfigReader(typeof(string), "AppName");
@@ -82,15 +94,13 @@ namespace BaseLogger
         public void LogWrite(string message, string? appbase, string func, MessageLevels Messagelvl)
         {
             // Initialising variables:
+            StringBuilder sb = new StringBuilder();
+            //string filename = $"{appName}";
             DebugState debugLevel = debugState != null ? (DebugState)debugState : DebugState.Inactive;
             appbase = appbase == null ? "" : appbase;
 
-            if (filenamepath == null || !appName.Equals(prevAppName))
-            {
-                filenamepath = Path.Combine(logFilePath, appName+".log");
-            }
+            string filenamepath = Path.Combine(logFilePath, appName+".log");
 
-            StringBuilder sb = new StringBuilder();
             DateTime datetime = DateTime.Now;
             string datetimenw = datetime.ToString("dddd, yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture);
 
@@ -119,7 +129,12 @@ namespace BaseLogger
                     sb.Append(logtext);
 
                     // Saving the logs into the textfile:
-                    File.AppendAllText(filenamepath, sb.ToString() + Environment.NewLine);
+                    //WaitForFileUnlock(filenamepath);
+                    //File.AppendAllText(filenamepath, sb.ToString() + Environment.NewLine);
+                    lock (_lockObj)
+                    {
+                        File.AppendAllText(filenamepath, sb.ToString() + Environment.NewLine);
+                    }
                     Console.WriteLine(sb.ToString());
                     sb.Clear();
                     return;
@@ -132,7 +147,12 @@ namespace BaseLogger
                     sb.Append(logtext);
 
                     // Saving the logs into the textfile:
-                    File.AppendAllText(filenamepath, sb.ToString() + Environment.NewLine);
+                    //WaitForFileUnlock(filenamepath);
+                    //File.AppendAllText(filenamepath, sb.ToString() + Environment.NewLine);
+                    lock (_lockObj)
+                    {
+                        File.AppendAllText(filenamepath, sb.ToString() + Environment.NewLine);
+                    }
                     sb.Clear();
                 }
                 else
@@ -182,5 +202,35 @@ namespace BaseLogger
                 throw new Exception(string.Format($"Config key:{path} was expected to be of type {expectedType} but was not."), ex);
             }
         }
+
+        ///// <summary>
+        ///// Blocks (with small sleeps) until the file is no longer locked by any other process.
+        ///// </summary>
+        //public static void WaitForFileUnlock(string path, int maxRetries = 20, int delayMs = 50)
+        //{
+        //    int tries = 0;
+        //    while (true)
+        //    {
+        //        try
+        //        {
+        //            // Try to open for exclusive access
+        //            using (var fs = new FileStream(
+        //                path,
+        //                FileMode.OpenOrCreate,
+        //                FileAccess.ReadWrite,
+        //                FileShare.None))
+        //            {
+        //                // If we got here, the file is unlocked. 
+        //                break;
+        //            }
+        //        }
+        //        catch (IOException)
+        //        {
+        //            if (++tries >= maxRetries)
+        //                throw;   // give up after too many retries
+        //            Thread.Sleep(delayMs);
+        //        }
+        //    }
+        //}
     }
 }
