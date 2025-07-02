@@ -53,295 +53,132 @@ namespace BaseClass.API
                 if (_clientProvider.testClient == null || _clientProvider.testClient == false)
                 {
                     var client = _client;
-                    //_client = new HttpClient();
 
-                    //if (_client == null)
-                    //{
-                    //    _client = _clientProvider.CreateClient(new Uri(apiURL));
-                    //}
-
-                    //using (var client = _client)
-                    //{
-                    //// Set personal access token in request headers of the baseurl:
-                    //if (PerAccTok != null)
-                    //{
-                    //    _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes($":{PerAccTok}")));
-                    //    _client.Timeout = TimeSpan.FromSeconds((double)timeOut);
-                    //}
-                    //else
-                    //{
-                    //    _client.Timeout = TimeSpan.FromSeconds((double)timeOut);
-                    //}
-                        if (clientCreated == false)
+                    if (clientCreated == false)
+                    {
+                        // Set personal access token in request headers of the baseurl:
+                        if (PerAccTok != null)
                         {
-                            // Set personal access token in request headers of the baseurl:
-                            if (PerAccTok != null)
-                            {
-                                client.Timeout = TimeSpan.FromSeconds((double)timeOut);
+                            client.Timeout = TimeSpan.FromSeconds((double)timeOut);
 
-                                if(_clientProvider.clientBase == "GitHub")
-                                {
-                                    //client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue($"{_clientProvider.appName}", "1.0"));
-                                    client.DefaultRequestHeaders.UserAgent.ParseAdd($"{_clientProvider.appName}");
-                                //new ProductInfoHeaderValue("appName")
-                                //client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                            if(_clientProvider.clientBase == "GitHub")
+                            {
+                                client.DefaultRequestHeaders.UserAgent.ParseAdd($"{_clientProvider.appName}");
                                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", PerAccTok);
-                                }
-                                else if(_clientProvider.clientBase == "AzureDevOps")
-                                {
-                                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes($":{PerAccTok}")));
-                                }
-                                else
-                                {
-                                    throw new Exception();
-                                }
-
-                                clientCreated = true;
+                            }
+                            else if(_clientProvider.clientBase == "AzureDevOps")
+                            {
+                                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes($":{PerAccTok}")));
                             }
                             else
                             {
-                                client.Timeout = TimeSpan.FromSeconds((double)timeOut);
-                                clientCreated = true;
+                                throw new Exception();
                             }
-                        }
 
-                        try
+                            clientCreated = true;
+                        }
+                        else
                         {
-                            //// Initiate Get request for the API url:
-                            //HttpResponseMessage response = await _client.GetAsync(apiURL);
-
-                            //// Check if the request was successful:
-                            //response.EnsureSuccessStatusCode();
-
-                            //// Get the response content from the request:
-                            //string responseBody = await response.Content.ReadAsStringAsync();
-
-                            //// Deserialize the JSON response:
-                            //T? responseObject = JsonConvert.DeserializeObject<T>(responseBody);
-
-                            //return responseObject;
-
-                            // Initiate Get request for the API url:
-                            Task<HttpResponseMessage> taskcol = _client.GetAsync(apiURL);
-                            Task.WaitAll(taskcol);
-                            if (taskcol.IsFaulted)
-                            {
-                                Console.WriteLine(taskcol.Exception.ToString());
-                                System.Diagnostics.Debug.WriteLine($@"Here is the Content of the Error Message: {taskcol.Exception.ToString()}");
-                                _logWriter.LogWrite($"Error in acquiring response from url {apiURL}: {taskcol.Exception.ToString()}", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
-                            }
-                            else
-                            {
-                                // Check if the request was successful:
-                                HttpResponseMessage response = taskcol.Result;
-
-                                // Get the response content from the request:
-                                string responseBody = await response.Content.ReadAsStringAsync();
-
-                                // Deserialize the JSON response:
-                                T? responseObject = JsonConvert.DeserializeObject<T>(responseBody);
-
-                                return responseObject;
-                            }
-
-                            return null;
+                            client.Timeout = TimeSpan.FromSeconds((double)timeOut);
+                            clientCreated = true;
                         }
-                        catch (Exception ex)
+                    }
+
+                    try
+                    {
+                        // Initiate Get request for the API url:
+                        Task<HttpResponseMessage> taskcol = _client.GetAsync(apiURL);
+                        Task.WaitAll(taskcol);
+                        if (taskcol.IsFaulted)
                         {
-                            //Console.WriteLine(ex.ToString());
-                            System.Diagnostics.Debug.WriteLine($@"Here is the Content of the Error Message: {ex.ToString()}");
-                            _logWriter.LogWrite("Error in De-Serializing the JSON Object: " + ex, this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
-                            return null;
+                            Console.WriteLine(taskcol.Exception.ToString());
+                            System.Diagnostics.Debug.WriteLine($@"Here is the Content of the Error Message: {taskcol.Exception.ToString()}");
+                            _logWriter.LogWrite($"Error in acquiring response from url {apiURL}: {taskcol.Exception.ToString()}", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
                         }
-                    //}
-                    //// Set personal access token in request headers of the baseurl:
-                    //if (PerAccTok != null)
-                    //{
-                    //    _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes($":{PerAccTok}")));
-                    //    _client.Timeout = TimeSpan.FromSeconds((double)timeOut);
-                    //}
-                    //else
-                    //{
-                    //    _client.Timeout = TimeSpan.FromSeconds((double)timeOut);
-                    //}
+                        else
+                        {
+                            // Check if the request was successful:
+                            HttpResponseMessage response = taskcol.Result;
 
-                    //try
-                    //{
-                    //    //// Initiate Get request for the API url:
-                    //    //HttpResponseMessage response = await _client.GetAsync(apiURL);
+                            // Check if the request was successful:
+                            response.EnsureSuccessStatusCode();
 
-                    //    //// Check if the request was successful:
-                    //    //response.EnsureSuccessStatusCode();
+                            // Get the response content from the request:
+                            string responseBody = await response.Content.ReadAsStringAsync();
 
-                    //    //// Get the response content from the request:
-                    //    //string responseBody = await response.Content.ReadAsStringAsync();
+                            // Deserialize the JSON response:
+                            T? responseObject = JsonConvert.DeserializeObject<T>(responseBody);
 
-                    //    //// Deserialize the JSON response:
-                    //    //T? responseObject = JsonConvert.DeserializeObject<T>(responseBody);
+                            return responseObject;
+                        }
 
-                    //    //return responseObject;
-
-                    //    // Initiate Get request for the API url:
-                    //    Task<HttpResponseMessage> taskcol = _client.GetAsync(apiURL);
-                    //    Task.WaitAll(taskcol);
-                    //    if (taskcol.IsFaulted)
-                    //    {
-                    //        Console.WriteLine(taskcol.Exception.ToString());
-                    //        System.Diagnostics.Debug.WriteLine($@"Here is the Content of the Error Message: {taskcol.Exception.ToString()}");
-                    //        _logWriter.LogWrite($"Error in acquiring response from url {apiURL}: {taskcol.Exception.ToString()}", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
-                    //    }
-                    //    else
-                    //    {
-                    //        // Check if the request was successful:
-                    //        HttpResponseMessage response = taskcol.Result;
-
-                    //        // Get the response content from the request:
-                    //        string responseBody = await response.Content.ReadAsStringAsync();
-
-                    //        // Deserialize the JSON response:
-                    //        T? responseObject = JsonConvert.DeserializeObject<T>(responseBody);
-
-                    //        return responseObject;
-                    //    }
-
-                    //    return null;
-                    //}
-                    //catch (Exception ex)
-                    //{
-                    //    //Console.WriteLine(ex.ToString());
-                    //    System.Diagnostics.Debug.WriteLine($@"Here is the Content of the Error Message: {ex.ToString()}");
-                    //    _logWriter.LogWrite("Error in De-Serializing the JSON Object: " + ex, this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
-                    //    return null;
-                    //}
+                        return null;
+                    }
+                    catch (Exception ex)
+                    {
+                        //Console.WriteLine(ex.ToString());
+                        System.Diagnostics.Debug.WriteLine($@"Here is the Content of the Error Message: {ex.ToString()}");
+                        _logWriter.LogWrite("Error in De-Serializing the JSON Object: " + ex, this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
+                        return null;
+                    }
                 }
                 else
                 {
                     var client = _clientProvider.CreateClient(new Uri(apiURL));
 
-                    //using(var client = _clientProvider.CreateClient(new Uri(apiURL)))
-                    //{
-                    //// Set personal access token in request headers of the baseurl:
-                    //if (PerAccTok != null)
-                    //{
-                    //    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes($":{PerAccTok}")));
-                    //    client.Timeout = TimeSpan.FromSeconds((double)timeOut);
-                    //}
-                    //else
-                    //{
-                    //    client.Timeout = TimeSpan.FromSeconds((double)timeOut);
-                    //}
-
-                    //if (client == null)
-                    //{
-                    //    // Set personal access token in request headers of the baseurl:
-                    //    if (PerAccTok != null)
-                    //    {
-                    //        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes($":{PerAccTok}")));
-                    //        client.Timeout = TimeSpan.FromSeconds((double)timeOut);
-                    //    }
-                    //    else
-                    //    {
-                    //        client.Timeout = TimeSpan.FromSeconds((double)timeOut);
-                    //    }
-                    //}
-
-                        if (clientCreated == false)
+                    if (clientCreated == false)
+                    {
+                        // Set personal access token in request headers of the baseurl:
+                        if (PerAccTok != null)
                         {
-                            // Set personal access token in request headers of the baseurl:
-                            if (PerAccTok != null)
-                            {
-                                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes($":{PerAccTok}")));
-                                client.Timeout = TimeSpan.FromSeconds((double)timeOut);
-                                clientCreated = true;
-                            }
-                            else
-                            {
-                                client.Timeout = TimeSpan.FromSeconds((double)timeOut);
-                                clientCreated = true;
-                            }
+                            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes($":{PerAccTok}")));
+                            client.Timeout = TimeSpan.FromSeconds((double)timeOut);
+                            clientCreated = true;
+                        }
+                        else
+                        {
+                            client.Timeout = TimeSpan.FromSeconds((double)timeOut);
+                            clientCreated = true;
+                        }
+                    }
+
+                    try
+                    {
+                        // Initiate Get request for the API url:
+                        Task<HttpResponseMessage> taskcol = client.GetAsync(apiURL);
+                        Task.WaitAll(taskcol);
+                        if (taskcol.IsFaulted)
+                        {
+                            Console.WriteLine(taskcol.Exception.ToString());
+                            System.Diagnostics.Debug.WriteLine($@"Here is the Content of the Error Message: {taskcol.Exception.ToString()}");
+                            _logWriter.LogWrite($"Error in acquiring response from url {apiURL}: {taskcol.Exception.ToString()}", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
+                        }
+                        else
+                        {
+                            // Check if the request was successful:
+                            HttpResponseMessage response = taskcol.Result;
+
+                            // Check if the request was successful:
+                            response.EnsureSuccessStatusCode();
+
+                            // Get the response content from the request:
+                            string responseBody = await response.Content.ReadAsStringAsync();
+
+                            // Deserialize the JSON response:
+                            T? responseObject = JsonConvert.DeserializeObject<T>(responseBody);
+
+                            return responseObject;
                         }
 
-                        try
-                        {
-                            // Initiate Get request for the API url:
-                            Task<HttpResponseMessage> taskcol = client.GetAsync(apiURL);
-                            Task.WaitAll(taskcol);
-                            if (taskcol.IsFaulted)
-                            {
-                                Console.WriteLine(taskcol.Exception.ToString());
-                                System.Diagnostics.Debug.WriteLine($@"Here is the Content of the Error Message: {taskcol.Exception.ToString()}");
-                                _logWriter.LogWrite($"Error in acquiring response from url {apiURL}: {taskcol.Exception.ToString()}", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
-                            }
-                            else
-                            {
-                                // Check if the request was successful:
-                                HttpResponseMessage response = taskcol.Result;
-
-                                // Get the response content from the request:
-                                string responseBody = await response.Content.ReadAsStringAsync();
-
-                                // Deserialize the JSON response:
-                                T? responseObject = JsonConvert.DeserializeObject<T>(responseBody);
-
-                                return responseObject;
-                            }
-
-                            return null;
-                        }
-                        catch (Exception ex)
-                        {
-                            //Console.WriteLine(ex.ToString());
-                            System.Diagnostics.Debug.WriteLine($@"Here is the Content of the Error Message: {ex.ToString()}");
-                            _logWriter.LogWrite("Error in De-Serializing the JSON Object: " + ex, this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
-                            return null;
-                        }
-                    //}
-
-                    //// Set personal access token in request headers of the baseurl:
-                    //if (PerAccTok != null)
-                    //{
-                    //    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes($":{PerAccTok}")));
-                    //    client.Timeout = TimeSpan.FromSeconds((double)timeOut);
-                    //}
-                    //else
-                    //{
-                    //    client.Timeout = TimeSpan.FromSeconds((double)timeOut);
-                    //}
-
-                    //try
-                    //{
-                    //    // Initiate Get request for the API url:
-                    //    Task<HttpResponseMessage> taskcol = client.GetAsync(apiURL);
-                    //    Task.WaitAll(taskcol);
-                    //    if (taskcol.IsFaulted)
-                    //    {
-                    //        Console.WriteLine(taskcol.Exception.ToString());
-                    //        System.Diagnostics.Debug.WriteLine($@"Here is the Content of the Error Message: {taskcol.Exception.ToString()}");
-                    //        _logWriter.LogWrite($"Error in acquiring response from url {apiURL}: {taskcol.Exception.ToString()}", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
-                    //    }
-                    //    else
-                    //    {
-                    //        // Check if the request was successful:
-                    //        HttpResponseMessage response = taskcol.Result;
-
-                    //        // Get the response content from the request:
-                    //        string responseBody = await response.Content.ReadAsStringAsync();
-
-                    //        // Deserialize the JSON response:
-                    //        T? responseObject = JsonConvert.DeserializeObject<T>(responseBody);
-
-                    //        return responseObject;
-                    //    }
-
-                    //    return null;
-                    //}
-                    //catch (Exception ex)
-                    //{
-                    //    //Console.WriteLine(ex.ToString());
-                    //    System.Diagnostics.Debug.WriteLine($@"Here is the Content of the Error Message: {ex.ToString()}");
-                    //    _logWriter.LogWrite("Error in De-Serializing the JSON Object: " + ex, this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
-                    //    return null;
-                    //}
+                        return null;
+                    }
+                    catch (Exception ex)
+                    {
+                        //Console.WriteLine(ex.ToString());
+                        System.Diagnostics.Debug.WriteLine($@"Here is the Content of the Error Message: {ex.ToString()}");
+                        _logWriter.LogWrite("Error in De-Serializing the JSON Object: " + ex, this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
+                        return null;
+                    }
                 }
             }
             catch (Exception ex)
