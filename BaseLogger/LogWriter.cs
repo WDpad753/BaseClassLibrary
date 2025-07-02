@@ -1,6 +1,4 @@
-﻿//using Common.Abstractions;
-//using Common.Abstractions.Models;
-using BaseLogger.Models;
+﻿using BaseLogger.Models;
 using System.Configuration;
 using System.Diagnostics;
 using System.Globalization;
@@ -16,9 +14,11 @@ namespace BaseLogger
         private int? loggingLvl;
         private int? debugState;
         private string? appName;
+        private string? prevAppName;
         private string logFilePath;
         private FileSystemWatcher watcher;
         private loggerSettings? _configLoggerSettingsSection;
+        private string? filenamepath;
 
         public LogWriter(string configPath, string logfilePath)
         {
@@ -30,7 +30,9 @@ namespace BaseLogger
             appName = (string?)SetupConfigReader(typeof(string), "AppName");
             loggingLvl = (int?)SetupConfigReader(typeof(int), "LoggingLevel");
             debugState = (int?)SetupConfigReader(typeof(int), "DebugState");
-            
+
+            //filenamepath = Path.Combine(logFilePath, appName+".log");
+
             if (Directory.Exists(logfilePath) == false)
             {
                 Directory.CreateDirectory(logfilePath);
@@ -48,7 +50,6 @@ namespace BaseLogger
                 EnableRaisingEvents = true,
                 NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName,
                 Filter = "*.config"
-                //Filter = Path.GetFileName(configPath)
             };
 
             watcher.Changed += ConfigOnChanged;
@@ -60,9 +61,15 @@ namespace BaseLogger
         {
             try
             {
+                prevAppName = appName;
+                StringBuilder sb = new StringBuilder();
+
                 Debug.WriteLine($"[Watcher] Event: {e.ChangeType} on {e.FullPath} at {DateTime.Now:HH:mm:ss.fff}");
+                sb.Append($"[Watcher] Event: {e.ChangeType} on {e.FullPath} at {DateTime.Now:HH:mm:ss.fff}");
+                File.AppendAllText(filenamepath, sb.ToString() + Environment.NewLine);
+
                 // existing reload logic...
-                //appName = (string?)SetupConfigReader(typeof(string), "AppName");
+                appName = (string?)SetupConfigReader(typeof(string), "AppName");
                 loggingLvl = (int?)SetupConfigReader(typeof(int), "LoggingLevel");
                 debugState = (int?)SetupConfigReader(typeof(int), "DebugState");
             }
@@ -75,19 +82,18 @@ namespace BaseLogger
         public void LogWrite(string message, string? appbase, string func, MessageLevels Messagelvl)
         {
             // Initialising variables:
-            string filename = $"{appName}";
-            string? filenamepath = Path.Combine(logFilePath,filename+".log");
             DebugState debugLevel = debugState != null ? (DebugState)debugState : DebugState.Inactive;
             appbase = appbase == null ? "" : appbase;
 
-            if (filenamepath == null)
+            if (filenamepath == null || !appName.Equals(prevAppName))
             {
-                throw new ArgumentNullException("filename");
+                filenamepath = Path.Combine(logFilePath, appName+".log");
             }
 
+            StringBuilder sb = new StringBuilder();
             DateTime datetime = DateTime.Now;
             string datetimenw = datetime.ToString("dddd, yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture);
-            StringBuilder sb = new StringBuilder();
+
             loggingLvl = loggingLvl != null ? loggingLvl : 1;
 
             if ((int)Messagelvl > loggingLvl && (int)debugLevel == 0)

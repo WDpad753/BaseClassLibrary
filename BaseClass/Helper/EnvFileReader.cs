@@ -158,11 +158,6 @@ namespace BaseClass.Helper
 
                         if (mainKeyFound && reader.NodeType == XmlNodeType.Element && reader.Name.Equals("add", StringComparison.OrdinalIgnoreCase))
                         {
-                            //if (reader.Read() && reader.NodeType == XmlNodeType.Text)
-                            //{
-                            //    res = reader.Value;
-                            //}
-
                             string? keyAttr = reader.GetAttribute("Key");
                             string? valueAttr = reader.GetAttribute("value");
 

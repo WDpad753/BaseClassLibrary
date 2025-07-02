@@ -1,8 +1,5 @@
 ﻿using BaseLogger;
 using BaseLogger.Models;
-
-//using Common.Abstractions;
-//using Common.Abstractions.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -17,9 +14,6 @@ namespace BaseClass.JSON
 {
     public class JSONFileHandler
     {
-        //private readonly ILogWriter _logWriter;
-        //private DebugState _debugState;
-        //private string? NameSpace = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
         private LogWriter _logWriter;
 
         public JSONFileHandler(LogWriter Logger) 
@@ -45,17 +39,6 @@ namespace BaseClass.JSON
             }
             catch (Exception ex)
             {
-                //if (!EventLog.SourceExists("ChangeLogWriterClass"))
-                //{
-                //    EventLog.CreateEventSource("ChangeLogWriterClass", "TagImportUI");
-                //}
-
-                //using (EventLog eventLog = new EventLog())
-                //{
-                //    eventLog.Source = "ChangeLogWriterClass";
-                //    eventLog.WriteEntry(ex.ToString(), EventLogEntryType.Error);
-                //}
-
                 _logWriter.LogWrite("Error saving data to file: " + ex.Message, this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
                 return;
             }
@@ -73,9 +56,8 @@ namespace BaseClass.JSON
 
                 if (!File.Exists(targetfilepath))
                 {
-                    // Log or handle missing file gracefully
                     _logWriter.LogWrite($"File not found: {targetfilepath}", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
-                    return null;  // Return null when file does not exist
+                    return null;  
                 }
 
                 using (StreamReader file = File.OpenText(targetfilepath))
@@ -87,17 +69,6 @@ namespace BaseClass.JSON
             }
             catch (Exception ex)
             {
-                //if (!EventLog.SourceExists("ChangeLogWriterClass"))
-                //{
-                //    EventLog.CreateEventSource("ChangeLogWriterClass", "TagImportUI");
-                //}
-
-                //using (EventLog eventLog = new EventLog())
-                //{
-                //    eventLog.Source = "ChangeLogWriterClass";
-                //    eventLog.WriteEntry(ex.ToString(), EventLogEntryType.Error);
-                //}
-
                 _logWriter.LogWrite("Error reading data to file: " + ex.Message, this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
                 return null;
             }

@@ -42,13 +42,12 @@ namespace BaseClass.Helper
         private string? CombineFolderPaths(string[] paths)
         {
             // Combine folder paths using Path.Combine
-            return System.IO.Path.Combine(paths);
+            return Path.Combine(paths);
         }
 
         private string? CombineURLPaths(string[] paths)
         {
             // Combine URL paths using string.Join
-            // Ensure that each path starts with a '/' and ends with a '/'
             return string.Join("/", paths.Select(p => p.Trim('/')))+"/";
         }
     }

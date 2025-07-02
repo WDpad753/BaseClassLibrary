@@ -95,10 +95,7 @@ namespace BaseClass.Config
                     _xmlHandler.XmlWrite(_targetSection, path, data);
 
                     // Mark the section as modified and save:
-                    //_configLoggerSettingsSection.SectionInformation.ForceSave = true;
-                    //config.Save(ConfigurationSaveMode.Modified);
-                    // Refresh so ConfigurationManager.GetSection sees new values:
-                    //ConfigurationManager.RefreshSection("loggerSettings");
+                    ConfigurationManager.RefreshSection("loggerSettings");
 
                     _logWriter.LogWrite($"{data} was saved in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Log);
 
@@ -109,9 +106,6 @@ namespace BaseClass.Config
                     _xmlHandler.XmlWrite(_targetSection, path, data);
 
                     // Mark the section as modified and save:
-                    //_configLoggerSettingsSection.SectionInformation.ForceSave = true;
-                    //config.Save(ConfigurationSaveMode.Modified);
-                    // Refresh so ConfigurationManager.GetSection sees new values:
                     ConfigurationManager.RefreshSection("changelogSettings");
 
                     _logWriter.LogWrite($"{data} was saved in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Log);

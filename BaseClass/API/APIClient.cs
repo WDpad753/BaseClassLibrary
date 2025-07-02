@@ -17,7 +17,7 @@ using UtilityClass = BaseClass.MethodNameExtractor.FuncNameExtractor;
 
 namespace BaseClass.API
 {
-    public class APIClient<TEntryPoint> where TEntryPoint : class
+    public class APIClient<TEntryPoint> : IDisposable where TEntryPoint : class
     {
         public string? APIURL { get; set; }
         public int? timeOut {  get; set; }
@@ -25,7 +25,7 @@ namespace BaseClass.API
 
         private static HttpClient? _client = null;
         private static bool? clientCreated = false;
-
+        private bool disposedValue;
         private readonly StringHandler _strHandler;
         private readonly LogWriter _logWriter;
         private readonly PathCombine _pathHandler;
@@ -124,7 +124,7 @@ namespace BaseClass.API
                 }
                 else
                 {
-                    var client = _clientProvider.CreateClient(new Uri(apiURL));
+                    var client = _client;
 
                     if (clientCreated == false)
                     {
@@ -203,86 +203,88 @@ namespace BaseClass.API
                 // Create HttpClient instance
                 if (_clientProvider.testClient == null || _clientProvider.testClient == false)
                 {
-                    using (var client = new HttpClient())
+                    var client = _client;
+
+                    if (clientCreated == false)
                     {
                         // Set personal access token in request headers of the baseurl:
                         if (PerAccTok != null)
                         {
                             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes($":{PerAccTok}")));
                             client.Timeout = TimeSpan.FromSeconds((double)timeOut);
+                            clientCreated = true;
                         }
                         else
                         {
                             client.Timeout = TimeSpan.FromSeconds((double)timeOut);
+                            clientCreated = true;
                         }
+                    }
 
-                        try
-                        {
-                            // Initiate Get request for the API url:
-                            HttpResponseMessage response = await client.GetAsync(apiURL);
+                    try
+                    {
+                        // Initiate Get request for the API url:
+                        HttpResponseMessage response = await client.GetAsync(apiURL);
 
-                            // Check if the request was successful:
-                            response.EnsureSuccessStatusCode();
+                        // Check if the request was successful:
+                        response.EnsureSuccessStatusCode();
 
-                            // Get the response content from the request:
-                            string responseBody = await response.Content.ReadAsStringAsync();
+                        // Get the response content from the request:
+                        string responseBody = await response.Content.ReadAsStringAsync();
 
-                            // Deserialize the JSON response:
-                            T? responseObject = JsonConvert.DeserializeObject<T>(responseBody);
+                        // Deserialize the JSON response:
+                        T? responseObject = JsonConvert.DeserializeObject<T>(responseBody);
 
-                            return responseObject;
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine(ex.ToString());
-                            System.Diagnostics.Debug.WriteLine($@"Here is the Content of the Error Message: {ex.ToString()}");
-                            return null;
-                        }
+                        return responseObject;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.ToString());
+                        System.Diagnostics.Debug.WriteLine($@"Here is the Content of the Error Message: {ex.ToString()}");
+                        return null;
                     }
                 }
                 else
                 {
-                    //HttpClient TestClient = _clientProvider.CreateClient(new Uri(apiURL));
-
-                    //using (var client = _client)
                     var client = _client;
+
+                    if (clientCreated == false)
                     {
-                        if (_client == null)
+                        // Set personal access token in request headers of the baseurl:
+                        if (PerAccTok != null)
                         {
-                            // Set personal access token in request headers of the baseurl:
-                            if (PerAccTok != null)
-                            {
-                                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes($":{PerAccTok}")));
-                                client.Timeout = TimeSpan.FromSeconds((double)timeOut);
-                            }
-                            else
-                            {
-                                client.Timeout = TimeSpan.FromSeconds((double)timeOut);
-                            }
+                            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes($":{PerAccTok}")));
+                            client.Timeout = TimeSpan.FromSeconds((double)timeOut);
+                            clientCreated = true;
                         }
-
-                        try
+                        else
                         {
-                            // Initiate Get request for the API url:
-                            HttpResponseMessage response = await client.GetAsync(apiURL);
-
-                            // Check if the request was successful:
-                            response.EnsureSuccessStatusCode();
-
-                            // Get the response content from the request:
-                            string responseBody = await response.Content.ReadAsStringAsync();
-
-                            // Deserialize the JSON response:
-                            T? responseObject = JsonConvert.DeserializeObject<T>(responseBody);
-
-                            return responseObject;
+                            client.Timeout = TimeSpan.FromSeconds((double)timeOut);
+                            clientCreated = true;
                         }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine(ex.ToString());
-                            System.Diagnostics.Debug.WriteLine($@"Here is the Content of the Error Message: {ex.ToString()}");
-                            return null;
-                        }
+                    }
+
+                    try
+                    {
+                        // Initiate Get request for the API url:
+                        HttpResponseMessage response = await client.GetAsync(apiURL);
+
+                        // Check if the request was successful:
+                        response.EnsureSuccessStatusCode();
+
+                        // Get the response content from the request:
+                        string responseBody = await response.Content.ReadAsStringAsync();
+
+                        // Deserialize the JSON response:
+                        T? responseObject = JsonConvert.DeserializeObject<T>(responseBody);
+
+                        return responseObject;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.ToString());
+                        System.Diagnostics.Debug.WriteLine($@"Here is the Content of the Error Message: {ex.ToString()}");
+                        return null;
                     }
                 }
             }
@@ -291,6 +293,36 @@ namespace BaseClass.API
                 _logWriter.LogWrite("Error saving data to file: " + ex, this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
                 return null;
             }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects)
+                    _client.Dispose();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                disposedValue=true;
+            }
+        }
+
+        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+        //~APIClient()
+        //{
+        //    // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        //    Dispose(disposing: false);
+        //}
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

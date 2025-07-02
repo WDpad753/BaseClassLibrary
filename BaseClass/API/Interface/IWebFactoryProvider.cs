@@ -8,6 +8,6 @@ namespace BaseClass.API.Interface
 {
     public interface IWebFactoryProvider
     {
-        HttpClient CreateClient(Uri baseAddress);
+        HttpClient? CreateClient(Uri baseAddress);
     }
 }

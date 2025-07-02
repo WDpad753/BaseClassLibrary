@@ -15,9 +15,7 @@ namespace BaseClass.API
     public class ClientProvider<T> : IWebFactoryProvider where T : class
     {
         private readonly WebApplicationFactory<T>? _factory;
-        //private readonly HttpClient? _client;
         private readonly LogWriter _logWriter;
-        //private readonly Uri? _uri;
         public bool? testClient { get; set; }
         public string? clientBase { get; set; }
         public string? appName { get; set; }
@@ -29,7 +27,7 @@ namespace BaseClass.API
             _factory = factory;
         }
 
-        public HttpClient CreateClient(Uri baseAddress)
+        public HttpClient? CreateClient(Uri baseAddress)
         {
             try
             {
