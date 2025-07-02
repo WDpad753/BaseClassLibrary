@@ -5,67 +5,27 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace BaseClass.Helper
 {
     public static class Crc32
     {
-        //public static string CalculateHash<T>(T input)
-        //{
-        //    StringBuilder sb = new StringBuilder();
-        //    int cnt = 0;
+        private static readonly uint[] Table;
 
-        //    foreach (var item in input.Value)
-        //    {
-        //        if (cnt == 0)
-        //        {
-        //            sb.Append($"{item}");
-        //        }
-        //        else
-        //        {
-        //            sb.Append($"|{item}");
-        //        }
-        //        cnt++;
-        //    }
-
-        //    using (SHA256 sha256 = SHA256.Create())
-        //    {
-        //        byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(sb.ToString()));
-        //        StringBuilder hashBuilder = new StringBuilder();
-        //        foreach (byte b in hashBytes)
-        //        {
-        //            hashBuilder.Append(b.ToString("x2"));
-        //        }
-        //        return hashBuilder.ToString();
-        //    }
-        //}
-
-        //public static string CalculateHash(IEnumerable input)
-        //{
-        //    StringBuilder sb = new StringBuilder();
-        //    int cnt = 0;
-
-        //    foreach (var item in input)
-        //    {
-        //        if (cnt == 0)
-        //            sb.Append($"{item}");
-        //        else
-        //            sb.Append($"|{item}");
-
-        //        cnt++;
-        //    }
-
-        //    using (SHA256 sha256 = SHA256.Create())
-        //    {
-        //        byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(sb.ToString()));
-        //        StringBuilder hashBuilder = new StringBuilder();
-        //        foreach (byte b in hashBytes)
-        //            hashBuilder.Append(b.ToString("x2"));
-
-        //        return hashBuilder.ToString();
-        //    }
-        //}
+        static Crc32()
+        {
+            Table = new uint[256];
+            const uint polynomial = 0xEDB88320;
+            for (uint i = 0; i < Table.Length; ++i)
+            {
+                uint crc = i;
+                for (int j = 0; j < 8; ++j)
+                    crc = (crc >> 1) ^ ((crc & 1) != 0 ? polynomial : 0);
+                Table[i] = crc;
+            }
+        }
 
         public static string CalculateHash<T>(T input)
         {
@@ -85,6 +45,19 @@ namespace BaseClass.Helper
                     hashBuilder.Append(b.ToString("x2"));
                 return hashBuilder.ToString();
             }
+        }
+
+        public static uint ComputeFromDigits(string input)
+        {
+            // Extract digits only
+            string digitsOnly = Regex.Replace(input, @"\D", "");
+            byte[] bytes = Encoding.ASCII.GetBytes(digitsOnly);
+
+            uint crc = 0xFFFFFFFF;
+            foreach (byte b in bytes)
+                crc = (crc >> 8) ^ Table[(crc ^ b) & 0xFF];
+
+            return ~crc;
         }
     }
 }
