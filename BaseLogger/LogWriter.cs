@@ -37,7 +37,6 @@ namespace BaseLogger
             {
                 Directory.CreateDirectory(logfilePath);
                 logFilePath=logfilePath;
-                //filenamepath = Path.Combine(logfilePath, appName+".log");
                 lock(_lockObj)
                 {
                     LogWrite("Log directory does not exist, created directory to save log files.", this.GetType().Name, nameof(LogWriter), MessageLevels.Verbose);
@@ -71,7 +70,6 @@ namespace BaseLogger
 
                 Debug.WriteLine($"[Watcher] Event: {e.ChangeType} on {e.FullPath} at {DateTime.Now:HH:mm:ss.fff}");
                 sb.Append($"[Watcher] Event: {e.ChangeType} on {e.FullPath} at {DateTime.Now:HH:mm:ss.fff}");
-                //WaitForFileUnlock(filenamepath);
                 lock (_lockObj)
                 {
                     File.AppendAllText(filenamepath, sb.ToString() + Environment.NewLine);
@@ -101,6 +99,11 @@ namespace BaseLogger
 
             string filenamepath = Path.Combine(logFilePath, appName+".log");
 
+            if (filenamepath == null)
+            {
+                throw new ArgumentNullException("filename");
+            }
+
             DateTime datetime = DateTime.Now;
             string datetimenw = datetime.ToString("dddd, yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture);
 
@@ -129,8 +132,6 @@ namespace BaseLogger
                     sb.Append(logtext);
 
                     // Saving the logs into the textfile:
-                    //WaitForFileUnlock(filenamepath);
-                    //File.AppendAllText(filenamepath, sb.ToString() + Environment.NewLine);
                     lock (_lockObj)
                     {
                         File.AppendAllText(filenamepath, sb.ToString() + Environment.NewLine);
@@ -147,8 +148,6 @@ namespace BaseLogger
                     sb.Append(logtext);
 
                     // Saving the logs into the textfile:
-                    //WaitForFileUnlock(filenamepath);
-                    //File.AppendAllText(filenamepath, sb.ToString() + Environment.NewLine);
                     lock (_lockObj)
                     {
                         File.AppendAllText(filenamepath, sb.ToString() + Environment.NewLine);
@@ -175,8 +174,6 @@ namespace BaseLogger
 
             Configuration config = ConfigurationManager.OpenMappedExeConfiguration(_fileMap, ConfigurationUserLevel.None);
 
-            //string value = config.AppSettings.Settings[path].Value;
-
             _configLoggerSettingsSection = (loggerSettings)config.GetSection("loggerSettings");
 
             if(_configLoggerSettingsSection != null)
@@ -202,35 +199,5 @@ namespace BaseLogger
                 throw new Exception(string.Format($"Config key:{path} was expected to be of type {expectedType} but was not."), ex);
             }
         }
-
-        ///// <summary>
-        ///// Blocks (with small sleeps) until the file is no longer locked by any other process.
-        ///// </summary>
-        //public static void WaitForFileUnlock(string path, int maxRetries = 20, int delayMs = 50)
-        //{
-        //    int tries = 0;
-        //    while (true)
-        //    {
-        //        try
-        //        {
-        //            // Try to open for exclusive access
-        //            using (var fs = new FileStream(
-        //                path,
-        //                FileMode.OpenOrCreate,
-        //                FileAccess.ReadWrite,
-        //                FileShare.None))
-        //            {
-        //                // If we got here, the file is unlocked. 
-        //                break;
-        //            }
-        //        }
-        //        catch (IOException)
-        //        {
-        //            if (++tries >= maxRetries)
-        //                throw;   // give up after too many retries
-        //            Thread.Sleep(delayMs);
-        //        }
-        //    }
-        //}
     }
 }
