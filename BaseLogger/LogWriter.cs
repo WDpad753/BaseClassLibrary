@@ -69,12 +69,16 @@ namespace BaseLogger
                 string filenamepath = Path.Combine(logFilePath, appName+".log");
 
                 Debug.WriteLine($"[Watcher] Event: {e.ChangeType} on {e.FullPath} at {DateTime.Now:HH:mm:ss.fff}");
-                sb.Append($"[Watcher] Event: {e.ChangeType} on {e.FullPath} at {DateTime.Now:HH:mm:ss.fff}");
-                lock (_lockObj)
+
+                if(debugState == 0)
                 {
-                    File.AppendAllText(filenamepath, sb.ToString() + Environment.NewLine);
+                    sb.Append($"[Watcher] Event: {e.ChangeType} on {e.FullPath} at {DateTime.Now:HH:mm:ss.fff}");
+                    lock (_lockObj)
+                    {
+                        File.AppendAllText(filenamepath, sb.ToString() + Environment.NewLine);
+                    }
+                    sb.Clear();
                 }
-                sb.Clear();
 
                 prevAppName = appName;
 
@@ -131,11 +135,16 @@ namespace BaseLogger
 
                     sb.Append(logtext);
 
-                    // Saving the logs into the textfile:
-                    lock (_lockObj)
+                    if (debugState == 0)
                     {
-                        File.AppendAllText(filenamepath, sb.ToString() + Environment.NewLine);
+                        // Saving the logs into the textfile:
+                        lock (_lockObj)
+                        {
+                            File.AppendAllText(filenamepath, sb.ToString() + Environment.NewLine);
+                        }
                     }
+
+                    Debug.WriteLine(sb.ToString());
                     Console.WriteLine(sb.ToString());
                     sb.Clear();
                     return;
