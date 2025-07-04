@@ -16,4 +16,8 @@
     <ProjectReference Include="..\BaseLogger\BaseLogger.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Database\Factory\" />
+  </ItemGroup>
+
 </Project>
