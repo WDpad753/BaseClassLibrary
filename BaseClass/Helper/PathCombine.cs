@@ -8,16 +8,9 @@ using System.Threading.Tasks;
 
 namespace BaseClass.Helper
 {
-    public class PathCombine
+    public static class PathCombine
     {
-        private LogWriter _logger;
-
-        public PathCombine(LogWriter Logger)
-        {
-            _logger = Logger;
-        }
-
-        public string? CombinePath(CombinationType type, params string[] paths)
+        public static string? CombinePath(CombinationType type, params string[] paths)
         {
             string? fullPath = null;
 
@@ -39,13 +32,13 @@ namespace BaseClass.Helper
             return fullPath;
         }
 
-        private string? CombineFolderPaths(string[] paths)
+        private static string? CombineFolderPaths(string[] paths)
         {
             // Combine folder paths using Path.Combine
             return Path.Combine(paths);
         }
 
-        private string? CombineURLPaths(string[] paths)
+        private static string? CombineURLPaths(string[] paths)
         {
             // Combine URL paths using string.Join
             return string.Join("/", paths.Select(p => p.Trim('/')))+"/";

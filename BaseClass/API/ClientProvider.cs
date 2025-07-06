@@ -16,7 +16,7 @@ namespace BaseClass.API
     {
         private readonly WebApplicationFactory<T>? _factory;
         private readonly LogWriter _logWriter;
-        public bool? testClient { get; set; }
+        //public bool? testClient { get; set; }
         public string? clientBase { get; set; }
         public string? appName { get; set; }
 
@@ -33,12 +33,12 @@ namespace BaseClass.API
             {
                 HttpClient? client = null;
 
-                if (testClient == null || testClient != true)
+                if (_factory == null)
                 {
                     client = new HttpClient();
                     client.BaseAddress = baseAddress;
                 }
-                else if (testClient == true)
+                else if (_factory != null)
                 {
                     client = _factory.CreateClient();
                     client.BaseAddress = baseAddress;
