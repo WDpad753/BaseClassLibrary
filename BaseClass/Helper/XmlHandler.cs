@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
-using UtilityClass = BaseClass.MethodNameExtractor.FuncNameExtractor;
+using FuncName = BaseClass.MethodNameExtractor.FuncNameExtractor;
 
 namespace BaseClass.Helper
 {

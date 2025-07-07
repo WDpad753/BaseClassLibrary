@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using UtilityClass = BaseClass.MethodNameExtractor.FuncNameExtractor;
+using FuncName = BaseClass.MethodNameExtractor.FuncNameExtractor;
 
 namespace BaseClass.JSON
 {
@@ -39,7 +39,7 @@ namespace BaseClass.JSON
             }
             catch (Exception ex)
             {
-                _logWriter.LogWrite("Error saving data to file: " + ex.Message, this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
+                _logWriter.LogWrite("Error saving data to file: " + ex.Message, this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
                 return;
             }
         }
@@ -56,7 +56,7 @@ namespace BaseClass.JSON
 
                 if (!File.Exists(targetfilepath))
                 {
-                    _logWriter.LogWrite($"File not found: {targetfilepath}", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
+                    _logWriter.LogWrite($"File not found: {targetfilepath}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
                     return null;  
                 }
 
@@ -69,7 +69,7 @@ namespace BaseClass.JSON
             }
             catch (Exception ex)
             {
-                _logWriter.LogWrite("Error reading data to file: " + ex.Message, this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
+                _logWriter.LogWrite("Error reading data to file: " + ex.Message, this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
                 return null;
             }
         }

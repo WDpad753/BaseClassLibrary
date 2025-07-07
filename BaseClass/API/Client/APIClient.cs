@@ -13,7 +13,7 @@ using System.Net.Http.Headers;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
-using UtilityClass = BaseClass.MethodNameExtractor.FuncNameExtractor;
+using FuncName = BaseClass.MethodNameExtractor.FuncNameExtractor;
 
 namespace BaseClass.API.Client
 {
@@ -75,7 +75,7 @@ namespace BaseClass.API.Client
                     {
                         Console.WriteLine(taskcol.Exception.ToString());
                         System.Diagnostics.Debug.WriteLine($@"Here is the Content of the Error Message: {taskcol.Exception.ToString()}");
-                        _logWriter.LogWrite($"Error in acquiring response from url {apiURL}: {taskcol.Exception.ToString()}", GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
+                        _logWriter.LogWrite($"Error in acquiring response from url {apiURL}: {taskcol.Exception.ToString()}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
                     }
                     else
                     {
@@ -100,14 +100,14 @@ namespace BaseClass.API.Client
                 {
                     //Console.WriteLine(ex.ToString());
                     System.Diagnostics.Debug.WriteLine($@"Here is the Content of the Error Message: {ex.ToString()}");
-                    _logWriter.LogWrite("Error in De-Serializing the JSON Object: " + ex, GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
+                    _logWriter.LogWrite("Error in De-Serializing the JSON Object: " + ex, GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
                     return null;
                 }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($@"Here is the Content of the Error Message: {ex.ToString()}");
-                _logWriter.LogWrite("Error in De-Serializing the JSON Object: " + ex, GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
+                _logWriter.LogWrite("Error in De-Serializing the JSON Object: " + ex, GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
                 return null;
             }
         }
@@ -157,7 +157,7 @@ namespace BaseClass.API.Client
             }
             catch (Exception ex)
             {
-                _logWriter.LogWrite("Error saving data to file: " + ex, GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
+                _logWriter.LogWrite("Error saving data to file: " + ex, GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
                 return null;
             }
         }

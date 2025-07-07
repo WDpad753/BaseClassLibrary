@@ -10,7 +10,7 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
-using UtilityClass = BaseClass.MethodNameExtractor.FuncNameExtractor;
+using FuncName = BaseClass.MethodNameExtractor.FuncNameExtractor;
 
 namespace BaseClass.Config
 {
@@ -72,7 +72,7 @@ namespace BaseClass.Config
                 else
                 {
                     _ConfigRead = false;
-                    _logWriter.LogWrite("Unknown Config Section", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
+                    _logWriter.LogWrite("Unknown Config Section", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
                     return;
                 }
 
@@ -86,9 +86,9 @@ namespace BaseClass.Config
                     //Refresh the section
                     ConfigurationManager.RefreshSection("appSettings");
 
-                    _logWriter.LogWrite($"{data} was saved in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Log);
+                    _logWriter.LogWrite($"{data} was saved in Config File.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Log);
 
-                    _logWriter.LogWrite($"{data} was saved in {path} Key in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
+                    _logWriter.LogWrite($"{data} was saved in {path} Key in Config File.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
                 }
                 else if (_configLoggerSettingsSection != null && _targetSection == "loggerSettings")
                 {
@@ -97,9 +97,9 @@ namespace BaseClass.Config
                     // Mark the section as modified and save:
                     ConfigurationManager.RefreshSection("loggerSettings");
 
-                    _logWriter.LogWrite($"{data} was saved in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Log);
+                    _logWriter.LogWrite($"{data} was saved in Config File.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Log);
 
-                    _logWriter.LogWrite($"{data} was saved in {path} Key in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
+                    _logWriter.LogWrite($"{data} was saved in {path} Key in Config File.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
                 }
                 else if (_configChangeLogSettingsSection != null && _targetSection == "changelogSettings")
                 {
@@ -108,18 +108,18 @@ namespace BaseClass.Config
                     // Mark the section as modified and save:
                     ConfigurationManager.RefreshSection("changelogSettings");
 
-                    _logWriter.LogWrite($"{data} was saved in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Log);
+                    _logWriter.LogWrite($"{data} was saved in Config File.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Log);
 
-                    _logWriter.LogWrite($"{data} was saved in {path} Key in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
+                    _logWriter.LogWrite($"{data} was saved in {path} Key in Config File.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
                 }
                 else
                 {
-                    _logWriter.LogWrite("Unable to save the data in the config file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
+                    _logWriter.LogWrite("Unable to save the data in the config file.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
                 }
             }
             catch (Exception ex)
             {
-                _logWriter.LogWrite($"Path does not exist. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
+                _logWriter.LogWrite($"Path does not exist. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
             }
             finally
             {
@@ -155,7 +155,7 @@ namespace BaseClass.Config
                 }
                 else
                 {
-                    _logWriter.LogWrite("Unknown Config Section", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
+                    _logWriter.LogWrite("Unknown Config Section", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
                     return null;
                 }
 
@@ -163,7 +163,7 @@ namespace BaseClass.Config
                 {
                     string? data = _configAppSettingsSection.CurrentConfiguration.AppSettings.Settings[path]?.Value;
 
-                    _logWriter.LogWrite($"{data} was collected from {path} Key in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
+                    _logWriter.LogWrite($"{data} was collected from {path} Key in Config File.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
 
                     return data;
                 }
@@ -171,7 +171,7 @@ namespace BaseClass.Config
                 {
                     string? data = _configLoggerSettingsSection.LoggerSettings[path]?.value;
 
-                    _logWriter.LogWrite($"{data} was collected from {path} Key in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
+                    _logWriter.LogWrite($"{data} was collected from {path} Key in Config File.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
 
                     return data;
                 }
@@ -179,19 +179,19 @@ namespace BaseClass.Config
                 {
                     string? data = _configChangeLogSettingsSection.ChangeLogSettings[path]?.value;
 
-                    _logWriter.LogWrite($"{data} was collected from {path} Key in Config File.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
+                    _logWriter.LogWrite($"{data} was collected from {path} Key in Config File.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
 
                     return data;
                 }
                 else
                 {
-                    _logWriter.LogWrite("Unable to save the data in the config file.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
+                    _logWriter.LogWrite("Unable to save the data in the config file.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
                     return null;
                 }
             }
             catch (Exception ex)
             {
-                _logWriter.LogWrite($"Path does not exist. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
+                _logWriter.LogWrite($"Path does not exist. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
                 return null;
             }
             finally
@@ -208,8 +208,8 @@ namespace BaseClass.Config
             {
                 if (string.IsNullOrEmpty(path))
                 {
-                    _logWriter.LogWrite($"Was not able to obtain value from given path.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Verbose);
-                    _logWriter.LogWrite($"Was not able to obtain value from given path. Submitted path => {path}", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Debug);
+                    _logWriter.LogWrite($"Was not able to obtain value from given path.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Verbose);
+                    _logWriter.LogWrite($"Was not able to obtain value from given path. Submitted path => {path}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
                     return null;
                 }
 
@@ -233,20 +233,20 @@ namespace BaseClass.Config
 
                 if(data == null)
                 {
-                    _logWriter.LogWrite($"Unable to obtain value from given path => {path}.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
+                    _logWriter.LogWrite($"Unable to obtain value from given path => {path}.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
 
                     return null;
                 }
                 else
                 {
-                    _logWriter.LogWrite($"Obtained following value {data} from given path => {path}.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Log);
+                    _logWriter.LogWrite($"Obtained following value {data} from given path => {path}.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Log);
 
                     return data;
                 }
             }
             catch (Exception ex)
             {
-                _logWriter.LogWrite($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
+                _logWriter.LogWrite($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
                 return null;
             }
         }

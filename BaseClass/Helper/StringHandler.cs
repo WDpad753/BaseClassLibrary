@@ -6,7 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using UtilityClass = BaseClass.MethodNameExtractor.FuncNameExtractor;
+using FuncName = BaseClass.MethodNameExtractor.FuncNameExtractor;
 
 
 namespace BaseClass.Helper
@@ -41,7 +41,7 @@ namespace BaseClass.Helper
             }
             catch(Exception ex)
             {
-                _logWriter.LogWrite("Error reading data to find difference between two strings. Exception Message: " + ex, this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
+                _logWriter.LogWrite("Error reading data to find difference between two strings. Exception Message: " + ex, this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
                 return null;
             }
         }

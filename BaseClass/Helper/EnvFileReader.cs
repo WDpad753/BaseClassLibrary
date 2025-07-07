@@ -9,7 +9,7 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using UtilityClass = BaseClass.MethodNameExtractor.FuncNameExtractor;
+using FuncName = BaseClass.MethodNameExtractor.FuncNameExtractor;
 
 namespace BaseClass.Helper
 {
@@ -43,7 +43,7 @@ namespace BaseClass.Helper
                     data = XmlEnvFileReader(key, mainkey);
                     break;
                 default:
-                    _writer.LogWrite($"Exception Occured. Exception: Unspported Environment File Extension, Exiting the Method.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
+                    _writer.LogWrite($"Exception Occured. Exception: Unspported Environment File Extension, Exiting the Method.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
                     return null;
             }
 
@@ -92,7 +92,7 @@ namespace BaseClass.Helper
             }
             catch (Exception ex)
             {
-                _writer.LogWrite($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
+                _writer.LogWrite($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
                 return null;
             }
         }
@@ -104,7 +104,7 @@ namespace BaseClass.Helper
                 string? res = null;
 
                 if (!File.Exists(filePath))
-                    _writer.LogWrite($"The file '{filePath}' does not exist.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Log);
+                    _writer.LogWrite($"The file '{filePath}' does not exist.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Log);
 
 
                 foreach (var line in File.ReadAllLines(filePath))
@@ -126,13 +126,13 @@ namespace BaseClass.Helper
                 }
 
                 if(res == null)
-                    _writer.LogWrite($"Key '{Key}' not found in the environment file '{filePath}'.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Verbose);
+                    _writer.LogWrite($"Key '{Key}' not found in the environment file '{filePath}'.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Verbose);
 
                 return res;
             }
             catch (Exception ex)
             {
-                _writer.LogWrite($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
+                _writer.LogWrite($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
                 return null;
             }
         }
@@ -145,7 +145,7 @@ namespace BaseClass.Helper
                 bool mainKeyFound = false;
 
                 if (!File.Exists(_filepath))
-                    _writer.LogWrite($"The file '{_filepath}' does not exist.", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Log);
+                    _writer.LogWrite($"The file '{_filepath}' does not exist.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Log);
 
                 using (XmlReader reader = XmlReader.Create(_filepath))
                 {
@@ -180,7 +180,7 @@ namespace BaseClass.Helper
             }
             catch (Exception ex)
             {
-                _writer.LogWrite($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, UtilityClass.GetMethodName(), MessageLevels.Fatal);
+                _writer.LogWrite($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
                 return null;
             }
         }
