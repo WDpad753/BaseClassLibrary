@@ -26,14 +26,14 @@ namespace BaseClass.API.Client
         private static HttpClient? _client = null;
         private static bool? clientCreated = false;
         private bool disposedValue;
-        private readonly StringHandler _strHandler;
+        //private readonly StringHandler _strHandler;
         private readonly LogWriter _logWriter;
         private readonly ClientProvider<TEntryPoint>? _clientProvider;
 
         public APIClient(LogWriter Logger, ClientProvider<TEntryPoint>? clientProvider = null)
         {
             _logWriter = Logger;
-            _strHandler = new(Logger);
+            //_strHandler = new(Logger);
             _clientProvider = clientProvider;
         }
 

@@ -11,16 +11,16 @@ using FuncName = BaseClass.MethodNameExtractor.FuncNameExtractor;
 
 namespace BaseClass.Helper
 {
-    public class StringHandler
+    public static class StringHandler
     {
-        private LogWriter _logWriter;
+        //private LogWriter _logWriter;
 
-        public StringHandler(LogWriter Logger)
-        {
-            _logWriter = Logger;
-        }
+        //public StringHandler(LogWriter Logger)
+        //{
+        //    _logWriter = Logger;
+        //}
 
-        public List<string>? FindTextDifference(string s1, string s2, string separator)
+        public static List<string>? FindTextDifference(string s1, string s2, string separator)
         {
             try
             {
@@ -41,8 +41,38 @@ namespace BaseClass.Helper
             }
             catch(Exception ex)
             {
-                _logWriter.LogWrite("Error reading data to find difference between two strings. Exception Message: " + ex, this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                throw new Exception(ex.ToString());
                 return null;
+            }
+        }
+
+        public static string? RemoveDublicatesInString(string? s, string? separator)
+        {
+            try
+            {
+                if (s == null)
+                {
+                    //_logWriter.LogWrite("Error in examination for dublicates. Entered value is empty", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                    throw new Exception("Error in examination for dublicates. Entered value is empty");
+
+                    //return null;
+                }
+                else if(s.Length > 0 && separator == null)
+                {
+                    //_logWriter.LogWrite("Error in examination for dublicates. Function requires separator", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                    throw new Exception("Error in examination for dublicates. Function requires separator");
+
+                    //return null;
+                }
+
+                string[] strings = s.Split(separator);
+                strings = strings.Distinct().ToArray();
+                return string.Join(separator, strings);
+            }
+            catch (Exception ex)
+            {
+                //_logWriter.LogWrite("Error reading data to find difference between two strings. Exception Message: " + ex, this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                throw new Exception(ex.ToString());
             }
         }
     }

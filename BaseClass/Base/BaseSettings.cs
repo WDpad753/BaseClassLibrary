@@ -15,12 +15,8 @@ namespace BaseClass.Base
         public string? LoggedOnUser { get; set; }
         public string? LoggedOnUserGroup { get; set; }
 
-        public BaseSettings(LogWriter logger, string? configPath, string? loggedOnUser, string? loggedOnUserGroup)
+        public BaseSettings()
         {
-            Logger = logger;
-            ConfigPath = configPath;
-            LoggedOnUser = loggedOnUser;
-            LoggedOnUserGroup = loggedOnUserGroup;
         }
     }
 }
