@@ -18,6 +18,8 @@
 
   <ItemGroup>
     <Folder Include="Database\Factory\" />
+    <Folder Include="Database\Interface\" />
+    <Folder Include="Encryption\Interface\" />
   </ItemGroup>
 
 </Project>
