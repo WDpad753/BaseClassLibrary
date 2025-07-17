@@ -8,14 +8,12 @@ using System.Threading.Tasks;
 
 namespace BaseClass.Base
 {
-    public class BaseSettings : IBase
+    public class BaseClassSettings : IBaseClass
     {
         public LogWriter Logger { get; set; }
         public string? ConfigPath { get; set; }
-        public string? LoggedOnUser { get; set; }
-        public string? LoggedOnUserGroup { get; set; }
 
-        public BaseSettings()
+        public BaseClassSettings()
         {
         }
     }

@@ -7,12 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Base\**" />
-    <EmbeddedResource Remove="Base\**" />
-    <None Remove="Base\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.17" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.6" />
@@ -25,7 +19,6 @@
   <ItemGroup>
     <Folder Include="Database\Factory\" />
     <Folder Include="Database\Interface\" />
-    <Folder Include="Encryption\Interface\" />
   </ItemGroup>
 
 </Project>
