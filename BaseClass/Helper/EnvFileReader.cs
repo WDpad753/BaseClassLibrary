@@ -221,26 +221,6 @@ namespace BaseClass.Helper
                 if (!File.Exists(_filepath))
                     _writer.LogWrite($"The file '{_filepath}' does not exist.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Log);
 
-                //XDocument xdoc = XDocument.Load(_filepath);
-                
-                //XElement targetNode = xdoc.Descendants(mainKey).FirstOrDefault();
-                //if (targetNode == null)
-                //{
-                //    _writer.LogWrite($"No element named '{mainKey}' found.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
-                //    return;
-                //}
-
-                //XElement? found = targetNode.Descendants().FirstOrDefault(el => string.Equals(el.Attribute("Key")?.Value, key, StringComparison.OrdinalIgnoreCase)) == null ?
-                //    targetNode.Descendants().FirstOrDefault(el => string.Equals(el.Name.LocalName, key, StringComparison.OrdinalIgnoreCase)) :
-                //    null;
-
-                //XElement container = targetNode.Elements().FirstOrDefault(child => child.Elements().Any(el => el.Attribute("key") != null)) ?? targetNode;
-
-                ////if (reader.NodeType == XmlNodeType.Element && reader.Name.Equals(mainKey, StringComparison.OrdinalIgnoreCase))
-                ////{
-                ////    mainKeyFound = true; // Main key found, start looking for the nested key
-                ////}
-
                 if(data != null)
                 {
                     _handler = new(_writer, _filepath);
