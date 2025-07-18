@@ -28,7 +28,7 @@ namespace BaseClass.Helper
             {
                 if (!File.Exists(_filePath))
                 {
-                    _logWriter.LogWrite($"XML File does not exist in the given path. Path => {_filePath}", this.GetType().Name, nameof(XmlWrite), MessageLevels.Fatal);
+                    _logWriter.LogWrite($"XML File does not exist in the given path. Path => {_filePath}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
                 }
 
                 XDocument xdoc = XDocument.Load(_filePath);
@@ -36,18 +36,29 @@ namespace BaseClass.Helper
                 XElement targetNode = xdoc.Descendants(mainKey).FirstOrDefault();
                 if (targetNode == null)
                 {
-                    _logWriter.LogWrite($"No element named '{mainKey}' found.", this.GetType().Name, nameof(XmlWrite), MessageLevels.Fatal);
+                    _logWriter.LogWrite($"No element named '{mainKey}' found.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
                     return;
                 }
 
-                XElement found = targetNode.Descendants().FirstOrDefault(el => string.Equals(el.Attribute("key")?.Value, key, StringComparison.OrdinalIgnoreCase));
+                //XElement found = targetNode.Descendants().FirstOrDefault(el => string.Equals(el.Attribute("key")?.Value, key, StringComparison.OrdinalIgnoreCase));
+                XElement? found = targetNode.Descendants().FirstOrDefault(el => string.Equals(el.Attribute("key")?.Value, key, StringComparison.OrdinalIgnoreCase) || 
+                                    string.Equals(el.Attribute("Key")?.Value, key, StringComparison.OrdinalIgnoreCase)) ??
+                                    targetNode.Descendants().FirstOrDefault(el => string.Equals(el.Name.LocalName, key, StringComparison.OrdinalIgnoreCase));
 
-                XElement container = targetNode.Elements().FirstOrDefault(child => child.Elements().Any(el => el.Attribute("key") != null)) ?? targetNode;
+                XElement? container = targetNode.Elements().FirstOrDefault(child => child.Elements().Any(el => el.Attribute("key") != null) || child.Elements().Any(el => el.Attribute("Key") != null)) ??
+                    targetNode.Descendants().FirstOrDefault(el => !string.IsNullOrEmpty(el.Name.LocalName)) ?? targetNode;
 
                 if (found != null)
                 {
-                    found.SetAttributeValue("value", value);
-                    _logWriter.LogWrite($"Updated <{found.Name} key=\"{key}\"> under <{mainKey}> to value=\"{value}\".", this.GetType().Name, nameof(XmlWrite), MessageLevels.Verbose);
+                    if(targetNode.Descendants().FirstOrDefault(el => string.Equals(el.Name.LocalName, key, StringComparison.OrdinalIgnoreCase))?.Name.LocalName == key)
+                    {
+                        found.Value = value;
+                    }
+                    else
+                    {
+                        found.SetAttributeValue("value", value);
+                    }
+                    _logWriter.LogWrite($"Updated <{found.Name} key=\"{key}\"> under <{mainKey}> to value=\"{value}\".", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Verbose);
                 }
                 else
                 {
@@ -62,14 +73,14 @@ namespace BaseClass.Helper
                         targetNode.Add(newElem);
                     }
 
-                    _logWriter.LogWrite($"Added <add key=\"{key}\" value=\"{value}\"/> under <{mainKey}>.", this.GetType().Name, nameof(XmlWrite), MessageLevels.Verbose);
+                    _logWriter.LogWrite($"Added <add key=\"{key}\" value=\"{value}\"/> under <{mainKey}>.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Verbose);
                 }
 
                 xdoc.Save(_filePath);
             }
             catch (Exception ex)
             {
-                _logWriter.LogWrite($"Exception Occurred: {ex.Message}", this.GetType().Name, nameof(XmlWrite), MessageLevels.Fatal);
+                _logWriter.LogWrite($"Exception Occurred: {ex.Message}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
             }
         }
     }

@@ -269,7 +269,7 @@ namespace BaseClass.Config
                 }
                 else if (mode == EnvAccessMode.File)
                 {
-                    data = _envFileReader.EnvFileRead(envpath, path, envkeyname);
+                    _envFileReader.EnvFileSave(envpath, path, envkeyname, data);
                 }
                 else if (mode == EnvAccessMode.User)
                 {
@@ -280,17 +280,7 @@ namespace BaseClass.Config
                     Environment.SetEnvironmentVariable(path, data, EnvironmentVariableTarget.Machine);
                 }
 
-                if (data == null)
-                {
-                    _logWriter.LogWrite($"Unable to obtain value from given path => {path}.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
-                    return;
-                }
-                else
-                {
-                    _logWriter.LogWrite($"Obtained following value {data} from given path => {path}.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Log);
-
-                    return;
-                }
+                _logWriter.LogWrite($"Saved following value {data} from given path => {path}.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Log);
             }
             catch (Exception ex)
             {

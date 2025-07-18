@@ -1,5 +1,6 @@
 ﻿using BaseLogger;
 using BaseLogger.Models;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -21,12 +22,13 @@ namespace BaseClass.Helper
         private string? _filepath;
         private LogWriter _writer;
         private JsonSerializer _serializer;
+        private XmlHandler _handler;
         private string? result;
 
         public EnvFileReader(LogWriter Logger) 
         {
             _writer = Logger;
-            _serializer = new JsonSerializer();
+            _serializer = new();
         }
 
         public string? EnvFileRead(string filepath, string key, string mainkey)
@@ -57,7 +59,7 @@ namespace BaseClass.Helper
             return data;
         }
 
-        public string? EnvFileSave(string filepath, string key, string mainkey, string data)
+        public void EnvFileSave(string filepath, string key, string mainkey, string data)
         {
             _filepath = filepath;
             string ext = Path.GetExtension(filepath).ToLower().Substring(1, Path.GetExtension(filepath).Length-1);
@@ -75,10 +77,10 @@ namespace BaseClass.Helper
                     break;
                 default:
                     _writer.LogWrite($"Exception Occured. Exception: Unspported Environment File Extension, Exiting the Method.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
-                    return null;
+                    return;
             }
 
-            return data;
+            return;
         }
 
         private void JsonEnvFileReader(string key, string mainKey, string? data = null)
@@ -213,54 +215,65 @@ namespace BaseClass.Helper
                 if (!File.Exists(_filepath))
                     _writer.LogWrite($"The file '{_filepath}' does not exist.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Log);
 
-                //using (XmlReader reader = XmlReader.Create(_filepath))
+                //XDocument xdoc = XDocument.Load(_filepath);
+                
+                //XElement targetNode = xdoc.Descendants(mainKey).FirstOrDefault();
+                //if (targetNode == null)
                 //{
-                //    while (reader.Read())
-                //    {
-                //        if (reader.NodeType == XmlNodeType.Element && reader.Name.Equals(mainKey, StringComparison.OrdinalIgnoreCase))
-                //        {
-                //            mainKeyFound = true; // Main key found, start looking for the nested key
-                //        }
-
-                //        if (mainKeyFound && reader.NodeType == XmlNodeType.Element && reader.Name.Equals("add", StringComparison.OrdinalIgnoreCase))
-                //        {
-                //            string? keyAttr = reader.GetAttribute("Key");
-                //            string? valueAttr = reader.GetAttribute("value");
-
-                //            if (keyAttr == key)
-                //            {
-                //                if(data != null)
-                //                {
-                //                    reader.SetAttribute(data);
-                //                }
-                //                else
-                //                {
-                //                    res = valueAttr;
-                //                    result = res;
-                //                }
-
-                //                break;
-                //            }
-                //        }
-                //        else if (mainKeyFound && reader.NodeType == XmlNodeType.Element && reader.Name.Equals(key, StringComparison.OrdinalIgnoreCase))
-                //        {
-                //            string value = reader.ReadElementContentAsString();
-                //            if (data != null)
-                //            {
-                //                reader.SetAttribute(data);
-                //            }
-                //            else
-                //            {
-                //                res = value;
-                //                result = res;
-                //            }
-                //            break;
-                //        }
-                //    }
+                //    _writer.LogWrite($"No element named '{mainKey}' found.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                //    return;
                 //}
 
-                XDocument doc = XDocument.Load(_filepath);
+                //XElement? found = targetNode.Descendants().FirstOrDefault(el => string.Equals(el.Attribute("Key")?.Value, key, StringComparison.OrdinalIgnoreCase)) == null ?
+                //    targetNode.Descendants().FirstOrDefault(el => string.Equals(el.Name.LocalName, key, StringComparison.OrdinalIgnoreCase)) :
+                //    null;
 
+                //XElement container = targetNode.Elements().FirstOrDefault(child => child.Elements().Any(el => el.Attribute("key") != null)) ?? targetNode;
+
+                ////if (reader.NodeType == XmlNodeType.Element && reader.Name.Equals(mainKey, StringComparison.OrdinalIgnoreCase))
+                ////{
+                ////    mainKeyFound = true; // Main key found, start looking for the nested key
+                ////}
+
+                if(data != null)
+                {
+                    _handler = new(_writer, _filepath);
+
+                    _handler.XmlWrite(mainKey,key, data);
+                }
+                else
+                {
+                    using (XmlReader reader = XmlReader.Create(_filepath))
+                    {
+                        while (reader.Read())
+                        {
+                            if (reader.NodeType == XmlNodeType.Element && reader.Name.Equals(mainKey, StringComparison.OrdinalIgnoreCase))
+                            {
+                                mainKeyFound = true; // Main key found, start looking for the nested key
+                            }
+
+                            if (mainKeyFound && reader.NodeType == XmlNodeType.Element && reader.Name.Equals("add", StringComparison.OrdinalIgnoreCase))
+                            {
+                                string? keyAttr = reader.GetAttribute("Key");
+                                string? valueAttr = reader.GetAttribute("value");
+
+                                if (keyAttr == key)
+                                {
+                                    res = valueAttr;
+                                    result = res;
+                                    break;
+                                }
+                            }
+                            else if (mainKeyFound && reader.NodeType == XmlNodeType.Element && reader.Name.Equals(key, StringComparison.OrdinalIgnoreCase))
+                            {
+                                string value = reader.ReadElementContentAsString();
+                                res = value;
+                                result = res;
+                                break;
+                            }
+                        }
+                    }
+                }
 
 
                 return;
