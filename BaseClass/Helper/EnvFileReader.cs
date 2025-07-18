@@ -7,8 +7,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Linq;
+using Formatting = Newtonsoft.Json.Formatting;
 using FuncName = BaseClass.MethodNameExtractor.FuncNameExtractor;
 
 namespace BaseClass.Helper
@@ -18,6 +21,7 @@ namespace BaseClass.Helper
         private string? _filepath;
         private LogWriter _writer;
         private JsonSerializer _serializer;
+        private string? result;
 
         public EnvFileReader(LogWriter Logger) 
         {
@@ -34,13 +38,16 @@ namespace BaseClass.Helper
             switch (ext)
             {
                 case "json":
-                    data = JsonEnvFileReader(key, mainkey);
+                    JsonEnvFileReader(key, mainkey);
+                    data = result;
                     break;
                 case "env":
-                    data = envEnvFileReader(key, filepath);
+                    envEnvFileReader(key, filepath);
+                    data = result;
                     break;
                 case "xml":
-                    data = XmlEnvFileReader(key, mainkey);
+                    XmlEnvFileReader(key, mainkey);
+                    data = result;
                     break;
                 default:
                     _writer.LogWrite($"Exception Occured. Exception: Unspported Environment File Extension, Exiting the Method.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
@@ -50,7 +57,31 @@ namespace BaseClass.Helper
             return data;
         }
 
-        private string? JsonEnvFileReader(string key, string mainKey)
+        public string? EnvFileSave(string filepath, string key, string mainkey, string data)
+        {
+            _filepath = filepath;
+            string ext = Path.GetExtension(filepath).ToLower().Substring(1, Path.GetExtension(filepath).Length-1);
+
+            switch (ext)
+            {
+                case "json":
+                    JsonEnvFileReader(key, mainkey, data);
+                    break;
+                case "env":
+                    envEnvFileReader(key, filepath, data);
+                    break;
+                case "xml":
+                    XmlEnvFileReader(key, mainkey, data);
+                    break;
+                default:
+                    _writer.LogWrite($"Exception Occured. Exception: Unspported Environment File Extension, Exiting the Method.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                    return null;
+            }
+
+            return data;
+        }
+
+        private void JsonEnvFileReader(string key, string mainKey, string? data = null)
         {
             try
             {
@@ -81,27 +112,38 @@ namespace BaseClass.Helper
                                 foreach(var envKeyVal in matchingNestedProps)
                                 {
                                     JToken keyVal = new JObject(envKeyVal);
-                                    res = keyVal[key].ToString();
+
+                                    if(data != null)
+                                    {
+                                        envKeyVal.Value.Replace(data);
+                                        File.WriteAllText(_filepath, jsonVal.ToString(Formatting.Indented));
+                                    }
+                                    else
+                                    {
+                                        res = keyVal[key].ToString();
+                                        result = res;
+                                    }
                                 }
                             }
                         }
                     }
                 }
 
-                return res;
+                return;
             }
             catch (Exception ex)
             {
                 _writer.LogWrite($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
-                return null;
+                return;
             }
         }
 
-        private string? envEnvFileReader(string Key, string filePath)
+        private void envEnvFileReader(string Key, string filePath, string? data = null)
         {
             try
             {
                 string? res = null;
+                var lines = File.ReadAllLines(filePath).ToList();
 
                 if (!File.Exists(filePath))
                     _writer.LogWrite($"The file '{filePath}' does not exist.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Log);
@@ -121,6 +163,30 @@ namespace BaseClass.Helper
                     if(key.Equals(Key, StringComparison.OrdinalIgnoreCase))
                     {
                         res = parts[1].Trim().Replace("\"", ""); // Remove quotes if present
+                        result = res;
+
+                        if (data != null)
+                        {
+                            var newline = $"{Key}={data}";
+
+                            int idx = lines.FindIndex(ln => ln.StartsWith(Key + "=", StringComparison.OrdinalIgnoreCase));
+                            if (idx >= 0)
+                            {
+                                lines[idx] = newline;
+                            }
+                            else
+                            {
+                                lines.Add(newline);
+                            }
+
+                            File.WriteAllLines(_filepath, lines);
+                        }
+                        else
+                        {
+                            result = res;
+                        }
+
+
                         break; // Exit loop once the key is found
                     }
                 }
@@ -128,16 +194,16 @@ namespace BaseClass.Helper
                 if(res == null)
                     _writer.LogWrite($"Key '{Key}' not found in the environment file '{filePath}'.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Verbose);
 
-                return res;
+                return;
             }
             catch (Exception ex)
             {
                 _writer.LogWrite($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
-                return null;
+                return;
             }
         }
 
-        private string? XmlEnvFileReader(string key, string mainKey)
+        private void XmlEnvFileReader(string key, string mainKey, string? data = null)
         {
             try
             {
@@ -147,41 +213,62 @@ namespace BaseClass.Helper
                 if (!File.Exists(_filepath))
                     _writer.LogWrite($"The file '{_filepath}' does not exist.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Log);
 
-                using (XmlReader reader = XmlReader.Create(_filepath))
-                {
-                    while (reader.Read())
-                    {
-                        if (reader.NodeType == XmlNodeType.Element && reader.Name.Equals(mainKey, StringComparison.OrdinalIgnoreCase))
-                        {
-                            mainKeyFound = true; // Main key found, start looking for the nested key
-                        }
+                //using (XmlReader reader = XmlReader.Create(_filepath))
+                //{
+                //    while (reader.Read())
+                //    {
+                //        if (reader.NodeType == XmlNodeType.Element && reader.Name.Equals(mainKey, StringComparison.OrdinalIgnoreCase))
+                //        {
+                //            mainKeyFound = true; // Main key found, start looking for the nested key
+                //        }
 
-                        if (mainKeyFound && reader.NodeType == XmlNodeType.Element && reader.Name.Equals("add", StringComparison.OrdinalIgnoreCase))
-                        {
-                            string? keyAttr = reader.GetAttribute("Key");
-                            string? valueAttr = reader.GetAttribute("value");
+                //        if (mainKeyFound && reader.NodeType == XmlNodeType.Element && reader.Name.Equals("add", StringComparison.OrdinalIgnoreCase))
+                //        {
+                //            string? keyAttr = reader.GetAttribute("Key");
+                //            string? valueAttr = reader.GetAttribute("value");
 
-                            if (keyAttr == key)
-                            {
-                                res = valueAttr;
-                                break;
-                            }
-                        }
-                        else if (mainKeyFound && reader.NodeType == XmlNodeType.Element && reader.Name.Equals(key, StringComparison.OrdinalIgnoreCase))
-                        {
-                            string value = reader.ReadElementContentAsString();
-                            res = value;
-                            break;
-                        }
-                    }
-                }
+                //            if (keyAttr == key)
+                //            {
+                //                if(data != null)
+                //                {
+                //                    reader.SetAttribute(data);
+                //                }
+                //                else
+                //                {
+                //                    res = valueAttr;
+                //                    result = res;
+                //                }
 
-                return res;
+                //                break;
+                //            }
+                //        }
+                //        else if (mainKeyFound && reader.NodeType == XmlNodeType.Element && reader.Name.Equals(key, StringComparison.OrdinalIgnoreCase))
+                //        {
+                //            string value = reader.ReadElementContentAsString();
+                //            if (data != null)
+                //            {
+                //                reader.SetAttribute(data);
+                //            }
+                //            else
+                //            {
+                //                res = value;
+                //                result = res;
+                //            }
+                //            break;
+                //        }
+                //    }
+                //}
+
+                XDocument doc = XDocument.Load(_filepath);
+
+
+
+                return;
             }
             catch (Exception ex)
             {
                 _writer.LogWrite($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
-                return null;
+                return;
             }
         }
     }

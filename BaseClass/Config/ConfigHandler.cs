@@ -250,5 +250,53 @@ namespace BaseClass.Config
                 return null;
             }
         }
+
+        public void EnvSave(string path, string? data = null, EnvAccessMode? mode = null, string? envpath = null, string? envkeyname = null)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(path) || string.IsNullOrEmpty(data))
+                {
+                    _logWriter.LogWrite($"Was not able to obtain value from given path.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Verbose);
+                    _logWriter.LogWrite($"Was not able to obtain value from given path. Submitted path => {path}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
+                    return;
+                }
+
+                if (mode == null || mode == EnvAccessMode.Project)
+                {
+                    // Read environment variable from the current process scope
+                    Environment.SetEnvironmentVariable(path, data);
+                }
+                else if (mode == EnvAccessMode.File)
+                {
+                    data = _envFileReader.EnvFileRead(envpath, path, envkeyname);
+                }
+                else if (mode == EnvAccessMode.User)
+                {
+                    Environment.SetEnvironmentVariable(path, data, EnvironmentVariableTarget.User);
+                }
+                else if (mode == EnvAccessMode.System)
+                {
+                    Environment.SetEnvironmentVariable(path, data, EnvironmentVariableTarget.Machine);
+                }
+
+                if (data == null)
+                {
+                    _logWriter.LogWrite($"Unable to obtain value from given path => {path}.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                    return;
+                }
+                else
+                {
+                    _logWriter.LogWrite($"Obtained following value {data} from given path => {path}.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Log);
+
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logWriter.LogWrite($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                return;
+            }
+        }
     }
 }
