@@ -88,6 +88,7 @@ namespace BaseClass.Helper
             try
             {
                 string? res = null;
+                JObject? JsonVal = null;
 
                 using (var streamreader = new StreamReader(_filepath))
                 {
@@ -97,6 +98,8 @@ namespace BaseClass.Helper
 
                         if (val != null && val is JObject jsonVal)
                         {
+                            JsonVal = jsonVal;
+
                             // All JProperty tokens in the tree:
                             var allProps = jsonVal.DescendantsAndSelf().OfType<JProperty>();
 
@@ -118,7 +121,6 @@ namespace BaseClass.Helper
                                     if(data != null)
                                     {
                                         envKeyVal.Value.Replace(data);
-                                        File.WriteAllText(_filepath, jsonVal.ToString(Formatting.Indented));
                                     }
                                     else
                                     {
@@ -129,6 +131,11 @@ namespace BaseClass.Helper
                             }
                         }
                     }
+                }
+
+                if(data != null)
+                {
+                    File.WriteAllText(_filepath, JsonVal.ToString(Formatting.Indented));
                 }
 
                 return;
@@ -165,7 +172,6 @@ namespace BaseClass.Helper
                     if(key.Equals(Key, StringComparison.OrdinalIgnoreCase))
                     {
                         res = parts[1].Trim().Replace("\"", ""); // Remove quotes if present
-                        result = res;
 
                         if (data != null)
                         {
