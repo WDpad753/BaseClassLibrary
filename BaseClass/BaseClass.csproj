@@ -14,7 +14,6 @@
 
   <ItemGroup>
 	  <ProjectReference Include="..\..\Custom-Message-Box\CustomMessageBox\CustomMessageBox.csproj" />
-	  <ProjectReference Include="..\..\UIBaseClass\UIBaseClass\UIBaseClass.csproj" />
       <ProjectReference Include="..\BaseLogger\BaseLogger.csproj" />
   </ItemGroup>
 
