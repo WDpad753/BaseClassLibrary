@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Abstraction", "..\Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseLogger", "..\BaseLogger\BaseLogger.csproj", "{0BAB2E4E-07A1-4111-B4AD-C6684137CA58}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomMessageBox", "..\..\Custom-Message-Box\CustomMessageBox\CustomMessageBox.csproj", "{908D5FCF-4469-FD01-714E-3D2BBC7A762F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UIBaseClass", "..\..\Custom-Message-Box\UIBaseClass\UIBaseClass\UIBaseClass.csproj", "{1BAE4F55-6D5F-201F-71B9-0D1314382043}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{0BAB2E4E-07A1-4111-B4AD-C6684137CA58}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0BAB2E4E-07A1-4111-B4AD-C6684137CA58}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0BAB2E4E-07A1-4111-B4AD-C6684137CA58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{908D5FCF-4469-FD01-714E-3D2BBC7A762F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{908D5FCF-4469-FD01-714E-3D2BBC7A762F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{908D5FCF-4469-FD01-714E-3D2BBC7A762F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{908D5FCF-4469-FD01-714E-3D2BBC7A762F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1BAE4F55-6D5F-201F-71B9-0D1314382043}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1BAE4F55-6D5F-201F-71B9-0D1314382043}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1BAE4F55-6D5F-201F-71B9-0D1314382043}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1BAE4F55-6D5F-201F-71B9-0D1314382043}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
