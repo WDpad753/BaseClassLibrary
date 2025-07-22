@@ -4,12 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BaseClass.Model
+namespace BaseClass.Database.Interface
 {
-    public enum DatabaseMode
+    public interface IDatabase
     {
-        SQLite,
-        SQLServer,
-        PostGresSQL
+
     }
 }

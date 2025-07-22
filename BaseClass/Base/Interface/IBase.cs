@@ -7,10 +7,13 @@ using System.Threading.Tasks;
 
 namespace BaseClass.Base.Interface
 {
-    public interface IBaseClass
+    public interface IBase
     {
         public LogWriter Logger { get; set; }
+        public CustomMessageBox Messagebox { get; set; }
         public string? ConfigPath { get; set; }
         //public string? ConfigFileName { get; set; }
+        public string? LoggedOnUser { get; set; }
+        public string? LoggedOnUserGroup { get; set; }
     }
 }
