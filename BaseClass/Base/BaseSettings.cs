@@ -1,6 +1,7 @@
 ﻿using BaseClass.Base.Interface;
 using BaseLogger;
-using CustomMessageBox.MVVM.Views.MainWindow;
+using CustomErrorMessageBox.MVVM.Views.ErrorMessageBox;
+using CustomMessageBox.MVVM.Views.MessageBox;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,11 +13,12 @@ namespace BaseClass.Base
 {
     public class BaseSettings : IBase
     {
-        public LogWriter Logger { get; set; }
+        public LogWriter? Logger { get; set; }
         public string? ConfigPath { get; set; }
         public string? LoggedOnUser { get; set; }
         public string? LoggedOnUserGroup { get; set; }
-        public BaseMessageBox Messagebox { get; set; }
+        public BaseMessageBox? Messagebox { get; set; }
+        public BaseErrorMessageBox? ErrorMessagebox { get; set; }
 
         public BaseSettings()
         {

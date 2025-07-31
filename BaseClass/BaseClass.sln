@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseLogger", "..\BaseLogger
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomMessageBox", "..\..\Custom-Message-Box\CustomMessageBox\CustomMessageBox.csproj", "{908D5FCF-4469-FD01-714E-3D2BBC7A762F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomErrorMessageBox", "..\..\Custom-Message-Box\CustomErrorMessageBox\CustomErrorMessageBox.csproj", "{CA8123C8-ED39-ED1C-A768-5543E0DE55B1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{908D5FCF-4469-FD01-714E-3D2BBC7A762F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{908D5FCF-4469-FD01-714E-3D2BBC7A762F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{908D5FCF-4469-FD01-714E-3D2BBC7A762F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA8123C8-ED39-ED1C-A768-5543E0DE55B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA8123C8-ED39-ED1C-A768-5543E0DE55B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA8123C8-ED39-ED1C-A768-5543E0DE55B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA8123C8-ED39-ED1C-A768-5543E0DE55B1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
