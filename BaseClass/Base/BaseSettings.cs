@@ -11,6 +11,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace BaseClass.Base
 {
+    // For Base Classes
     public class BaseSettings : IBase
     {
         public LogWriter? Logger { get; set; }
