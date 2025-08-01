@@ -1,4 +1,5 @@
-﻿using BaseClass.Helper;
+﻿using BaseClass.Base.Interface;
+using BaseClass.Helper;
 using BaseClass.JSON;
 using BaseClass.Model;
 using BaseLogger;
@@ -16,6 +17,7 @@ namespace BaseClass.Config
 {
     public class ConfigHandler
     {
+        private readonly IBase? baseConfig;
         //private string? configPath;
         private ExeConfigurationFileMap _fileMap;
         private EnvFileReader _envFileReader;
@@ -23,7 +25,7 @@ namespace BaseClass.Config
         private string? _filepath;
         //private string? _targetSection;
         //private ILogWriter _logWriter;
-        private LogWriter _logWriter;
+        private LogWriter? _logWriter;
         private AppSettingsSection? _configAppSettingsSection;
         private loggerSettings? _configLoggerSettingsSection;
         private changelogSettings? _configChangeLogSettingsSection;
@@ -32,18 +34,35 @@ namespace BaseClass.Config
         private static readonly Mutex ConfigFileMutex = new Mutex(false, "Global\\MyApp_ConfigFileMutex");
         //private JSONFileHandler? _fileHandler;
 
-        public ConfigHandler(string? filepath, LogWriter Logger)
+        //public ConfigHandler(string? filepath, LogWriter Logger)
+        //{
+        //    _filepath = filepath;
+        //    _logWriter = Logger;
+
+        //    _fileMap = new ExeConfigurationFileMap
+        //    {
+        //        ExeConfigFilename = filepath,
+        //    };
+
+        //    _envFileReader = new(Logger);
+        //    _xmlHandler = new(Logger, filepath);
+        //}
+        public ConfigHandler(IBase? baseSettings)
         {
-            _filepath = filepath;
-            _logWriter = Logger;
+            baseConfig = baseSettings;
+
+            _logWriter = baseSettings.Logger;
 
             _fileMap = new ExeConfigurationFileMap
             {
-                ExeConfigFilename = filepath,
+                ExeConfigFilename = baseSettings.ConfigPath,
             };
 
-            _envFileReader = new(Logger);
-            _xmlHandler = new(Logger, filepath);
+            _envFileReader = new(baseSettings);
+            //_xmlHandler = new(Logger, filepath);
+            _xmlHandler = new(baseSettings);
+            baseSettings.EnvFileReader = _envFileReader;
+            baseSettings.XmlHandler = _xmlHandler;
         }
 
         public void SaveInfo(string data, string path, string? section = null)
@@ -92,6 +111,7 @@ namespace BaseClass.Config
                 }
                 else if (_configLoggerSettingsSection != null && _targetSection == "loggerSettings")
                 {
+                    //baseConfig.FilePath = _filepath == null ? _fileMap.ExeConfigFilename : _filepath;
                     _xmlHandler.XmlWrite(_targetSection, path, data);
 
                     // Mark the section as modified and save:
@@ -269,6 +289,7 @@ namespace BaseClass.Config
                 }
                 else if (mode == EnvAccessMode.File)
                 {
+                    baseConfig.FilePath = envpath;
                     _envFileReader.EnvFileSave(envpath, path, envkeyname, data);
                 }
                 else if (mode == EnvAccessMode.User)

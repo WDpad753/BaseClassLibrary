@@ -1,4 +1,8 @@
 ﻿using BaseClass.Base.Interface;
+using BaseClass.Config;
+using BaseClass.Database.Interface;
+using BaseClass.Helper;
+using BaseClass.JSON;
 using BaseLogger;
 using CustomErrorMessageBox.MVVM.Views.ErrorMessageBox;
 using CustomMessageBox.MVVM.Views.MessageBox;
@@ -20,6 +24,13 @@ namespace BaseClass.Base
         public string? LoggedOnUserGroup { get; set; }
         public BaseMessageBox? Messagebox { get; set; }
         public BaseErrorMessageBox? ErrorMessagebox { get; set; }
+        public Uri? BaseUrlAddress { get; set; }
+        public string? FilePath { get; set; }
+        public JSONFileHandler? JSONFileHandler { get; set; }
+        public ConfigHandler? ConfigHandler { get; set; }
+        public XmlHandler? XmlHandler { get; set; }
+        public EnvFileReader? EnvFileReader { get; set; }
+        public IDatabase? Database { get; set; }
 
         public BaseSettings()
         {

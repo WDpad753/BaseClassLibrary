@@ -1,4 +1,10 @@
-﻿using BaseLogger;
+﻿using BaseClass.API;
+using BaseClass.Config;
+using BaseClass.Database.Factory;
+using BaseClass.Database.Interface;
+using BaseClass.Helper;
+using BaseClass.JSON;
+using BaseLogger;
 using CustomErrorMessageBox.MVVM.Views.ErrorMessageBox;
 using CustomMessageBox.MVVM.Views.MessageBox;
 using System;
@@ -14,9 +20,17 @@ namespace BaseClass.Base.Interface
         public LogWriter? Logger { get; set; }
         public BaseMessageBox? Messagebox { get; set; }
         public BaseErrorMessageBox? ErrorMessagebox { get; set; }
+        public JSONFileHandler? JSONFileHandler { get; set; }
+        public ConfigHandler? ConfigHandler { get; set; }
+        public XmlHandler? XmlHandler { get; set; }
+        public EnvFileReader? EnvFileReader { get; set; }
+        //public ClientProvider<T> ClientProvider { get; set; }
+        public IDatabase? Database { get; set; }
         public string? ConfigPath { get; set; }
         //public string? ConfigFileName { get; set; }
         public string? LoggedOnUser { get; set; }
         public string? LoggedOnUserGroup { get; set; }
+        public Uri? BaseUrlAddress { get; set; }
+        public string? FilePath { get; set; }
     }
 }

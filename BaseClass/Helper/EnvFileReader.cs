@@ -1,4 +1,5 @@
-﻿using BaseLogger;
+﻿using BaseClass.Base.Interface;
+using BaseLogger;
 using BaseLogger.Models;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -19,15 +20,23 @@ namespace BaseClass.Helper
 {
     public class EnvFileReader
     {
+        private readonly IBase? baseConfig;
         private string? _filepath;
-        private LogWriter _writer;
+        private LogWriter? _writer;
         private JsonSerializer _serializer;
         private XmlHandler _handler;
         private string? result;
 
-        public EnvFileReader(LogWriter Logger) 
+        //public EnvFileReader(LogWriter Logger) 
+        //{
+        //    _writer = Logger;
+        //    _serializer = new();
+        //}
+        public EnvFileReader(IBase? BaseConfig) 
         {
-            _writer = Logger;
+            baseConfig = BaseConfig;
+            //_filepath = BaseConfig.FilePath == null ? null : BaseConfig.FilePath;
+            _writer = BaseConfig.Logger;
             _serializer = new();
         }
 
@@ -218,12 +227,13 @@ namespace BaseClass.Helper
                 string? res = null;
                 bool mainKeyFound = false;
 
-                if (!File.Exists(_filepath))
+                if (!File.Exists(_filepath) && !string.Equals(Path.GetExtension(_filepath), ".xml", StringComparison.OrdinalIgnoreCase))
                     _writer.LogWrite($"The file '{_filepath}' does not exist.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Log);
 
                 if(data != null)
                 {
-                    _handler = new(_writer, _filepath);
+                    //_handler = new(_writer, _filepath);
+                    _handler = new(baseConfig);
 
                     _handler.XmlWrite(mainKey,key, data);
                 }

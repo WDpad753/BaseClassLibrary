@@ -1,4 +1,5 @@
-﻿using BaseLogger;
+﻿using BaseClass.Base.Interface;
+using BaseLogger;
 using BaseLogger.Models;
 using Newtonsoft.Json;
 using System;
@@ -14,11 +15,16 @@ namespace BaseClass.JSON
 {
     public class JSONFileHandler
     {
-        private LogWriter _logWriter;
+        private readonly IBase? baseConfig;
+        private LogWriter? _logWriter;
 
-        public JSONFileHandler(LogWriter Logger) 
+        //public JSONFileHandler(LogWriter Logger) 
+        //{
+        //    _logWriter = Logger;
+        //}
+        public JSONFileHandler(IBase? baseConfig) 
         {
-            _logWriter = Logger;
+            _logWriter = baseConfig.Logger;
         }
 
         public void SaveJson<T>(T json, string targetfilepath)
