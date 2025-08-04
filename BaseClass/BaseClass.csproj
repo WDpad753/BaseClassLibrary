@@ -12,7 +12,7 @@
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.6" />
   </ItemGroup>
 
-  <PropertyGroup>
+  <!--<PropertyGroup>
 	  <CustomErrorA>..\..\..\Custom-Error-Message-Box\CustomErrorMessageBox\CustomErrorMessageBox.csproj</CustomErrorA>
 	  <CustomErrorB>..\..\Custom-Error-Message-Box\CustomErrorMessageBox\CustomErrorMessageBox.csproj</CustomErrorB>
   </PropertyGroup>
@@ -23,10 +23,11 @@
 
   <ItemGroup Condition="!Exists('$(CustomErrorA)') and Exists('$(CustomErrorB)')">
    <ProjectReference Include="$(CustomErrorB)" />
-  </ItemGroup>
+  </ItemGroup>-->
 
   <ItemGroup>
 	  <!--<ProjectReference Include="..\..\..\Custom-Error-Message-Box\CustomErrorMessageBox\CustomErrorMessageBox.csproj" />-->
+	  <ProjectReference Include="..\..\..\Custom-Error-Message-Box\CustomErrorMessageBox\CustomErrorMessageBox.csproj" />
 	  <ProjectReference Include="..\..\Custom-Message-Box\CustomMessageBox\CustomMessageBox.csproj" />
       <ProjectReference Include="..\BaseLogger\BaseLogger.csproj" />
   </ItemGroup>
