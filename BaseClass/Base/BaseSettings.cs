@@ -4,7 +4,7 @@ using BaseClass.Database.Interface;
 using BaseClass.Helper;
 using BaseClass.JSON;
 using BaseLogger;
-using CustomErrorMessageBox.MVVM.Views.ErrorMessageBox;
+using CustomMessageBox.MVVM.Views.ErrorMessageBox;
 using CustomMessageBox.MVVM.Views.MessageBox;
 using System;
 using System.Collections.Generic;

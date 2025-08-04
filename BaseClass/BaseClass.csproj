@@ -27,7 +27,6 @@
 
   <ItemGroup>
 	  <!--<ProjectReference Include="..\..\..\Custom-Error-Message-Box\CustomErrorMessageBox\CustomErrorMessageBox.csproj" />-->
-	  <ProjectReference Include="..\..\..\Custom-Error-Message-Box\CustomErrorMessageBox\CustomErrorMessageBox.csproj" />
 	  <ProjectReference Include="..\..\Custom-Message-Box\CustomMessageBox\CustomMessageBox.csproj" />
       <ProjectReference Include="..\BaseLogger\BaseLogger.csproj" />
   </ItemGroup>
