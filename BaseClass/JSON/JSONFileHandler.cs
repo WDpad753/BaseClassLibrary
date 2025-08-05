@@ -2,7 +2,9 @@
 using BaseLogger;
 using BaseLogger.Models;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -50,7 +52,7 @@ namespace BaseClass.JSON
             }
         }
 
-        public T? GetJson<T>(string targetfilepath) where T : class
+        public T? GetJson<T>(string targetfilepath)
         {
             try
             {
@@ -63,7 +65,7 @@ namespace BaseClass.JSON
                 if (!File.Exists(targetfilepath))
                 {
                     _logWriter.LogWrite($"File not found: {targetfilepath}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
-                    return null;  
+                    return default;  
                 }
 
                 using (StreamReader file = File.OpenText(targetfilepath))
@@ -76,7 +78,24 @@ namespace BaseClass.JSON
             catch (Exception ex)
             {
                 _logWriter.LogWrite("Error reading data to file: " + ex.Message, this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
-                return null;
+                return default;
+            }
+        }
+
+        public IEnumerable<JProperty> ValueSearch(string Json, string KeyName)
+        {
+            try
+            {
+                var JsonObject = JObject.Parse(Json);
+
+                var JsonSearch = JsonObject.DescendantsAndSelf().OfType<JProperty>().Where(el => el.Path.Contains(KeyName, StringComparison.OrdinalIgnoreCase));
+
+                return JsonSearch;
+            }
+            catch (Exception ex)
+            {
+                _logWriter.LogWrite("Error searching for value in the input JSON: " + ex.Message, this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                return default;
             }
         }
     }
