@@ -90,6 +90,16 @@ namespace BaseClass.JSON
 
                 var JsonSearch = JsonObject.DescendantsAndSelf().OfType<JProperty>().Where(el => el.Path.Contains(KeyName, StringComparison.OrdinalIgnoreCase));
 
+                if(JsonSearch.Count() > 0)
+                {
+                    _logWriter.LogWrite($"Found some matches based on the given Key ({KeyName}). Matches Count: {JsonSearch.Count()}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
+                }
+                else
+                {
+                    _logWriter.LogWrite($"Unable to find any entries that ties to the inserted Key ({KeyName}).", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Verbose);
+                    return default;
+                }
+
                 return JsonSearch;
             }
             catch (Exception ex)
