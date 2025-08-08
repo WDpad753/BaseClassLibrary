@@ -86,18 +86,21 @@ namespace BaseClass.JSON
         {
             try
             {
-                var JsonObject = JObject.Parse(Json);
+                using var reader = new JsonTextReader(new StringReader(Json));
+                var JsonObject = JObject.Load(reader);
+
+                //var JsonObject = JObject.Parse(Json);
 
                 var JsonSearch = JsonObject.DescendantsAndSelf().OfType<JProperty>().Where(el => el.Path.Contains(KeyName, StringComparison.OrdinalIgnoreCase));
 
-                if(JsonSearch.Count() > 0)
+                if(JsonSearch.Any())
                 {
                     _logWriter.LogWrite($"Found some matches based on the given Key ({KeyName}). Matches Count: {JsonSearch.Count()}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
                 }
                 else
                 {
                     _logWriter.LogWrite($"Unable to find any entries that ties to the inserted Key ({KeyName}).", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Verbose);
-                    return default;
+                    return Enumerable.Empty<JProperty>();
                 }
 
                 return JsonSearch;
@@ -105,7 +108,7 @@ namespace BaseClass.JSON
             catch (Exception ex)
             {
                 _logWriter.LogWrite("Error searching for value in the input JSON: " + ex.Message, this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
-                return default;
+                return Enumerable.Empty<JProperty>();
             }
         }
     }
