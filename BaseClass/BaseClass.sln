@@ -5,13 +5,9 @@ VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseClass", "BaseClass.csproj", "{95AE31C5-FC4E-417B-B99A-280EBF66CDC9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Abstraction", "..\Common.Abstraction\Common.Abstraction.csproj", "{2E8FE334-A561-4EBF-9688-311660DFC311}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseLogger", "..\BaseLogger\BaseLogger.csproj", "{0BAB2E4E-07A1-4111-B4AD-C6684137CA58}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomMessageBox", "..\..\Custom-Message-Box\CustomMessageBox\CustomMessageBox.csproj", "{908D5FCF-4469-FD01-714E-3D2BBC7A762F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomErrorMessageBox", "..\..\Custom-Error-Message-Box\CustomErrorMessageBox\CustomErrorMessageBox.csproj", "{CFB2698A-E104-0562-D996-ED6ACA4035F7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +19,6 @@ Global
 		{95AE31C5-FC4E-417B-B99A-280EBF66CDC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{95AE31C5-FC4E-417B-B99A-280EBF66CDC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{95AE31C5-FC4E-417B-B99A-280EBF66CDC9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2E8FE334-A561-4EBF-9688-311660DFC311}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2E8FE334-A561-4EBF-9688-311660DFC311}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2E8FE334-A561-4EBF-9688-311660DFC311}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2E8FE334-A561-4EBF-9688-311660DFC311}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0BAB2E4E-07A1-4111-B4AD-C6684137CA58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0BAB2E4E-07A1-4111-B4AD-C6684137CA58}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0BAB2E4E-07A1-4111-B4AD-C6684137CA58}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -35,10 +27,6 @@ Global
 		{908D5FCF-4469-FD01-714E-3D2BBC7A762F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{908D5FCF-4469-FD01-714E-3D2BBC7A762F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{908D5FCF-4469-FD01-714E-3D2BBC7A762F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CFB2698A-E104-0562-D996-ED6ACA4035F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CFB2698A-E104-0562-D996-ED6ACA4035F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CFB2698A-E104-0562-D996-ED6ACA4035F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CFB2698A-E104-0562-D996-ED6ACA4035F7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
