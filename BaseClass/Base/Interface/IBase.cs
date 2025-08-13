@@ -2,6 +2,7 @@
 using BaseClass.Config;
 using BaseClass.Database.Factory;
 using BaseClass.Database.Interface;
+using BaseClass.Encryption.Interface;
 using BaseClass.Helper;
 using BaseClass.JSON;
 using BaseLogger;
@@ -26,6 +27,8 @@ namespace BaseClass.Base.Interface
         public EnvFileReader? EnvFileReader { get; set; }
         //public ClientProvider<T> ClientProvider { get; set; }
         public IDatabase? Database { get; set; }
+        public IEncryption? Encryption { get; set; }
+        public string? EncryptPathType { get; set; }
         public string? ConfigPath { get; set; }
         //public string? ConfigFileName { get; set; }
         public string? LoggedOnUser { get; set; }

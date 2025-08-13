@@ -1,6 +1,7 @@
 ﻿using BaseClass.Base.Interface;
 using BaseClass.Config;
 using BaseClass.Database.Interface;
+using BaseClass.Encryption.Interface;
 using BaseClass.Helper;
 using BaseClass.JSON;
 using BaseLogger;
@@ -31,6 +32,8 @@ namespace BaseClass.Base
         public XmlHandler? XmlHandler { get; set; }
         public EnvFileReader? EnvFileReader { get; set; }
         public IDatabase? Database { get; set; }
+        public IEncryption? Encryption { get; set; }
+        public string? EncryptPathType { get; set; }
 
         public BaseSettings()
         {
