@@ -1,5 +1,6 @@
 ﻿using BaseClass.Base.Interface;
 using BaseClass.Encryption.Interface;
+using BaseClass.Model;
 using BaseLogger;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace BaseClass.Encryption.Encryptions
         public bool IsDecrypted { get; set; }
         public bool IsEncrypted { get; set; }
 
-        public HybridEncryption(IBase? BaseConfig)
+        public HybridEncryption(IBase? BaseConfig, ConfigAccessMode? AccessMode)
         {
             baseConfig = BaseConfig;
             _logWriter = BaseConfig?.Logger;

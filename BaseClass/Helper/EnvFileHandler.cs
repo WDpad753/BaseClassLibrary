@@ -18,29 +18,23 @@ using FuncName = BaseClass.MethodNameExtractor.FuncNameExtractor;
 
 namespace BaseClass.Helper
 {
-    public class EnvFileReader
+    public class EnvFileHandler
     {
         private readonly IBase? baseConfig;
         private string? _filepath;
         private LogWriter? _writer;
-        private JsonSerializer _serializer;
-        private XmlHandler _handler;
+        private JsonSerializer? _serializer;
+        private XmlHandler? _handler;
         private string? result;
 
-        //public EnvFileReader(LogWriter Logger) 
-        //{
-        //    _writer = Logger;
-        //    _serializer = new();
-        //}
-        public EnvFileReader(IBase? BaseConfig) 
+        public EnvFileHandler(IBase? BaseConfig) 
         {
             baseConfig = BaseConfig;
-            //_filepath = BaseConfig.FilePath == null ? null : BaseConfig.FilePath;
-            _writer = BaseConfig.Logger;
+            _writer = BaseConfig?.Logger;
             _serializer = new();
         }
 
-        public string? EnvFileRead(string filepath, string key, string mainkey)
+        public string? EnvFileRead(string? filepath, string? key, string? mainkey)
         {
             _filepath = filepath;
             string? data = null;

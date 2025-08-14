@@ -24,13 +24,12 @@ namespace BaseClass.Base.Interface
         public JSONFileHandler? JSONFileHandler { get; set; }
         public ConfigHandler? ConfigHandler { get; set; }
         public XmlHandler? XmlHandler { get; set; }
-        public EnvFileReader? EnvFileReader { get; set; }
-        //public ClientProvider<T> ClientProvider { get; set; }
+        public EnvFileHandler? EnvFileHandler { get; set; }
+        public EnvHandler? EnvHandler { get; set; }
         public IDatabase? Database { get; set; }
         public IEncryption? Encryption { get; set; }
         public string? EncryptPathType { get; set; }
         public string? ConfigPath { get; set; }
-        //public string? ConfigFileName { get; set; }
         public string? LoggedOnUser { get; set; }
         public string? LoggedOnUserGroup { get; set; }
         public Uri? BaseUrlAddress { get; set; }

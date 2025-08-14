@@ -18,13 +18,10 @@ namespace BaseClass.Config
     public class ConfigHandler
     {
         private readonly IBase? baseConfig;
-        //private string? configPath;
-        private ExeConfigurationFileMap _fileMap;
-        private EnvFileReader _envFileReader;
-        private XmlHandler _xmlHandler;
+        private ExeConfigurationFileMap? _fileMap;
+        private EnvFileHandler? _envFileReader;
+        private XmlHandler? _xmlHandler;
         private string? _filepath;
-        //private string? _targetSection;
-        //private ILogWriter _logWriter;
         private LogWriter? _logWriter;
         private AppSettingsSection? _configAppSettingsSection;
         private loggerSettings? _configLoggerSettingsSection;
@@ -32,22 +29,8 @@ namespace BaseClass.Config
         public bool _ConfigRead = false;
         private string? _targetSection;
         private static readonly Mutex ConfigFileMutex = new Mutex(false, "Global\\MyApp_ConfigFileMutex");
-        //private JSONFileHandler? _fileHandler;
 
-        //public ConfigHandler(string? filepath, LogWriter Logger)
-        //{
-        //    _filepath = filepath;
-        //    _logWriter = Logger;
-
-        //    _fileMap = new ExeConfigurationFileMap
-        //    {
-        //        ExeConfigFilename = filepath,
-        //    };
-
-        //    _envFileReader = new(Logger);
-        //    _xmlHandler = new(Logger, filepath);
-        //}
-        public ConfigHandler(IBase? baseSettings)
+        public ConfigHandler(IBase baseSettings)
         {
             baseConfig = baseSettings;
 
@@ -61,7 +44,7 @@ namespace BaseClass.Config
             _envFileReader = new(baseSettings);
             //_xmlHandler = new(Logger, filepath);
             _xmlHandler = new(baseSettings);
-            baseSettings.EnvFileReader = _envFileReader;
+            baseSettings.EnvFileHandler = _envFileReader;
             baseSettings.XmlHandler = _xmlHandler;
         }
 
@@ -217,96 +200,6 @@ namespace BaseClass.Config
             finally
             {
                 ConfigFileMutex.ReleaseMutex(); // Release the mutex
-            }
-        }
-
-        public string? EnvRead(string path, EnvAccessMode? mode = null, string? envpath = null, string? envkeyname = null)
-        {
-            string? data = null;
-
-            try
-            {
-                if (string.IsNullOrEmpty(path))
-                {
-                    _logWriter.LogWrite($"Was not able to obtain value from given path.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Verbose);
-                    _logWriter.LogWrite($"Was not able to obtain value from given path. Submitted path => {path}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
-                    return null;
-                }
-
-                if (mode == null || mode == EnvAccessMode.Project)
-                {
-                    // Read environment variable from the current process scope
-                    data = Environment.GetEnvironmentVariable(path);
-                }
-                else if (mode == EnvAccessMode.File)
-                {
-                    data = _envFileReader.EnvFileRead(envpath, path, envkeyname);
-                }
-                else if (mode == EnvAccessMode.User)
-                {
-                    data = Environment.GetEnvironmentVariable(path, EnvironmentVariableTarget.User);
-                }
-                else if (mode == EnvAccessMode.System)
-                {
-                    data = Environment.GetEnvironmentVariable(path, EnvironmentVariableTarget.Machine);
-                }
-
-                if(data == null)
-                {
-                    _logWriter.LogWrite($"Unable to obtain value from given path => {path}.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
-
-                    return null;
-                }
-                else
-                {
-                    _logWriter.LogWrite($"Obtained following value {data} from given path => {path}.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Log);
-
-                    return data;
-                }
-            }
-            catch (Exception ex)
-            {
-                _logWriter.LogWrite($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
-                return null;
-            }
-        }
-
-        public void EnvSave(string path, string? data = null, EnvAccessMode? mode = null, string? envpath = null, string? envkeyname = null)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(path) || string.IsNullOrEmpty(data))
-                {
-                    _logWriter.LogWrite($"Was not able to obtain value from given path.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Verbose);
-                    _logWriter.LogWrite($"Was not able to obtain value from given path. Submitted path => {path}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
-                    return;
-                }
-
-                if (mode == null || mode == EnvAccessMode.Project)
-                {
-                    // Read environment variable from the current process scope
-                    Environment.SetEnvironmentVariable(path, data);
-                }
-                else if (mode == EnvAccessMode.File)
-                {
-                    baseConfig.FilePath = envpath;
-                    _envFileReader.EnvFileSave(envpath, path, envkeyname, data);
-                }
-                else if (mode == EnvAccessMode.User)
-                {
-                    Environment.SetEnvironmentVariable(path, data, EnvironmentVariableTarget.User);
-                }
-                else if (mode == EnvAccessMode.System)
-                {
-                    Environment.SetEnvironmentVariable(path, data, EnvironmentVariableTarget.Machine);
-                }
-
-                _logWriter.LogWrite($"Saved following value {data} from given path => {path}.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Log);
-            }
-            catch (Exception ex)
-            {
-                _logWriter.LogWrite($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
-                return;
             }
         }
     }

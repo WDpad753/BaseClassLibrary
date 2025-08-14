@@ -1,5 +1,7 @@
 ﻿using BaseClass.Base.Interface;
 using BaseClass.Encryption.Interface;
+using BaseClass.Helper;
+using BaseClass.Model;
 using BaseLogger;
 using BaseLogger.Models;
 using Microsoft.Win32;
@@ -18,18 +20,20 @@ namespace BaseClass.Encryption.Encryptions
     {
         private readonly IBase? baseConfig;
         private LogWriter? _logWriter;
-        private string _filepath;
+        private RegistryHandler? _regHandler;
+        private EnvFileHandler? _envHandler;
+        //private string _filepath;
         private readonly byte[]? _Key;
         private readonly byte[]? _IV;
         //private ExeConfigurationFileMap _fileMap;
         private static bool keysGenerated;
         private static bool keysExist;
-        private AesCng AESCng;
+        private AesCng? AESCng;
 
         public bool IsDecrypted { get; set; }
         public bool IsEncrypted { get; set; }
 
-        public AESEncryption(IBase? BaseConfig) 
+        public AESEncryption(IBase? BaseConfig, ConfigAccessMode? AccessMode) 
         {
             baseConfig = BaseConfig;
             _logWriter = BaseConfig?.Logger;
@@ -41,12 +45,23 @@ namespace BaseClass.Encryption.Encryptions
             AESCng.KeySize = 256;                // Set key size (128, 192, or 256 bits)
             AESCng.BlockSize = 128;              // AES block size is fixed at 128 bits
 
-            //// Setting the constructor for the ExeConfig FilePath:
-            //_fileMap = new ExeConfigurationFileMap
-            //{
-            //    ExeConfigFilename = baseConfig.ConfigPath,
-            //};
-
+            if(AccessMode.HasValue && AccessMode.Value == ConfigAccessMode.Registry)
+            {
+                _regHandler = new(BaseConfig);
+            }
+            else if(AccessMode.HasValue && AccessMode.Value == ConfigAccessMode.Environment)
+            {
+                _regHandler = new(BaseConfig);
+            }
+            else if(AccessMode.HasValue && (AccessMode.Value == ConfigAccessMode.EnvironmentFile || AccessMode.Value == ConfigAccessMode.JSONFile))
+            {
+                _envHandler = new(BaseConfig);
+            }
+            else
+            {
+                throw new Exception("Unable to find assigned access mode.");
+            }
+            
             GenerateandSaveEncryptionKeys();
         }
 
@@ -90,6 +105,7 @@ namespace BaseClass.Encryption.Encryptions
             try
             {
                 string RegistyKeyName = RegistryRead();
+                //string RegistyKeyName = _regHandler.RegistryRead();
                 RegistryKey key = Registry.CurrentUser.OpenSubKey(RegistyKeyName, false);
                 object keyvalue1 = key.GetValue("KeyA");
                 object keyvalue2 = key.GetValue("KeyIV");
@@ -103,7 +119,7 @@ namespace BaseClass.Encryption.Encryptions
                     else if ((myByte1.Length == 0 || mybyte2.Length != 0) && myByte1.Length != 0 && mybyte2.Length == 0)
                     {
                         keysGenerated = false;
-                        _logWriter.LogWrite($"Keys did not generate correctly.", GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
+                        _logWriter?.LogWrite($"Keys did not generate correctly.", GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
                     }
                     else
                     {
@@ -112,16 +128,63 @@ namespace BaseClass.Encryption.Encryptions
                 }
                 else
                 {
-                    _logWriter.LogWrite($"Value/s does not exist", GetType().Name, FuncName.GetMethodName(), MessageLevels.Verbose);
+                    _logWriter?.LogWrite($"Value/s does not exist", GetType().Name, FuncName.GetMethodName(), MessageLevels.Verbose);
                     keysGenerated = false;
                 }
             }
             catch (Exception ex)
             {
-                _logWriter.LogWrite($"Key verification had failed. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                _logWriter?.LogWrite($"Key verification had failed. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
             }
 
             return keysGenerated;
+        }
+
+        private void RegistryValSave(byte[] data, byte[] data2)
+        {
+            try
+            {
+                string RegistyKeyName = RegistryRead();
+                //string RegistyKeyName = _regHandler.RegistryRead();
+
+                _logWriter?.LogWrite($"Actual Registry Path Value => {RegistyKeyName}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
+
+                RegistryKey key = Registry.CurrentUser.OpenSubKey(RegistyKeyName, true);
+                key.SetValue("KeyA", data, RegistryValueKind.Binary);
+                key.SetValue("KeyIV", data2, RegistryValueKind.Binary);
+                key.Close();
+            }
+            catch (Exception ex)
+            {
+                _logWriter?.LogWrite($"Key was not saved. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+            }
+        }
+
+        private List<byte[]> RegistryValGet()
+        {
+            try
+            {
+                string RegistyKeyName = RegistryRead();
+                //string RegistyKeyName = _regHandler.RegistryRead();
+
+                List<byte[]> list = new List<byte[]>();
+
+                _logWriter?.LogWrite($"Actual Registry Path Value => {RegistyKeyName}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
+
+                RegistryKey key = Registry.CurrentUser.OpenSubKey(RegistyKeyName, true);
+                byte[] val = (byte[])key.GetValue("KeyA");
+                byte[] val2 = (byte[])key.GetValue("KeyIV");
+                list.Add(val);
+                list.Add(val2);
+                key.Close();
+
+                return list;
+            }
+            catch (Exception ex)
+            {
+                _logWriter?.LogWrite($"Key was not saved. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                return null;
+            }
         }
     }
 }

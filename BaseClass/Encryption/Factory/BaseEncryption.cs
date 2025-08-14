@@ -15,13 +15,13 @@ namespace BaseClass.Encryption.Factory
 {
     public static class BaseEncryption
     {
-        public static IEncryption GetEncryption(EncryptionMode mode, IBase settings)
+        public static IEncryption GetEncryption(EncryptionMode mode, ConfigAccessMode accessMode, IBase settings)
         {
             return mode switch
             {
-                EncryptionMode.AES => new AESEncryption(settings),
-                EncryptionMode.RSA => new RSAEncryption(settings),
-                EncryptionMode.Hybrid => new HybridEncryption(settings),
+                EncryptionMode.AES => new AESEncryption(settings, accessMode),
+                EncryptionMode.RSA => new RSAEncryption(settings, accessMode),
+                EncryptionMode.Hybrid => new HybridEncryption(settings, accessMode),
                 _ => throw new ArgumentException("Invalid mode", nameof(mode))
             };
         }

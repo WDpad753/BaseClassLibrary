@@ -30,7 +30,8 @@ namespace BaseClass.Base
         public JSONFileHandler? JSONFileHandler { get; set; }
         public ConfigHandler? ConfigHandler { get; set; }
         public XmlHandler? XmlHandler { get; set; }
-        public EnvFileReader? EnvFileReader { get; set; }
+        public EnvFileHandler? EnvFileHandler { get; set; }
+        public EnvHandler? EnvHandler { get; set; }
         public IDatabase? Database { get; set; }
         public IEncryption? Encryption { get; set; }
         public string? EncryptPathType { get; set; }
