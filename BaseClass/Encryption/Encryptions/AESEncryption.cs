@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading.Tasks;
 using FuncName = BaseClass.MethodNameExtractor.FuncNameExtractor;
@@ -19,12 +20,14 @@ namespace BaseClass.Encryption.Encryptions
     public class AESEncryption : IEncryption
     {
         private readonly IBase? baseConfig;
+        private readonly EncryptionModel? _encModel;
         private LogWriter? _logWriter;
         private RegistryHandler? _regHandler;
-        private EnvFileHandler? _envHandler;
+        private EnvHandler? _envHandler;
+        private EnvFileHandler? _envFileHandler;
         //private string _filepath;
-        private readonly byte[]? _Key;
-        private readonly byte[]? _IV;
+        private byte[]? _Key;
+        private byte[]? _IV;
         //private ExeConfigurationFileMap _fileMap;
         private static bool keysGenerated;
         private static bool keysExist;
@@ -33,9 +36,10 @@ namespace BaseClass.Encryption.Encryptions
         public bool IsDecrypted { get; set; }
         public bool IsEncrypted { get; set; }
 
-        public AESEncryption(IBase? BaseConfig, ConfigAccessMode? AccessMode) 
+        public AESEncryption(IBase? BaseConfig, EncryptionModel? EncModel, ConfigAccessMode? AccessMode) 
         {
             baseConfig = BaseConfig;
+            _encModel = EncModel;
             _logWriter = BaseConfig?.Logger;
 
             AESCng = new AesCng();
@@ -45,18 +49,18 @@ namespace BaseClass.Encryption.Encryptions
             AESCng.KeySize = 256;                // Set key size (128, 192, or 256 bits)
             AESCng.BlockSize = 128;              // AES block size is fixed at 128 bits
 
-            if(AccessMode.HasValue && AccessMode.Value == ConfigAccessMode.Registry)
+            if (AccessMode.HasValue && AccessMode.Value == ConfigAccessMode.Registry)
             {
                 _regHandler = new(BaseConfig);
             }
-            else if(AccessMode.HasValue && AccessMode.Value == ConfigAccessMode.Environment)
-            {
-                _regHandler = new(BaseConfig);
-            }
-            else if(AccessMode.HasValue && (AccessMode.Value == ConfigAccessMode.EnvironmentFile || AccessMode.Value == ConfigAccessMode.JSONFile))
+            else if (AccessMode.HasValue && AccessMode.Value == ConfigAccessMode.Environment)
             {
                 _envHandler = new(BaseConfig);
             }
+            //else if (AccessMode.HasValue && (AccessMode.Value == ConfigAccessMode.EnvironmentFile || AccessMode.Value == ConfigAccessMode.JSONFile))
+            //{
+            //    _envFileHandler = new(BaseConfig);
+            //}
             else
             {
                 throw new Exception("Unable to find assigned access mode.");
@@ -85,30 +89,118 @@ namespace BaseClass.Encryption.Encryptions
             throw new NotImplementedException();
         }
 
+        private void LoadPrivateKey()
+        {
+            try
+            {
+                List<byte[]> data = RegistryValGet();
+                byte[] decrypteddata = ProtectedData.Unprotect(data[0], null, DataProtectionScope.CurrentUser);
+                byte[] decrypteddata2 = ProtectedData.Unprotect(data[1], null, DataProtectionScope.CurrentUser);
+                string KeyString = Encoding.UTF8.GetString(decrypteddata);
+                string IVString = Encoding.UTF8.GetString(decrypteddata2);
+                var Key = Convert.FromBase64String(KeyString);
+                var IV = Convert.FromBase64String(IVString);
+
+                AESCng.Key = Key;
+                AESCng.IV = IV;
+            }
+            catch (Exception ex)
+            {
+                _logWriter.LogWrite($"Key does not exist in the container. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+            }
+        }
+
         public void GenerateandSaveEncryptionKeys()
         {
-            
+            try
+            {
+                bool? keyVer = null;
+
+                keyVer = PrivateKeyVerification();
+
+                if (keyVer != null)
+                {
+                    if ((bool)!keyVer)
+                    {
+                        AESCng.GenerateKey();
+                        AESCng.GenerateIV();
+
+                        _Key = AESCng.Key;
+                        _IV = AESCng.IV;
+
+                        var KeyString = Convert.ToBase64String(_Key);
+                        var IVString = Convert.ToBase64String(_IV);
+                        byte[] data = ProtectedData.Protect(Encoding.UTF8.GetBytes(KeyString), null, DataProtectionScope.CurrentUser);
+                        byte[] data2 = ProtectedData.Protect(Encoding.UTF8.GetBytes(IVString), null, DataProtectionScope.CurrentUser);
+                        RegistryValSave(data, data2);
+                    }
+                    else
+                    {
+                        LoadPrivateKey();
+                    }
+                }
+                else
+                {
+                    throw new Exception($"Key was not generated and saved.");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logWriter.LogWrite($"Key was not generated and saved. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+            }
         }
 
         public string RegistryRead()
         {
-            throw new NotImplementedException();
+            return _regHandler?.RegistryRead(_encModel?.PathKey,_encModel?.Key);
         }
 
         public void RegistrySave(string data)
         {
-            throw new NotImplementedException();
+            _regHandler?.RegistrySave(_encModel?.PathKey, _encModel?.Key, data);
         }
 
-        private bool PrivateKeyVerification()
+        private bool? PrivateKeyVerification()
         {
+            object? keyvalue1 = null;
+            object? keyvalue2 = null;
+            RegistryKey? key = null;
+            byte[]? RegType = null;
+
             try
             {
-                string RegistyKeyName = RegistryRead();
-                //string RegistyKeyName = _regHandler.RegistryRead();
-                RegistryKey key = Registry.CurrentUser.OpenSubKey(RegistyKeyName, false);
-                object keyvalue1 = key.GetValue("KeyA");
-                object keyvalue2 = key.GetValue("KeyIV");
+                if (_regHandler != null)
+                {
+                    string RegistyKeyName = RegistryRead();
+
+                    RegType = _encModel?.RegType;
+
+                    if(RegType != null)
+                    {
+                        //if()
+                    }
+                    
+                    List<byte[]>? keys = _encModel?.Keys;
+
+                    if(keys.Count > 1)
+                    {
+                        keyvalue1 = key.GetValue(Encoding.UTF8.GetString(ProtectedData.Unprotect(keys[0], null, DataProtectionScope.CurrentUser)));
+                        keyvalue2 = key.GetValue(Encoding.UTF8.GetString(ProtectedData.Unprotect(keys[1], null, DataProtectionScope.CurrentUser)));
+                    }
+                    else
+                    {
+
+                    }
+                }
+                else if(_envHandler != null)
+                {
+
+                }
+                else
+                {
+                    throw new Exception("Unable to verfiy the keys.");
+                }
+
 
                 if (keyvalue1 is byte[] myByte1 && keyvalue2 is byte[] mybyte2)
                 {
@@ -165,7 +257,6 @@ namespace BaseClass.Encryption.Encryptions
             try
             {
                 string RegistyKeyName = RegistryRead();
-                //string RegistyKeyName = _regHandler.RegistryRead();
 
                 List<byte[]> list = new List<byte[]>();
 

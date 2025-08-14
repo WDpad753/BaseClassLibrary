@@ -18,7 +18,7 @@ namespace BaseClass.Encryption.Encryptions
         public bool IsDecrypted { get; set; }
         public bool IsEncrypted { get; set; }
 
-        public RSAEncryption(IBase? BaseConfig, ConfigAccessMode? AccessMode)
+        public RSAEncryption(IBase? BaseConfig, EncryptionModel? EncModel, ConfigAccessMode? AccessMode)
         {
             baseConfig = BaseConfig;
             _logWriter = BaseConfig?.Logger;

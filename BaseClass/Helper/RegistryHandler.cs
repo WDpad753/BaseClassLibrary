@@ -48,22 +48,46 @@ namespace BaseClass.Helper
             }
         }
 
-        public string? RegistryRead(string? PathKey, string? Key, RegPath? regPath)
+        public string? RegistryRead(object? PathKey, object? Key)
         {
+            string? pathKey = null;
+            string? key = null;
+            string? configvalue = null;
+
             try
             {
-                string? configvalue = null;
                 Configuration? config = null;
+
+                switch (PathKey)
+                {
+                    case string s:
+                        pathKey = s;
+                        break;
+                    case byte[] b:
+                        byte[] decrypteddata = ProtectedData.Unprotect(b, null, DataProtectionScope.CurrentUser);
+                        pathKey = Encoding.UTF8.GetString(decrypteddata);
+                        break;
+                }
+                switch (Key)
+                {
+                    case string s:
+                        key = s;
+                        break;
+                    case byte[] b:
+                        byte[] decrypteddata = ProtectedData.Unprotect(b, null, DataProtectionScope.CurrentUser);
+                        key = Encoding.UTF8.GetString(decrypteddata);
+                        break;
+                }
 
                 if (_fileMap != null)
                 {
                     config = ConfigurationManager.OpenMappedExeConfiguration(_fileMap, ConfigurationUserLevel.None);
-                    configvalue = config.AppSettings.Settings[PathKey].Value;
+                    configvalue = config.AppSettings.Settings[pathKey].Value;
                 }
                 else
                 {
                     //configvalue = _envHandler?.EnvFileRead(_configPath, PathKey, Key);/**/
-                    configvalue = _envHandler?.EnvRead(Key, EnvAccessMode.File, _configPath, PathKey);
+                    configvalue = _envHandler?.EnvRead(key, EnvAccessMode.File, _configPath, pathKey);
 
                     if (configvalue == null)
                     {
@@ -102,19 +126,49 @@ namespace BaseClass.Helper
                 _logWriter?.LogWrite($"Path does not exist. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
                 return null;
             }
+            finally
+            {
+                pathKey = null;
+                key = null;
+                configvalue = null;
+            }
         }
 
-        public void RegistrySave(string? PathKey, string? Key, string? data)
+        public void RegistrySave(object? PathKey, object? Key, string? data)
         {
+            string? pathKey = null;
+            string? key = null;
+            string? configvalue = null;
+
             try
             {
-                string? configvalue = null;
                 Configuration? config = null;
+
+                switch (PathKey)
+                {
+                    case string s:
+                        pathKey = s;
+                        break;
+                    case byte[] b:
+                        byte[] decrypteddata = ProtectedData.Unprotect(b, null, DataProtectionScope.CurrentUser);
+                        pathKey = Encoding.UTF8.GetString(decrypteddata);
+                        break;
+                }
+                switch (Key)
+                {
+                    case string s:
+                        key = s;
+                        break;
+                    case byte[] b:
+                        byte[] decrypteddata = ProtectedData.Unprotect(b, null, DataProtectionScope.CurrentUser);
+                        key = Encoding.UTF8.GetString(decrypteddata);
+                        break;
+                }
 
                 if (_fileMap != null)
                 {
                     config = ConfigurationManager.OpenMappedExeConfiguration(_fileMap, ConfigurationUserLevel.None);
-                    configvalue = config.AppSettings.Settings[PathKey].Value;
+                    configvalue = config.AppSettings.Settings[pathKey].Value;
 
                     if (configvalue == null)
                     {
@@ -125,7 +179,7 @@ namespace BaseClass.Helper
                 else
                 {
                     //configvalue = _envHandler?.EnvFileRead(_configPath, PathKey, Key);
-                    configvalue = _envHandler?.EnvRead(Key, EnvAccessMode.File, _configPath, PathKey);
+                    configvalue = _envHandler?.EnvRead(key, EnvAccessMode.File, _configPath, pathKey);
 
                     if (configvalue == null)
                     {
@@ -153,7 +207,7 @@ namespace BaseClass.Helper
                         else
                         {
                             //configvalue = _envHandler?.EnvFileSave(encrypteddata, PathKey, Key);    
-                            _envHandler?.EnvSave(Key, encrypteddata, EnvAccessMode.File, _configPath, PathKey);
+                            _envHandler?.EnvSave(key, encrypteddata, EnvAccessMode.File, _configPath, pathKey);
                         }
                     }
                     else
