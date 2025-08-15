@@ -26,6 +26,7 @@ namespace BaseClass.Base.Interface
         public XmlHandler? XmlHandler { get; set; }
         public EnvFileHandler? EnvFileHandler { get; set; }
         public EnvHandler? EnvHandler { get; set; }
+        public RegistryHandler? RegistryHandler { get; set; }
         public IDatabase? Database { get; set; }
         public IEncryption? Encryption { get; set; }
         public string? EncryptPathType { get; set; }

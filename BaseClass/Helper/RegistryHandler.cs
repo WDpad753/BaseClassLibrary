@@ -9,6 +9,7 @@ using System.Configuration;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Security.Cryptography;
+using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -48,7 +49,7 @@ namespace BaseClass.Helper
             }
         }
 
-        public string? RegistryRead(object? PathKey, object? Key)
+        public string? RegistryRead(object? PathKey, object? Key = null)
         {
             string? pathKey = null;
             string? key = null;
@@ -101,9 +102,21 @@ namespace BaseClass.Helper
                     _logWriter?.LogWrite("There is Registry Path", GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
                     _logWriter?.LogWrite($"RegistryKey Value = {configvalue}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
 
-                    byte[] encrypteddata = Convert.FromBase64String(configvalue);
-                    byte[] decryptedData = ProtectedData.Unprotect(encrypteddata, null, DataProtectionScope.CurrentUser);
-                    string keyval = Encoding.UTF8.GetString(decryptedData);
+                    string? keyval = null;
+                    bool keyValVer = StringHandler.IsValidBase64(configvalue, true);
+
+                    if(keyValVer == true)
+                    {
+                        keyval = DPAPIHandler.Decrypt(Convert.FromBase64String(configvalue));
+                    }
+                    else if(keyValVer == false)
+                    {
+                        keyval = configvalue;
+                    }
+                    else
+                    {
+                        throw new Exception("Inserted value of unknown type.");
+                    }
 
                     if (keyval != null)
                     {
@@ -134,7 +147,7 @@ namespace BaseClass.Helper
             }
         }
 
-        public void RegistrySave(object? PathKey, object? Key, string? data)
+        public void RegistrySave(object? PathKey, object? data, object? Key = null)
         {
             string? pathKey = null;
             string? key = null;
@@ -178,7 +191,6 @@ namespace BaseClass.Helper
                 }
                 else
                 {
-                    //configvalue = _envHandler?.EnvFileRead(_configPath, PathKey, Key);
                     configvalue = _envHandler?.EnvRead(key, EnvAccessMode.File, _configPath, pathKey);
 
                     if (configvalue == null)
@@ -192,27 +204,47 @@ namespace BaseClass.Helper
                 {
                     _logWriter?.LogWrite("There is Registry Key Setting in Config File", GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
 
-                    byte[] DataBytes = Encoding.UTF8.GetBytes(data);
-                    byte[] EncryptedData = ProtectedData.Protect(DataBytes, null, DataProtectionScope.CurrentUser);
-                    string encrypteddata = Convert.ToBase64String(EncryptedData);
+                    string? keyval = null;
+                    bool keyValVer = StringHandler.IsValidBase64(configvalue, true);
 
-                    if (encrypteddata != null)
+                    if (keyValVer == true)
+                    {
+                        byte[] DataBytes = Encoding.UTF8.GetBytes(configvalue);
+                        byte[] EncryptedData = ProtectedData.Protect(DataBytes, null, DataProtectionScope.CurrentUser);
+                        string encrypteddata = Convert.ToBase64String(EncryptedData);
+
+                        if (encrypteddata != null)
+                        {
+                            if (_fileMap != null)
+                            {
+                                config.AppSettings.Settings[pathKey].Value = encrypteddata;
+                                config.Save(ConfigurationSaveMode.Modified);
+                                ConfigurationManager.RefreshSection("appSettings");
+                            }
+                            else
+                            {
+                                //configvalue = _envHandler?.EnvFileSave(encrypteddata, PathKey, Key);    
+                                _envHandler?.EnvSave(key, encrypteddata, EnvAccessMode.File, _configPath, pathKey);
+                            }
+                        }
+                        else
+                        {
+                            _logWriter?.LogWrite("Element does not exist in file.", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                        }
+                    }
+                    else if (keyValVer == false)
                     {
                         if (_fileMap != null)
                         {
-                            config.AppSettings.Settings["RegistryKey"].Value = encrypteddata;
+                            config.AppSettings.Settings[pathKey].Value = configvalue;
                             config.Save(ConfigurationSaveMode.Modified);
                             ConfigurationManager.RefreshSection("appSettings");
                         }
                         else
                         {
                             //configvalue = _envHandler?.EnvFileSave(encrypteddata, PathKey, Key);    
-                            _envHandler?.EnvSave(key, encrypteddata, EnvAccessMode.File, _configPath, pathKey);
+                            _envHandler?.EnvSave(key, configvalue, EnvAccessMode.File, _configPath, pathKey);
                         }
-                    }
-                    else
-                    {
-                        _logWriter?.LogWrite("Element does not exist in file.", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
                     }
                 }
                 else
@@ -223,6 +255,12 @@ namespace BaseClass.Helper
             catch (Exception ex)
             {
                 _logWriter?.LogWrite($"Path does not exist. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+            }
+            finally
+            {
+                pathKey = null;
+                key = null;
+                configvalue = null;
             }
         }
     }

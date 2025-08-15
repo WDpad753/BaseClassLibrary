@@ -13,6 +13,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using FuncName = BaseClass.MethodNameExtractor.FuncNameExtractor;
 
 namespace BaseClass.Encryption.Encryptions
@@ -98,11 +99,9 @@ namespace BaseClass.Encryption.Encryptions
                 byte[] decrypteddata2 = ProtectedData.Unprotect(data[1], null, DataProtectionScope.CurrentUser);
                 string KeyString = Encoding.UTF8.GetString(decrypteddata);
                 string IVString = Encoding.UTF8.GetString(decrypteddata2);
-                var Key = Convert.FromBase64String(KeyString);
-                var IV = Convert.FromBase64String(IVString);
 
-                AESCng.Key = Key;
-                AESCng.IV = IV;
+                AESCng.Key = Convert.FromBase64String(KeyString);
+                AESCng.IV = Convert.FromBase64String(IVString);
             }
             catch (Exception ex)
             {
@@ -173,13 +172,6 @@ namespace BaseClass.Encryption.Encryptions
                 {
                     string RegistyKeyName = RegistryRead();
 
-                    RegType = _encModel?.RegType;
-
-                    if(RegType != null)
-                    {
-                        //if()
-                    }
-                    
                     List<byte[]>? keys = _encModel?.Keys;
 
                     if(keys.Count > 1)
@@ -189,7 +181,7 @@ namespace BaseClass.Encryption.Encryptions
                     }
                     else
                     {
-
+                        throw new InvalidOperationException("There has to be more than one key");
                     }
                 }
                 else if(_envHandler != null)
@@ -234,16 +226,39 @@ namespace BaseClass.Encryption.Encryptions
 
         private void RegistryValSave(byte[] data, byte[] data2)
         {
+            RegistryKey? key = null;
+
             try
             {
                 string RegistyKeyName = RegistryRead();
-                //string RegistyKeyName = _regHandler.RegistryRead();
 
                 _logWriter?.LogWrite($"Actual Registry Path Value => {RegistyKeyName}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
 
-                RegistryKey key = Registry.CurrentUser.OpenSubKey(RegistyKeyName, true);
-                key.SetValue("KeyA", data, RegistryValueKind.Binary);
-                key.SetValue("KeyIV", data2, RegistryValueKind.Binary);
+                if(Encoding.UTF8.GetString(ProtectedData.Unprotect(_encModel?.RegType, null, DataProtectionScope.CurrentUser)).Equals(RegPath.User.ToString()))
+                {
+                    key = Registry.CurrentUser.OpenSubKey(RegistyKeyName, true);
+                }
+                else if(Encoding.UTF8.GetString(ProtectedData.Unprotect(_encModel?.RegType, null, DataProtectionScope.CurrentUser)).Equals(RegPath.Machine.ToString()))
+                {
+                    key = Registry.LocalMachine.OpenSubKey(RegistyKeyName, true);
+                }
+                else
+                {
+                    throw new Exception("Unknown Registry Type.");
+                }
+
+                List<byte[]>? keys = _encModel?.Keys;
+
+                if (keys.Count > 1)
+                {
+                    key.SetValue(Encoding.UTF8.GetString(ProtectedData.Unprotect(keys[0], null, DataProtectionScope.CurrentUser)), data, RegistryValueKind.Binary);
+                    key.SetValue(Encoding.UTF8.GetString(ProtectedData.Unprotect(keys[1], null, DataProtectionScope.CurrentUser)), data2, RegistryValueKind.Binary);
+                }
+                else
+                {
+                    throw new InvalidOperationException("There has to be more than one key");
+                }
+
                 key.Close();
             }
             catch (Exception ex)
@@ -254,6 +269,8 @@ namespace BaseClass.Encryption.Encryptions
 
         private List<byte[]> RegistryValGet()
         {
+            RegistryKey? key = null;
+
             try
             {
                 string RegistyKeyName = RegistryRead();
@@ -262,9 +279,34 @@ namespace BaseClass.Encryption.Encryptions
 
                 _logWriter?.LogWrite($"Actual Registry Path Value => {RegistyKeyName}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
 
-                RegistryKey key = Registry.CurrentUser.OpenSubKey(RegistyKeyName, true);
-                byte[] val = (byte[])key.GetValue("KeyA");
-                byte[] val2 = (byte[])key.GetValue("KeyIV");
+                if (Encoding.UTF8.GetString(ProtectedData.Unprotect(_encModel?.RegType, null, DataProtectionScope.CurrentUser)).Equals(RegPath.User.ToString()))
+                {
+                    key = Registry.CurrentUser.OpenSubKey(RegistyKeyName, true);
+                }
+                else if (Encoding.UTF8.GetString(ProtectedData.Unprotect(_encModel?.RegType, null, DataProtectionScope.CurrentUser)).Equals(RegPath.Machine.ToString()))
+                {
+                    key = Registry.LocalMachine.OpenSubKey(RegistyKeyName, true);
+                }
+                else
+                {
+                    throw new Exception("Unknown Registry Type.");
+                }
+
+                byte[]? val = null;
+                byte[]? val2 = null;
+
+                List<byte[]>? keys = _encModel?.Keys;
+
+                if (keys.Count > 1)
+                {
+                    val = (byte[])key.GetValue(Encoding.UTF8.GetString(ProtectedData.Unprotect(keys[0], null, DataProtectionScope.CurrentUser)));
+                    val2 = (byte[])key.GetValue(Encoding.UTF8.GetString(ProtectedData.Unprotect(keys[1], null, DataProtectionScope.CurrentUser)));
+                }
+                else
+                {
+                    throw new InvalidOperationException("There has to be more than one key");
+                }
+
                 list.Add(val);
                 list.Add(val2);
                 key.Close();

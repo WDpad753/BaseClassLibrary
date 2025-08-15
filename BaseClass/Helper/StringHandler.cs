@@ -1,9 +1,13 @@
 ﻿using BaseLogger;
 using BaseLogger.Models;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Buffers.Text;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using FuncName = BaseClass.MethodNameExtractor.FuncNameExtractor;
@@ -73,6 +77,35 @@ namespace BaseClass.Helper
             {
                 //_logWriter.LogWrite("Error reading data to find difference between two strings. Exception Message: " + ex, this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
                 throw new Exception(ex.ToString());
+            }
+        }
+
+        public static bool IsValidBase64(string? StrVal, bool checkDPAPI = false, byte[]? optionalEntropy = null, DataProtectionScope scope = DataProtectionScope.CurrentUser)
+        {
+            if (string.IsNullOrWhiteSpace(StrVal))
+                return false;
+
+            if (!Base64.IsValid(StrVal.AsSpan()))
+                return false;
+
+            try
+            {
+                byte[] res = Convert.FromBase64String(StrVal);
+
+                if (checkDPAPI)
+                {
+                    return DPAPIHandler.VerifyDPAPIData(res, optionalEntropy, scope);
+                }
+
+                return true;
+            }
+            catch (FormatException)
+            {
+                return false;
+            }
+            catch
+            {
+                return false;
             }
         }
     }
