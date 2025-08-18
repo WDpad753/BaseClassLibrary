@@ -3,6 +3,7 @@ using BaseClass.Config;
 using BaseClass.Model;
 using BaseLogger;
 using BaseLogger.Models;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -27,8 +28,9 @@ namespace BaseClass.Helper
         private readonly EnvFileHandler? _envFileHandler;
         private ExeConfigurationFileMap? _fileMap;
         private readonly string? _configPath;
+        private readonly EncryptionModel? _encModel;
 
-        public RegistryHandler(IBase? BaseConfig) 
+        public RegistryHandler(IBase? BaseConfig, EncryptionModel? EncModel)
         {
             baseConfig = BaseConfig;
             _logWriter = BaseConfig?.Logger;
@@ -47,9 +49,11 @@ namespace BaseClass.Helper
             {
                 _configPath = BaseConfig?.ConfigPath;
             }
+
+            _encModel=EncModel;
         }
 
-        public string? RegistryRead(object? PathKey, object? Key = null)
+        public string? RegistryRead(string? PathKey, object? Key = null)
         {
             string? pathKey = null;
             string? key = null;
@@ -59,16 +63,6 @@ namespace BaseClass.Helper
             {
                 Configuration? config = null;
 
-                switch (PathKey)
-                {
-                    case string s:
-                        pathKey = s;
-                        break;
-                    case byte[] b:
-                        byte[] decrypteddata = ProtectedData.Unprotect(b, null, DataProtectionScope.CurrentUser);
-                        pathKey = Encoding.UTF8.GetString(decrypteddata);
-                        break;
-                }
                 switch (Key)
                 {
                     case string s:
@@ -83,12 +77,12 @@ namespace BaseClass.Helper
                 if (_fileMap != null)
                 {
                     config = ConfigurationManager.OpenMappedExeConfiguration(_fileMap, ConfigurationUserLevel.None);
-                    configvalue = config.AppSettings.Settings[pathKey].Value;
+                    configvalue = config.AppSettings.Settings[PathKey].Value;
                 }
                 else
                 {
                     //configvalue = _envHandler?.EnvFileRead(_configPath, PathKey, Key);/**/
-                    configvalue = _envHandler?.EnvRead(key, EnvAccessMode.File, _configPath, pathKey);
+                    configvalue = _envHandler?.EnvRead(key, EnvAccessMode.File, _configPath, PathKey);
 
                     if (configvalue == null)
                     {
@@ -108,6 +102,11 @@ namespace BaseClass.Helper
                     if(keyValVer == true)
                     {
                         keyval = DPAPIHandler.Decrypt(Convert.FromBase64String(configvalue));
+
+                        if(StringHandler.IsValidBase64(keyval, true))
+                        {
+                            keyval = DPAPIHandler.Decrypt(Convert.FromBase64String(keyval));
+                        }
                     }
                     else if(keyValVer == false)
                     {
@@ -147,26 +146,18 @@ namespace BaseClass.Helper
             }
         }
 
-        public void RegistrySave(object? PathKey, object? data, object? Key = null)
+        public void RegistrySave(string? PathKey, object? data, object? Key = null)
         {
             string? pathKey = null;
             string? key = null;
+            string? Data = null;
+            string? encrypteddata = null;
             string? configvalue = null;
 
             try
             {
                 Configuration? config = null;
 
-                switch (PathKey)
-                {
-                    case string s:
-                        pathKey = s;
-                        break;
-                    case byte[] b:
-                        byte[] decrypteddata = ProtectedData.Unprotect(b, null, DataProtectionScope.CurrentUser);
-                        pathKey = Encoding.UTF8.GetString(decrypteddata);
-                        break;
-                }
                 switch (Key)
                 {
                     case string s:
@@ -177,79 +168,62 @@ namespace BaseClass.Helper
                         key = Encoding.UTF8.GetString(decrypteddata);
                         break;
                 }
-
-                if (_fileMap != null)
+                switch (data)
                 {
-                    config = ConfigurationManager.OpenMappedExeConfiguration(_fileMap, ConfigurationUserLevel.None);
-                    configvalue = config.AppSettings.Settings[pathKey].Value;
-
-                    if (configvalue == null)
-                    {
-                        _logWriter?.LogWrite("Unable to find the Registry", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
-                        return;
-                    }
-                }
-                else
-                {
-                    configvalue = _envHandler?.EnvRead(key, EnvAccessMode.File, _configPath, pathKey);
-
-                    if (configvalue == null)
-                    {
-                        _logWriter?.LogWrite("Unable to find the Registry", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
-                        return;
-                    }
-                }
-
-                if (configvalue != null || configvalue == "")
-                {
-                    _logWriter?.LogWrite("There is Registry Key Setting in Config File", GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
-
-                    string? keyval = null;
-                    bool keyValVer = StringHandler.IsValidBase64(configvalue, true);
-
-                    if (keyValVer == true)
-                    {
-                        byte[] DataBytes = Encoding.UTF8.GetBytes(configvalue);
+                    case string s:
+                        byte[] DataBytes = Encoding.UTF8.GetBytes(s);
                         byte[] EncryptedData = ProtectedData.Protect(DataBytes, null, DataProtectionScope.CurrentUser);
-                        string encrypteddata = Convert.ToBase64String(EncryptedData);
+                        encrypteddata = Convert.ToBase64String(EncryptedData);
+                        break;
+                    case byte[] b:
+                        byte[] encryptedBytes = ProtectedData.Protect(b, null, DataProtectionScope.CurrentUser);
+                        encrypteddata = Convert.ToBase64String(encryptedBytes);
+                        break;
+                }
 
-                        if (encrypteddata != null)
-                        {
-                            if (_fileMap != null)
-                            {
-                                config.AppSettings.Settings[pathKey].Value = encrypteddata;
-                                config.Save(ConfigurationSaveMode.Modified);
-                                ConfigurationManager.RefreshSection("appSettings");
-                            }
-                            else
-                            {
-                                //configvalue = _envHandler?.EnvFileSave(encrypteddata, PathKey, Key);    
-                                _envHandler?.EnvSave(key, encrypteddata, EnvAccessMode.File, _configPath, pathKey);
-                            }
-                        }
-                        else
-                        {
-                            _logWriter?.LogWrite("Element does not exist in file.", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
-                        }
-                    }
-                    else if (keyValVer == false)
+                string? keyval = null;
+                bool keyValVer = StringHandler.IsValidBase64(encrypteddata, true);
+
+                if (keyValVer == true)
+                {
+                    //byte[] DataBytes = Encoding.UTF8.GetBytes(Data);
+                    //byte[] EncryptedData = ProtectedData.Protect(DataBytes, null, DataProtectionScope.CurrentUser);
+                    //string encrypteddata = Convert.ToBase64String(EncryptedData);
+
+                    if (encrypteddata != null)
                     {
                         if (_fileMap != null)
                         {
-                            config.AppSettings.Settings[pathKey].Value = configvalue;
+                            config = ConfigurationManager.OpenMappedExeConfiguration(_fileMap, ConfigurationUserLevel.None);
+                            config.AppSettings.Settings[PathKey].Value = encrypteddata;
                             config.Save(ConfigurationSaveMode.Modified);
                             ConfigurationManager.RefreshSection("appSettings");
                         }
                         else
                         {
                             //configvalue = _envHandler?.EnvFileSave(encrypteddata, PathKey, Key);    
-                            _envHandler?.EnvSave(key, configvalue, EnvAccessMode.File, _configPath, pathKey);
+                            _envHandler?.EnvSave(key, encrypteddata, EnvAccessMode.File, _configPath, PathKey);
                         }
                     }
+                    else
+                    {
+                        _logWriter?.LogWrite("Element does not exist in file.", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                    }
                 }
-                else
+                else if (keyValVer == false)
                 {
-                    _logWriter?.LogWrite("There is no registry path in the Configuration file.", GetType().Name, FuncName.GetMethodName(), MessageLevels.Verbose);
+                    if (_fileMap != null)
+                    {
+                        config = ConfigurationManager.OpenMappedExeConfiguration(_fileMap, ConfigurationUserLevel.None);
+                        config.AppSettings.Settings[PathKey].Value = encrypteddata;
+                        config.Save(ConfigurationSaveMode.Modified);
+                        ConfigurationManager.RefreshSection("appSettings");
+                    }
+                    else
+                    {
+                        //configvalue = _envHandler?.EnvFileSave(encrypteddata, PathKey, Key);    
+                        _envHandler?.EnvSave(key, configvalue, EnvAccessMode.File, _configPath, PathKey);
+                    }
                 }
             }
             catch (Exception ex)
@@ -261,6 +235,94 @@ namespace BaseClass.Helper
                 pathKey = null;
                 key = null;
                 configvalue = null;
+            }
+        }
+
+        public void RegistryValSave(byte[] data, byte[] data2)
+        {
+            RegistryKey? key = null;
+
+            try
+            {
+                string RegistyKeyName = RegistryRead(_encModel?.ConfigKey, _encModel?.Key);
+
+                _logWriter?.LogWrite($"Actual Registry Path Value => {RegistyKeyName}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
+
+                if (Encoding.UTF8.GetString(ProtectedData.Unprotect(_encModel?.RegType, null, DataProtectionScope.CurrentUser)).Equals(RegPath.User.ToString()))
+                {
+                    key = Registry.CurrentUser.OpenSubKey(RegistyKeyName, true);
+                }
+                else if (Encoding.UTF8.GetString(ProtectedData.Unprotect(_encModel?.RegType, null, DataProtectionScope.CurrentUser)).Equals(RegPath.Machine.ToString()))
+                {
+                    key = Registry.LocalMachine.OpenSubKey(RegistyKeyName, true);
+                }
+                else
+                {
+                    throw new Exception("Unknown Registry Type.");
+                }
+
+                List<byte[]>? keys = _encModel?.Keys;
+
+                if (keys.Count > 1)
+                {
+                    key.SetValue(Encoding.UTF8.GetString(ProtectedData.Unprotect(keys[0], null, DataProtectionScope.CurrentUser)), data, RegistryValueKind.Binary);
+                    key.SetValue(Encoding.UTF8.GetString(ProtectedData.Unprotect(keys[1], null, DataProtectionScope.CurrentUser)), data2, RegistryValueKind.Binary);
+                }
+                else
+                {
+                    throw new InvalidOperationException("There has to be more than one key");
+                }
+
+                key.Close();
+            }
+            catch (Exception ex)
+            {
+                _logWriter?.LogWrite($"Key was not saved. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+            }
+        }
+
+        public List<byte[]> RegistryValGet()
+        {
+            RegistryKey? key = null;
+
+            try
+            {
+                List<byte[]> list = new List<byte[]>();
+
+                _logWriter?.LogWrite($"Actual Registry Path Value => {RegistryRead(_encModel?.ConfigKey)}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
+
+                foreach(var Key in _encModel?.Keys)
+                {
+                    if (Encoding.UTF8.GetString(ProtectedData.Unprotect(_encModel?.RegType, null, DataProtectionScope.CurrentUser)).Equals(RegPath.User.ToString()))
+                    {
+                        //key = Registry.CurrentUser.OpenSubKey(RegistyKeyName, true);
+                        //var da = Encoding.UTF8.GetString(ProtectedData.Unprotect(Encoding.UTF8.GetBytes(RegistyKeyName), null, DataProtectionScope.CurrentUser));
+                        key = Registry.CurrentUser.OpenSubKey(RegistryRead(_encModel?.ConfigKey), true);
+                    }
+                    else if (Encoding.UTF8.GetString(ProtectedData.Unprotect(_encModel?.RegType, null, DataProtectionScope.CurrentUser)).Equals(RegPath.Machine.ToString()))
+                    {
+                        key = Registry.LocalMachine.OpenSubKey(RegistryRead(_encModel?.ConfigKey), true);
+                    }
+                    else
+                    {
+                        throw new Exception("Unknown Registry Type.");
+                    }
+
+                    byte[]? val = null;
+
+                    val = (byte[])key.GetValue(Encoding.UTF8.GetString(ProtectedData.Unprotect(Key, null, DataProtectionScope.CurrentUser)));
+
+                    list.Add(val);
+                }
+
+                key.Close();
+
+                return list;
+            }
+            catch (Exception ex)
+            {
+                _logWriter?.LogWrite($"Key was not saved. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                return null;
             }
         }
     }

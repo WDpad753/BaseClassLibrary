@@ -12,9 +12,7 @@ namespace BaseClass.Encryption.Interface
         bool IsEncrypted { get; set; }
         string Encrypt(string data);
         string Decrypt(string data);
-        void RegistrySave(string data);
         void EnvSave(string data);
-        string RegistryRead();
         string EnvRead();
         void GenerateandSaveEncryptionKeys();
     }

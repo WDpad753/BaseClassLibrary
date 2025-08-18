@@ -52,7 +52,7 @@ namespace BaseClass.Encryption.Encryptions
 
             if (AccessMode.HasValue && AccessMode.Value == ConfigAccessMode.Registry)
             {
-                _regHandler = new(BaseConfig);
+                _regHandler = new(BaseConfig,EncModel);
             }
             else if (AccessMode.HasValue && AccessMode.Value == ConfigAccessMode.Environment)
             {
@@ -94,7 +94,7 @@ namespace BaseClass.Encryption.Encryptions
         {
             try
             {
-                List<byte[]> data = RegistryValGet();
+                List<byte[]>? data = _regHandler?.RegistryValGet();
                 byte[] decrypteddata = ProtectedData.Unprotect(data[0], null, DataProtectionScope.CurrentUser);
                 byte[] decrypteddata2 = ProtectedData.Unprotect(data[1], null, DataProtectionScope.CurrentUser);
                 string KeyString = Encoding.UTF8.GetString(decrypteddata);
@@ -131,7 +131,7 @@ namespace BaseClass.Encryption.Encryptions
                         var IVString = Convert.ToBase64String(_IV);
                         byte[] data = ProtectedData.Protect(Encoding.UTF8.GetBytes(KeyString), null, DataProtectionScope.CurrentUser);
                         byte[] data2 = ProtectedData.Protect(Encoding.UTF8.GetBytes(IVString), null, DataProtectionScope.CurrentUser);
-                        RegistryValSave(data, data2);
+                        _regHandler?.RegistryValSave(data, data2);
                     }
                     else
                     {
@@ -149,16 +149,6 @@ namespace BaseClass.Encryption.Encryptions
             }
         }
 
-        public string RegistryRead()
-        {
-            return _regHandler?.RegistryRead(_encModel?.PathKey,_encModel?.Key);
-        }
-
-        public void RegistrySave(string data)
-        {
-            _regHandler?.RegistrySave(_encModel?.PathKey, _encModel?.Key, data);
-        }
-
         private bool? PrivateKeyVerification()
         {
             object? keyvalue1 = null;
@@ -170,7 +160,7 @@ namespace BaseClass.Encryption.Encryptions
             {
                 if (_regHandler != null)
                 {
-                    string RegistyKeyName = RegistryRead();
+                    string? RegistyKeyName = _regHandler.RegistryRead(_encModel?.ConfigKey, _encModel?.Key);
 
                     List<byte[]>? keys = _encModel?.Keys;
 
@@ -224,100 +214,5 @@ namespace BaseClass.Encryption.Encryptions
             return keysGenerated;
         }
 
-        private void RegistryValSave(byte[] data, byte[] data2)
-        {
-            RegistryKey? key = null;
-
-            try
-            {
-                string RegistyKeyName = RegistryRead();
-
-                _logWriter?.LogWrite($"Actual Registry Path Value => {RegistyKeyName}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
-
-                if(Encoding.UTF8.GetString(ProtectedData.Unprotect(_encModel?.RegType, null, DataProtectionScope.CurrentUser)).Equals(RegPath.User.ToString()))
-                {
-                    key = Registry.CurrentUser.OpenSubKey(RegistyKeyName, true);
-                }
-                else if(Encoding.UTF8.GetString(ProtectedData.Unprotect(_encModel?.RegType, null, DataProtectionScope.CurrentUser)).Equals(RegPath.Machine.ToString()))
-                {
-                    key = Registry.LocalMachine.OpenSubKey(RegistyKeyName, true);
-                }
-                else
-                {
-                    throw new Exception("Unknown Registry Type.");
-                }
-
-                List<byte[]>? keys = _encModel?.Keys;
-
-                if (keys.Count > 1)
-                {
-                    key.SetValue(Encoding.UTF8.GetString(ProtectedData.Unprotect(keys[0], null, DataProtectionScope.CurrentUser)), data, RegistryValueKind.Binary);
-                    key.SetValue(Encoding.UTF8.GetString(ProtectedData.Unprotect(keys[1], null, DataProtectionScope.CurrentUser)), data2, RegistryValueKind.Binary);
-                }
-                else
-                {
-                    throw new InvalidOperationException("There has to be more than one key");
-                }
-
-                key.Close();
-            }
-            catch (Exception ex)
-            {
-                _logWriter?.LogWrite($"Key was not saved. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
-            }
-        }
-
-        private List<byte[]> RegistryValGet()
-        {
-            RegistryKey? key = null;
-
-            try
-            {
-                string RegistyKeyName = RegistryRead();
-
-                List<byte[]> list = new List<byte[]>();
-
-                _logWriter?.LogWrite($"Actual Registry Path Value => {RegistyKeyName}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
-
-                if (Encoding.UTF8.GetString(ProtectedData.Unprotect(_encModel?.RegType, null, DataProtectionScope.CurrentUser)).Equals(RegPath.User.ToString()))
-                {
-                    key = Registry.CurrentUser.OpenSubKey(RegistyKeyName, true);
-                }
-                else if (Encoding.UTF8.GetString(ProtectedData.Unprotect(_encModel?.RegType, null, DataProtectionScope.CurrentUser)).Equals(RegPath.Machine.ToString()))
-                {
-                    key = Registry.LocalMachine.OpenSubKey(RegistyKeyName, true);
-                }
-                else
-                {
-                    throw new Exception("Unknown Registry Type.");
-                }
-
-                byte[]? val = null;
-                byte[]? val2 = null;
-
-                List<byte[]>? keys = _encModel?.Keys;
-
-                if (keys.Count > 1)
-                {
-                    val = (byte[])key.GetValue(Encoding.UTF8.GetString(ProtectedData.Unprotect(keys[0], null, DataProtectionScope.CurrentUser)));
-                    val2 = (byte[])key.GetValue(Encoding.UTF8.GetString(ProtectedData.Unprotect(keys[1], null, DataProtectionScope.CurrentUser)));
-                }
-                else
-                {
-                    throw new InvalidOperationException("There has to be more than one key");
-                }
-
-                list.Add(val);
-                list.Add(val2);
-                key.Close();
-
-                return list;
-            }
-            catch (Exception ex)
-            {
-                _logWriter?.LogWrite($"Key was not saved. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
-                return null;
-            }
-        }
     }
 }

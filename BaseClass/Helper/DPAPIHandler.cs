@@ -50,8 +50,8 @@ namespace BaseClass.Helper
             try
             {
                 byte[] decryptedBytes = ProtectedData.Unprotect(encryptedBytes, optionalEntropy, scope);
-                string val = Convert.ToBase64String(decryptedBytes);
-                //string val = Encoding.UTF8.GetString(decryptedBytes);
+                //string val = Convert.ToBase64String(decryptedBytes);
+                string val = Encoding.UTF8.GetString(decryptedBytes);
                 return val;
             }
             catch (Exception ex)

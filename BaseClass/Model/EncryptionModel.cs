@@ -8,6 +8,7 @@ namespace BaseClass.Model
 {
     public class EncryptionModel
     {
+        public string? ConfigKey { get; set; }
         public byte[]? PathKey { get; set; }
         public byte[]? Key { get; set; }
         public byte[]? RegType { get; set; }
