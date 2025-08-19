@@ -130,7 +130,6 @@ namespace BaseLogger
             {
                 if (loggingLvl > (int)Enum.GetValues(typeof(MessageLevels)).Cast<MessageLevels>().Last())
                 {
-
                     logtext = $"{appName}: {datetimenw} LevelX: {appbase}::{func} - Unknown Log Level, Please change the log level.";
 
                     sb.Append(logtext);
@@ -150,7 +149,7 @@ namespace BaseLogger
                     return;
                 }
 
-                if (debugState == 0)
+                if (debugLevel == 0)
                 {
                     logtext = $"{appName}: {datetimenw} Level{Messagelvl.ToString().Substring(0, 1)}: {appbase}::{func} - {message}";
 
@@ -169,7 +168,7 @@ namespace BaseLogger
 
                     sb.Append(logtext);
 
-                    // Saving the logs into the textfile:
+                    // Displaying the logs into the Console and Debug Section:
                     Debug.WriteLine(sb.ToString());
                     Console.WriteLine(sb.ToString());
                     sb.Clear();

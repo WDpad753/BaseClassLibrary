@@ -7,12 +7,14 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Security.Cryptography;
 using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using System.Windows.Input;
 using static System.Net.Mime.MediaTypeNames;
 using FuncName = BaseClass.MethodNameExtractor.FuncNameExtractor;
@@ -238,7 +240,7 @@ namespace BaseClass.Helper
             }
         }
 
-        public void RegistryValSave(byte[] data, byte[] data2)
+        public void RegistryValSave(List<byte[]>? datas)
         {
             RegistryKey? key = null;
 
@@ -246,31 +248,63 @@ namespace BaseClass.Helper
             {
                 string RegistyKeyName = RegistryRead(_encModel?.ConfigKey, _encModel?.Key);
 
-                _logWriter?.LogWrite($"Actual Registry Path Value => {RegistyKeyName}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
+                //_logWriter?.LogWrite($"Actual Registry Path Value => {RegistyKeyName}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
 
-                if (Encoding.UTF8.GetString(ProtectedData.Unprotect(_encModel?.RegType, null, DataProtectionScope.CurrentUser)).Equals(RegPath.User.ToString()))
-                {
-                    key = Registry.CurrentUser.OpenSubKey(RegistyKeyName, true);
-                }
-                else if (Encoding.UTF8.GetString(ProtectedData.Unprotect(_encModel?.RegType, null, DataProtectionScope.CurrentUser)).Equals(RegPath.Machine.ToString()))
-                {
-                    key = Registry.LocalMachine.OpenSubKey(RegistyKeyName, true);
-                }
-                else
-                {
-                    throw new Exception("Unknown Registry Type.");
-                }
+                //if (Encoding.UTF8.GetString(ProtectedData.Unprotect(_encModel?.RegType, null, DataProtectionScope.CurrentUser)).Equals(RegPath.User.ToString()))
+                //{
+                //    key = Registry.CurrentUser.OpenSubKey(RegistyKeyName, true);
+                //}
+                //else if (Encoding.UTF8.GetString(ProtectedData.Unprotect(_encModel?.RegType, null, DataProtectionScope.CurrentUser)).Equals(RegPath.Machine.ToString()))
+                //{
+                //    key = Registry.LocalMachine.OpenSubKey(RegistyKeyName, true);
+                //}
+                //else
+                //{
+                //    throw new Exception("Unknown Registry Type.");
+                //}
 
-                List<byte[]>? keys = _encModel?.Keys;
+                //List<byte[]>? keys = _encModel?.Keys;
 
-                if (keys.Count > 1)
+                //if (keys.Count > 1)
+                //{
+                //    key.SetValue(Encoding.UTF8.GetString(ProtectedData.Unprotect(keys[0], null, DataProtectionScope.CurrentUser)), data, RegistryValueKind.Binary);
+                //    key.SetValue(Encoding.UTF8.GetString(ProtectedData.Unprotect(keys[1], null, DataProtectionScope.CurrentUser)), data2, RegistryValueKind.Binary);
+                //}
+                //else
+                //{
+                //    throw new InvalidOperationException("There has to be more than one key");
+                //}
+
+                _logWriter?.LogWrite($"Actual Registry Path Value => {RegistryRead(_encModel?.ConfigKey)}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
+
+                foreach (var Key in _encModel?.Keys)
                 {
-                    key.SetValue(Encoding.UTF8.GetString(ProtectedData.Unprotect(keys[0], null, DataProtectionScope.CurrentUser)), data, RegistryValueKind.Binary);
-                    key.SetValue(Encoding.UTF8.GetString(ProtectedData.Unprotect(keys[1], null, DataProtectionScope.CurrentUser)), data2, RegistryValueKind.Binary);
-                }
-                else
-                {
-                    throw new InvalidOperationException("There has to be more than one key");
+                    if (Encoding.UTF8.GetString(ProtectedData.Unprotect(_encModel?.RegType, null, DataProtectionScope.CurrentUser)).Equals(RegPath.User.ToString()))
+                    {
+                        //key = Registry.CurrentUser.OpenSubKey(RegistyKeyName, true);
+                        //var da = Encoding.UTF8.GetString(ProtectedData.Unprotect(Encoding.UTF8.GetBytes(RegistyKeyName), null, DataProtectionScope.CurrentUser));
+                        Debug.WriteLine($"[{RegistryRead(_encModel?.ConfigKey)}]");
+                        key = Registry.CurrentUser.OpenSubKey(RegistryRead(_encModel?.ConfigKey), false);
+                    }
+                    else if (Encoding.UTF8.GetString(ProtectedData.Unprotect(_encModel?.RegType, null, DataProtectionScope.CurrentUser)).Equals(RegPath.Machine.ToString()))
+                    {
+                        key = Registry.LocalMachine.OpenSubKey(RegistryRead(_encModel?.ConfigKey), true);
+                    }
+                    else
+                    {
+                        throw new Exception("Unknown Registry Type.");
+                    }
+
+                    byte[]? val = null;
+
+                    Debug.WriteLine($"[{ProtectedData.Unprotect(Key, null, DataProtectionScope.CurrentUser)}]");
+                    Debug.WriteLine($"[{Encoding.UTF8.GetString(ProtectedData.Unprotect(Key, null, DataProtectionScope.CurrentUser))}]");
+                    Debug.WriteLine($"[{key.GetValue(Encoding.UTF8.GetString(ProtectedData.Unprotect(Key, null, DataProtectionScope.CurrentUser)))}]");
+
+                    foreach(var Data in datas)
+                    {
+                        key.SetValue(Encoding.UTF8.GetString(ProtectedData.Unprotect(Key, null, DataProtectionScope.CurrentUser)), Data, RegistryValueKind.Binary);
+                    }
                 }
 
                 key.Close();
@@ -297,7 +331,8 @@ namespace BaseClass.Helper
                     {
                         //key = Registry.CurrentUser.OpenSubKey(RegistyKeyName, true);
                         //var da = Encoding.UTF8.GetString(ProtectedData.Unprotect(Encoding.UTF8.GetBytes(RegistyKeyName), null, DataProtectionScope.CurrentUser));
-                        key = Registry.CurrentUser.OpenSubKey(RegistryRead(_encModel?.ConfigKey), true);
+                        Debug.WriteLine($"[{RegistryRead(_encModel?.ConfigKey)}]");
+                        key = Registry.CurrentUser.OpenSubKey(RegistryRead(_encModel?.ConfigKey), false);
                     }
                     else if (Encoding.UTF8.GetString(ProtectedData.Unprotect(_encModel?.RegType, null, DataProtectionScope.CurrentUser)).Equals(RegPath.Machine.ToString()))
                     {
@@ -310,7 +345,11 @@ namespace BaseClass.Helper
 
                     byte[]? val = null;
 
-                    val = (byte[])key.GetValue(Encoding.UTF8.GetString(ProtectedData.Unprotect(Key, null, DataProtectionScope.CurrentUser)));
+                    Debug.WriteLine($"[{ProtectedData.Unprotect(Key, null, DataProtectionScope.CurrentUser)}]");
+                    Debug.WriteLine($"[{Encoding.UTF8.GetString(ProtectedData.Unprotect(Key, null, DataProtectionScope.CurrentUser))}]");
+                    Debug.WriteLine($"[{key.GetValue(Encoding.UTF8.GetString(ProtectedData.Unprotect(Key, null, DataProtectionScope.CurrentUser)))}]");
+                    
+                    val = ProtectedData.Protect(Encoding.UTF8.GetBytes((string)key.GetValue(Encoding.UTF8.GetString(ProtectedData.Unprotect(Key, null, DataProtectionScope.CurrentUser)))),null, DataProtectionScope.CurrentUser);
 
                     list.Add(val);
                 }

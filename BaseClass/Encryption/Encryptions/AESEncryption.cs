@@ -131,7 +131,8 @@ namespace BaseClass.Encryption.Encryptions
                         var IVString = Convert.ToBase64String(_IV);
                         byte[] data = ProtectedData.Protect(Encoding.UTF8.GetBytes(KeyString), null, DataProtectionScope.CurrentUser);
                         byte[] data2 = ProtectedData.Protect(Encoding.UTF8.GetBytes(IVString), null, DataProtectionScope.CurrentUser);
-                        _regHandler?.RegistryValSave(data, data2);
+                        List<byte[]> Datas = new List<byte[]>() { data, data2 };
+                        _regHandler?.RegistryValSave(Datas);
                     }
                     else
                     {
