@@ -78,7 +78,7 @@ namespace BaseLogger
         {
             try
             {
-                StringBuilder sb = new StringBuilder();
+                sb = new StringBuilder();
 
                 string filenamepath = Path.Combine(logFilePath, appName+".log");
 
@@ -108,8 +108,7 @@ namespace BaseLogger
         private void LogWrite(string message, string func, MessageLevels Messagelvl)
         {
             // Initialising variables:
-            StringBuilder sb = new StringBuilder();
-            //string filename = $"{appName}";
+            sb = new StringBuilder();
             DebugState debugLevel = debugState != null ? (DebugState)debugState : DebugState.Inactive;
             baseMsg = FuncName.GetCallingClassName();
 
