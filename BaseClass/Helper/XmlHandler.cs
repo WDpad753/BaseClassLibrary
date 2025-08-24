@@ -9,14 +9,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
-using FuncName = BaseClass.MethodNameExtractor.FuncNameExtractor;
+
 
 namespace BaseClass.Helper
 {
     public class XmlHandler
     {
         private readonly IBase baseConfig;
-        private LogWriter? _logWriter;
+        private ILogger? _logWriter;
         private string? _filePath;
         private List<string> fileExtensions = new List<string>() { ".xml", ".config" };
 
@@ -58,7 +58,7 @@ namespace BaseClass.Helper
 
                 if (!File.Exists(_filePath) && (!string.Equals(Path.GetExtension(_filePath), ".xml", StringComparison.OrdinalIgnoreCase) || !fileExtensions.Contains(Path.GetExtension(_filePath))))
                 {
-                    _logWriter.LogWrite($"XML File does not exist in the given path. Path => {_filePath}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                    _logWriter.LogError($"XML File does not exist in the given path. Path => {_filePath}");
                     return;
                 }
 
@@ -67,7 +67,7 @@ namespace BaseClass.Helper
                 XElement targetNode = xdoc.Descendants(mainKey).FirstOrDefault();
                 if (targetNode == null)
                 {
-                    _logWriter.LogWrite($"No element named '{mainKey}' found.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                    _logWriter.LogError($"No element named '{mainKey}' found.");
                     return;
                 }
 
@@ -89,7 +89,7 @@ namespace BaseClass.Helper
                     {
                         found.SetAttributeValue("value", value);
                     }
-                    _logWriter.LogWrite($"Updated <{found.Name} key=\"{key}\"> under <{mainKey}> to value=\"{value}\".", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Verbose);
+                    _logWriter.LogDebug($"Updated <{found.Name} key=\"{key}\"> under <{mainKey}> to value=\"{value}\".");
                 }
                 else
                 {
@@ -104,14 +104,14 @@ namespace BaseClass.Helper
                         targetNode.Add(newElem);
                     }
 
-                    _logWriter.LogWrite($"Added <add key=\"{key}\" value=\"{value}\"/> under <{mainKey}>.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Verbose);
+                    _logWriter.LogDebug($"Added <add key=\"{key}\" value=\"{value}\"/> under <{mainKey}>.");
                 }
 
                 xdoc.Save(_filePath);
             }
             catch (Exception ex)
             {
-                _logWriter.LogWrite($"Exception Occurred: {ex.Message}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                _logWriter.LogError($"Exception Occurred: {ex.Message}");
             }
         }
     }

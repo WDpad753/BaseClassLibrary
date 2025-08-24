@@ -20,8 +20,8 @@ namespace BaseLogger.Models
     {
         Fatal = 0,
         //Error = 0,
-        Log = 1,
-        Verbose = 2,
+        Base = 1,
+        Alert = 2,
         Debug = 3,
         Info = 4
     }

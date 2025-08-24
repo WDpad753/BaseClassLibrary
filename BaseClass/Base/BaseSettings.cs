@@ -19,7 +19,7 @@ namespace BaseClass.Base
     // For Base Classes
     public class BaseSettings : IBase
     {
-        public LogWriter? Logger { get; set; }
+        public ILogger? Logger { get; set; }
         public string? ConfigPath { get; set; }
         public string? LoggedOnUser { get; set; }
         public string? LoggedOnUserGroup { get; set; }
