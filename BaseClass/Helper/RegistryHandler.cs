@@ -17,14 +17,14 @@ using System.Threading.Tasks;
 using System.Windows.Documents;
 using System.Windows.Input;
 using static System.Net.Mime.MediaTypeNames;
-using FuncName = BaseClass.MethodNameExtractor.FuncNameExtractor;
+
 
 namespace BaseClass.Helper
 {
     public class RegistryHandler
     {
         private readonly IBase? baseConfig;
-        private readonly LogWriter? _logWriter;
+        private readonly ILogger? _logWriter;
         private readonly ConfigHandler? _configHandler;
         private readonly EnvHandler? _envHandler;
         private readonly EnvFileHandler? _envFileHandler;
@@ -88,15 +88,15 @@ namespace BaseClass.Helper
 
                     if (configvalue == null)
                     {
-                        _logWriter?.LogWrite("Unable to find the Registry", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                        _logWriter?.LogError("Unable to find the Registry");
                         return null;
                     }
                 }
 
                 if (configvalue != null)
                 {
-                    _logWriter?.LogWrite("There is Registry Path", GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
-                    _logWriter?.LogWrite($"RegistryKey Value = {configvalue}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
+                    _logWriter?.LogBase("There is Registry Path");
+                    _logWriter?.LogDebug($"RegistryKey Value = {configvalue}");
 
                     string? keyval = null;
                     bool keyValVer = StringHandler.IsValidBase64(configvalue, true);
@@ -125,19 +125,19 @@ namespace BaseClass.Helper
                     }
                     else
                     {
-                        _logWriter?.LogWrite("Element does not exist in file.", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                        _logWriter?.LogError("Element does not exist in file.");
                         return null;
                     }
                 }
                 else
                 {
-                    _logWriter?.LogWrite("There is no registry path in the Configuration file.", GetType().Name, FuncName.GetMethodName(), MessageLevels.Verbose);
+                    _logWriter?.LogAlert("There is no registry path in the Configuration file.");
                     return null;
                 }
             }
             catch (Exception ex)
             {
-                _logWriter?.LogWrite($"Path does not exist. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                _logWriter?.LogError($"Path does not exist. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
                 return null;
             }
             finally
@@ -209,7 +209,7 @@ namespace BaseClass.Helper
                     }
                     else
                     {
-                        _logWriter?.LogWrite("Element does not exist in file.", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                        _logWriter?.LogError("Element does not exist in file.");
                     }
                 }
                 else if (keyValVer == false)
@@ -230,7 +230,7 @@ namespace BaseClass.Helper
             }
             catch (Exception ex)
             {
-                _logWriter?.LogWrite($"Path does not exist. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                _logWriter?.LogError($"Path does not exist. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
             }
             finally
             {
@@ -248,7 +248,7 @@ namespace BaseClass.Helper
             {
                 string RegistyKeyName = RegistryRead(_encModel?.ConfigKey, _encModel?.Key);
 
-                //_logWriter?.LogWrite($"Actual Registry Path Value => {RegistyKeyName}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
+                //_logWriter?.LogWrite($"Actual Registry Path Value => {RegistyKeyName}", MessageLevels.Debug);
 
                 //if (Encoding.UTF8.GetString(ProtectedData.Unprotect(_encModel?.RegType, null, DataProtectionScope.CurrentUser)).Equals(RegPath.User.ToString()))
                 //{
@@ -275,7 +275,7 @@ namespace BaseClass.Helper
                 //    throw new InvalidOperationException("There has to be more than one key");
                 //}
 
-                _logWriter?.LogWrite($"Actual Registry Path Value => {RegistryRead(_encModel?.ConfigKey)}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
+                _logWriter?.LogDebug($"Actual Registry Path Value => {RegistryRead(_encModel?.ConfigKey)}");
 
                 foreach (var Key in _encModel?.Keys)
                 {
@@ -311,7 +311,7 @@ namespace BaseClass.Helper
             }
             catch (Exception ex)
             {
-                _logWriter?.LogWrite($"Key was not saved. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                _logWriter?.LogError($"Key was not saved. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
             }
         }
 
@@ -323,7 +323,7 @@ namespace BaseClass.Helper
             {
                 List<byte[]> list = new List<byte[]>();
 
-                _logWriter?.LogWrite($"Actual Registry Path Value => {RegistryRead(_encModel?.ConfigKey)}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
+                _logWriter?.LogDebug($"Actual Registry Path Value => {RegistryRead(_encModel?.ConfigKey)}");
 
                 foreach(var Key in _encModel?.Keys)
                 {
@@ -360,7 +360,7 @@ namespace BaseClass.Helper
             }
             catch (Exception ex)
             {
-                _logWriter?.LogWrite($"Key was not saved. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                _logWriter?.LogError($"Key was not saved. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
                 return null;
             }
         }

@@ -11,14 +11,14 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using FuncName = BaseClass.MethodNameExtractor.FuncNameExtractor;
+
 
 namespace BaseClass.JSON
 {
     public class JSONFileHandler
     {
         private readonly IBase? baseConfig;
-        private LogWriter? _logWriter;
+        private ILogger? _logWriter;
 
         //public JSONFileHandler(LogWriter Logger) 
         //{
@@ -47,7 +47,7 @@ namespace BaseClass.JSON
             }
             catch (Exception ex)
             {
-                _logWriter.LogWrite("Error saving data to file: " + ex.Message, this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                _logWriter.LogError("Error saving data to file: " + ex.Message);
                 return;
             }
         }
@@ -64,7 +64,7 @@ namespace BaseClass.JSON
 
                 if (!File.Exists(targetfilepath))
                 {
-                    _logWriter.LogWrite($"File not found: {targetfilepath}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
+                    _logWriter.LogDebug($"File not found: {targetfilepath}");
                     return default;  
                 }
 
@@ -77,7 +77,7 @@ namespace BaseClass.JSON
             }
             catch (Exception ex)
             {
-                _logWriter.LogWrite("Error reading data to file: " + ex.Message, this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                _logWriter.LogError("Error reading data to file: " + ex.Message);
                 return default;
             }
         }
@@ -95,11 +95,11 @@ namespace BaseClass.JSON
 
                 if(JsonSearch.Any())
                 {
-                    _logWriter.LogWrite($"Found some matches based on the given Key ({KeyName}). Matches Count: {JsonSearch.Count()}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
+                    _logWriter.LogDebug($"Found some matches based on the given Key ({KeyName}). Matches Count: {JsonSearch.Count()}");
                 }
                 else
                 {
-                    _logWriter.LogWrite($"Unable to find any entries that ties to the inserted Key ({KeyName}).", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Verbose);
+                    _logWriter.LogError($"Unable to find any entries that ties to the inserted Key ({KeyName}).");
                     return Enumerable.Empty<JProperty>();
                 }
 
@@ -107,7 +107,7 @@ namespace BaseClass.JSON
             }
             catch (Exception ex)
             {
-                _logWriter.LogWrite("Error searching for value in the input JSON: " + ex.Message, this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                _logWriter.LogError("Error searching for value in the input JSON: " + ex.Message);
                 return Enumerable.Empty<JProperty>();
             }
         }

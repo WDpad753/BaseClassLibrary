@@ -13,7 +13,7 @@ namespace BaseClass.Encryption.Encryptions
     public class HybridEncryption : IEncryption
     {
         private readonly IBase? baseConfig;
-        private LogWriter? _logWriter;
+        private ILogger? _logWriter;
 
         public bool IsDecrypted { get; set; }
         public bool IsEncrypted { get; set; }

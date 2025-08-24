@@ -14,7 +14,6 @@ using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using FuncName = BaseClass.MethodNameExtractor.FuncNameExtractor;
 
 namespace BaseClass.Encryption.Encryptions
 {
@@ -22,7 +21,7 @@ namespace BaseClass.Encryption.Encryptions
     {
         private readonly IBase? baseConfig;
         private readonly EncryptionModel? _encModel;
-        private LogWriter? _logWriter;
+        private ILogger? _logger;
         private RegistryHandler? _regHandler;
         private EnvHandler? _envHandler;
         private EnvFileHandler? _envFileHandler;
@@ -41,7 +40,7 @@ namespace BaseClass.Encryption.Encryptions
         {
             baseConfig = BaseConfig;
             _encModel = EncModel;
-            _logWriter = BaseConfig?.Logger;
+            _logger = BaseConfig?.Logger;
 
             AESCng = new AesCng();
 
@@ -105,7 +104,7 @@ namespace BaseClass.Encryption.Encryptions
             }
             catch (Exception ex)
             {
-                _logWriter.LogWrite($"Key does not exist in the container. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                _logger?.LogError($"Key does not exist in the container. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
             }
         }
 
@@ -146,7 +145,7 @@ namespace BaseClass.Encryption.Encryptions
             }
             catch (Exception ex)
             {
-                _logWriter.LogWrite($"Key was not generated and saved. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                _logger?.LogError($"Key was not generated and saved. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
             }
         }
 
@@ -194,7 +193,7 @@ namespace BaseClass.Encryption.Encryptions
                     else if ((myByte1.Length == 0 || mybyte2.Length != 0) && myByte1.Length != 0 && mybyte2.Length == 0)
                     {
                         keysGenerated = false;
-                        _logWriter?.LogWrite($"Keys did not generate correctly.", GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
+                        _logger?.LogDebug($"Keys did not generate correctly.");
                     }
                     else
                     {
@@ -203,13 +202,13 @@ namespace BaseClass.Encryption.Encryptions
                 }
                 else
                 {
-                    _logWriter?.LogWrite($"Value/s does not exist", GetType().Name, FuncName.GetMethodName(), MessageLevels.Verbose);
+                    _logger?.LogAlert("Value/s does not exist");
                     keysGenerated = false;
                 }
             }
             catch (Exception ex)
             {
-                _logWriter?.LogWrite($"Key verification had failed. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                _logger?.LogError($"Key verification had failed. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
             }
 
             return keysGenerated;

@@ -2,27 +2,28 @@
 using System.Configuration;
 using System.Diagnostics;
 using System.Globalization;
+using System.Reflection;
 using System.Reflection.Metadata;
 using System.Text;
 
 namespace BaseLogger
 {
-    public class LogWriter
+    public class Logger: ILogger
     {
         string? logtext;
         private ExeConfigurationFileMap _fileMap;
         private int? loggingLvl;
         private int? debugState;
         private string? appName;
-        private string? prevAppName;
+        private string? baseMsg;
         private string logFilePath;
         private FileSystemWatcher watcher;
-        private loggerSettings? _configLoggerSettingsSection;
+        private loggerSettings _configLoggerSettingsSection;
         private StringBuilder sb;
         private static readonly object _lockObj = new object();
 
 
-        public LogWriter(string configPath, string logfilePath)
+        public Logger(string configPath, string logfilePath)
         {
             _fileMap = new ExeConfigurationFileMap
             {
@@ -39,7 +40,8 @@ namespace BaseLogger
                 logFilePath=logfilePath;
                 lock(_lockObj)
                 {
-                    LogWrite("Log directory does not exist, created directory to save log files.", this.GetType().Name, nameof(LogWriter), MessageLevels.Verbose);
+                    //LogWrite("Log directory does not exist, created directory to save log files.", this.GetType().Name, nameof(LogWriter), MessageLevels.Verbose);
+                    LogAlert("Log directory does not exist, created directory to save log files.");
                 }
             }
             else
@@ -59,6 +61,18 @@ namespace BaseLogger
             //watcher.Renamed += ConfigOnChanged;
             //watcher.Created += ConfigOnChanged;
         }
+
+        public void LogInfo(string message) => LogWrite(message, FuncName.GetMethodName(), MessageLevels.Info);
+
+        public void LogAlert(string message) => LogWrite(message, FuncName.GetMethodName(), MessageLevels.Alert);
+
+        public void LogError(string message) => LogWrite(message, FuncName.GetMethodName(), MessageLevels.Fatal);
+
+        public void LogDebug(string message) => LogWrite(message, FuncName.GetMethodName(), MessageLevels.Debug);
+
+        public void LogBase(string message) => LogWrite(message, FuncName.GetMethodName(), MessageLevels.Base);
+
+        public void Log(string message, string func, MessageLevels level) => LogWrite(message, FuncName.GetMethodName(), level);
 
         private void ConfigOnChanged(object sender, FileSystemEventArgs e)
         {
@@ -80,8 +94,6 @@ namespace BaseLogger
                     sb.Clear();
                 }
 
-                prevAppName = appName;
-
                 // existing reload logic...
                 appName = (string?)SetupConfigReader(typeof(string), "AppName");
                 loggingLvl = (int?)SetupConfigReader(typeof(int), "LoggingLevel");
@@ -93,13 +105,15 @@ namespace BaseLogger
             }
         }
 
-        public void LogWrite(string message, string? appbase, string func, MessageLevels Messagelvl)
+        private void LogWrite(string message, string func, MessageLevels Messagelvl)
         {
             // Initialising variables:
             StringBuilder sb = new StringBuilder();
             //string filename = $"{appName}";
             DebugState debugLevel = debugState != null ? (DebugState)debugState : DebugState.Inactive;
-            appbase = appbase == null ? "" : appbase;
+            baseMsg = FuncName.GetCallingClassName();
+
+            baseMsg = baseMsg == null ? "" : baseMsg;
 
             string filenamepath = Path.Combine(logFilePath, appName+".log");
 
@@ -117,7 +131,7 @@ namespace BaseLogger
                 return;
             else if ((int)Messagelvl > loggingLvl && (int)debugLevel == 1)
             {
-                logtext = $"{appName}: {datetimenw} Level{Messagelvl.ToString().Substring(0, 1)}: {appbase}::{func} - {message}";
+                logtext = $"{appName}: {datetimenw} Level{Messagelvl.ToString().Substring(0, 1)}: {baseMsg}::{func} - {message}";
 
                 sb.Append(logtext);
 
@@ -130,7 +144,7 @@ namespace BaseLogger
             {
                 if (loggingLvl > (int)Enum.GetValues(typeof(MessageLevels)).Cast<MessageLevels>().Last())
                 {
-                    logtext = $"{appName}: {datetimenw} LevelX: {appbase}::{func} - Unknown Log Level, Please change the log level.";
+                    logtext = $"{appName}: {datetimenw} LevelX: {baseMsg}::{func} - Unknown Log Level, Please change the log level.";
 
                     sb.Append(logtext);
 
@@ -151,7 +165,7 @@ namespace BaseLogger
 
                 if (debugLevel == 0)
                 {
-                    logtext = $"{appName}: {datetimenw} Level{Messagelvl.ToString().Substring(0, 1)}: {appbase}::{func} - {message}";
+                    logtext = $"{appName}: {datetimenw} Level{Messagelvl.ToString().Substring(0, 1)}: {baseMsg}::{func} - {message}";
 
                     sb.Append(logtext);
 
@@ -164,7 +178,7 @@ namespace BaseLogger
                 }
                 else
                 {
-                    logtext = $"{appName}: {datetimenw} Level{Messagelvl.ToString().Substring(0, 1)}: {appbase}::{func} - {message}";
+                    logtext = $"{appName}: {datetimenw} Level{Messagelvl.ToString().Substring(0, 1)}: {baseMsg}::{func} - {message}";
 
                     sb.Append(logtext);
 

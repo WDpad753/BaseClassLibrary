@@ -18,7 +18,7 @@ namespace BaseClass.Base.Interface
 {
     public interface IBase
     {
-        public LogWriter? Logger { get; set; }
+        public ILogger? Logger { get; set; }
         public BaseMessageBox? Messagebox { get; set; }
         public BaseErrorMessageBox? ErrorMessagebox { get; set; }
         public JSONFileHandler? JSONFileHandler { get; set; }

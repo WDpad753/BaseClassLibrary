@@ -14,7 +14,8 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using Formatting = Newtonsoft.Json.Formatting;
-using FuncName = BaseClass.MethodNameExtractor.FuncNameExtractor;
+using ILogger = BaseLogger.ILogger;
+
 
 namespace BaseClass.Helper
 {
@@ -22,7 +23,7 @@ namespace BaseClass.Helper
     {
         private readonly IBase? baseConfig;
         private string? _filepath;
-        private LogWriter? _writer;
+        private ILogger? _writer;
         private JsonSerializer? _serializer;
         private XmlHandler? _handler;
         private string? result;
@@ -55,7 +56,7 @@ namespace BaseClass.Helper
                     data = result;
                     break;
                 default:
-                    _writer.LogWrite($"Exception Occured. Exception: Unspported Environment File Extension, Exiting the Method.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                    _writer.LogError($"Exception Occured. Exception: Unspported Environment File Extension, Exiting the Method.");
                     return null;
             }
 
@@ -79,7 +80,7 @@ namespace BaseClass.Helper
                     XmlEnvFileReader(key, mainkey, data);
                     break;
                 default:
-                    _writer.LogWrite($"Exception Occured. Exception: Unspported Environment File Extension, Exiting the Method.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                    _writer.LogError($"Exception Occured. Exception: Unspported Environment File Extension, Exiting the Method.");
                     return;
             }
 
@@ -145,7 +146,7 @@ namespace BaseClass.Helper
             }
             catch (Exception ex)
             {
-                _writer.LogWrite($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                _writer.LogError($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
                 return;
             }
         }
@@ -158,7 +159,10 @@ namespace BaseClass.Helper
                 var lines = File.ReadAllLines(filePath).ToList();
 
                 if (!File.Exists(filePath))
-                    _writer.LogWrite($"The file '{filePath}' does not exist.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Log);
+                {
+                    _writer.LogError($"The file '{filePath}' does not exist.");
+                    return;
+                }
 
 
                 foreach (var line in File.ReadAllLines(filePath))
@@ -203,13 +207,13 @@ namespace BaseClass.Helper
                 }
 
                 if(res == null)
-                    _writer.LogWrite($"Key '{Key}' not found in the environment file '{filePath}'.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Verbose);
+                    _writer.LogAlert($"Key '{Key}' not found in the environment file '{filePath}'.");
 
                 return;
             }
             catch (Exception ex)
             {
-                _writer.LogWrite($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                _writer.LogError($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
                 return;
             }
         }
@@ -222,7 +226,10 @@ namespace BaseClass.Helper
                 bool mainKeyFound = false;
 
                 if (!File.Exists(_filepath) && !string.Equals(Path.GetExtension(_filepath), ".xml", StringComparison.OrdinalIgnoreCase))
-                    _writer.LogWrite($"The file '{_filepath}' does not exist.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Log);
+                {
+                    _writer.LogAlert($"The file '{_filepath}' does not exist.");
+                    return;
+                }
 
                 if(data != null)
                 {
@@ -270,7 +277,7 @@ namespace BaseClass.Helper
             }
             catch (Exception ex)
             {
-                _writer.LogWrite($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                _writer.LogError($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
                 return;
             }
         }

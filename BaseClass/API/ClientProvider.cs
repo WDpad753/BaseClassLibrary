@@ -8,20 +8,20 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
-using FuncName = BaseClass.MethodNameExtractor.FuncNameExtractor;
+
 
 namespace BaseClass.API
 {
     public class ClientProvider<T> : IWebFactoryProvider where T : class
     {
         private readonly WebApplicationFactory<T>? _factory;
-        private readonly LogWriter _logWriter;
+        private readonly ILogger? _logWriter;
         //public bool? testClient { get; set; }
         public string? clientBase { get; set; }
         public string? appName { get; set; }
 
 
-        public ClientProvider(LogWriter Logger, WebApplicationFactory<T>? factory = null)
+        public ClientProvider(Logger Logger, WebApplicationFactory<T>? factory = null)
         {
             _logWriter = Logger;
             _factory = factory;
@@ -52,7 +52,7 @@ namespace BaseClass.API
             }
             catch (Exception ex)
             {
-                _logWriter.LogWrite($"Unable to create client. Error Message: {ex.Message}; Trace: {ex.StackTrace}; Exception: {ex.InnerException}; Error Source: {ex.Source}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                _logWriter.LogError($"Unable to create client. Error Message: {ex.Message}; Trace: {ex.StackTrace}; Exception: {ex.InnerException}; Error Source: {ex.Source}");
                 return null;
             }
         }

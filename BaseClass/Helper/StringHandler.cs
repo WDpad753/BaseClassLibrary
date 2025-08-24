@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using FuncName = BaseClass.MethodNameExtractor.FuncNameExtractor;
+
 
 
 namespace BaseClass.Helper

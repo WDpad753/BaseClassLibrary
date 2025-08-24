@@ -8,7 +8,6 @@ using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FuncName = BaseClass.MethodNameExtractor.FuncNameExtractor;
 
 namespace BaseClass.Helper
 {
@@ -16,7 +15,7 @@ namespace BaseClass.Helper
     {
         private readonly IBase baseConfig;
         private EnvFileHandler _envFileHandler;
-        private LogWriter? _logWriter;
+        private ILogger? _logWriter;
         public bool _ConfigRead = false;
 
         public EnvHandler(IBase baseSettings)
@@ -37,8 +36,8 @@ namespace BaseClass.Helper
             {
                 if (string.IsNullOrEmpty(path))
                 {
-                    _logWriter?.LogWrite($"Was not able to obtain value from given path.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Verbose);
-                    _logWriter?.LogWrite($"Was not able to obtain value from given path. Submitted path => {path}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
+                    _logWriter?.LogBase("Was not able to obtain value from given path.");
+                    _logWriter?.LogDebug($"Was not able to obtain value from given path. Submitted path => {path}");
                     return null;
                 }
 
@@ -62,20 +61,20 @@ namespace BaseClass.Helper
 
                 if (data == null)
                 {
-                    _logWriter?.LogWrite($"Unable to obtain value from given path => {path}.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                    _logWriter?.LogError($"Unable to obtain value from given path => {path}.");
 
                     return null;
                 }
                 else
                 {
-                    _logWriter?.LogWrite($"Obtained following value {data} from given path => {path}.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Log);
+                    _logWriter?.LogInfo($"Obtained following value {data} from given path => {path}.");
 
                     return data;
                 }
             }
             catch (Exception ex)
             {
-                _logWriter?.LogWrite($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                _logWriter?.LogError($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
                 return null;
             }
         }
@@ -86,8 +85,8 @@ namespace BaseClass.Helper
             {
                 if (string.IsNullOrEmpty(path) || string.IsNullOrEmpty(data))
                 {
-                    _logWriter?.LogWrite($"Was not able to obtain value from given path.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Verbose);
-                    _logWriter?.LogWrite($"Was not able to obtain value from given path. Submitted path => {path}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Debug);
+                    _logWriter?.LogAlert($"Was not able to obtain value from given path.");
+                    _logWriter?.LogDebug($"Was not able to obtain value from given path. Submitted path => {path}");
                     return;
                 }
 
@@ -110,11 +109,11 @@ namespace BaseClass.Helper
                     Environment.SetEnvironmentVariable(path, data, EnvironmentVariableTarget.Machine);
                 }
 
-                _logWriter?.LogWrite($"Saved following value {data} from given path => {path}.", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Log);
+                _logWriter?.LogDebug($"Saved following value {data} from given path => {path}.");
             }
             catch (Exception ex)
             {
-                _logWriter?.LogWrite($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}", this.GetType().Name, FuncName.GetMethodName(), MessageLevels.Fatal);
+                _logWriter?.LogError($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
                 return;
             }
         }
