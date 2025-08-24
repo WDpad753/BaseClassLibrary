@@ -1,4 +1,5 @@
 ﻿using BaseClass.Base.Interface;
+using BaseClass.BaseRegistry;
 using BaseClass.Config;
 using BaseClass.Database.Interface;
 using BaseClass.Encryption.Interface;

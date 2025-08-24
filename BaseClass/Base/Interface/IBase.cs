@@ -1,4 +1,5 @@
 ﻿using BaseClass.API;
+using BaseClass.BaseRegistry;
 using BaseClass.Config;
 using BaseClass.Database.Factory;
 using BaseClass.Database.Interface;

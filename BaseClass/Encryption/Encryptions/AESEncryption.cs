@@ -1,4 +1,5 @@
 ﻿using BaseClass.Base.Interface;
+using BaseClass.BaseRegistry;
 using BaseClass.Encryption.Interface;
 using BaseClass.Helper;
 using BaseClass.Model;
@@ -131,7 +132,7 @@ namespace BaseClass.Encryption.Encryptions
                         byte[] data = ProtectedData.Protect(Encoding.UTF8.GetBytes(KeyString), null, DataProtectionScope.CurrentUser);
                         byte[] data2 = ProtectedData.Protect(Encoding.UTF8.GetBytes(IVString), null, DataProtectionScope.CurrentUser);
                         List<byte[]> Datas = new List<byte[]>() { data, data2 };
-                        _regHandler?.RegistryValSave(Datas);
+                        _regHandler?.RegistryValSave(Datas, RegistryValueKind.Binary);
                     }
                     else
                     {
