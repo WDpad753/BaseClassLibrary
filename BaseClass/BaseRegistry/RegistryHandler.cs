@@ -188,10 +188,6 @@ namespace BaseClass.BaseRegistry
 
                 if (keyValVer == true)
                 {
-                    //byte[] DataBytes = Encoding.UTF8.GetBytes(Data);
-                    //byte[] EncryptedData = ProtectedData.Protect(DataBytes, null, DataProtectionScope.CurrentUser);
-                    //string encrypteddata = Convert.ToBase64String(EncryptedData);
-
                     if (encrypteddata != null)
                     {
                         if (_fileMap != null)
@@ -240,7 +236,7 @@ namespace BaseClass.BaseRegistry
             }
         }
 
-        public void RegistryValSave(List<byte[]>? datas, RegistryValueKind valueKind)
+        public void RegistryValSave(List<object>? datas, RegistryValueKind valueKind)
         {
             RegistryKey? key = null;
 
@@ -274,7 +270,8 @@ namespace BaseClass.BaseRegistry
 
                     foreach(var Data in datas)
                     {
-                        key.SetValue(Encoding.UTF8.GetString(ProtectedData.Unprotect(Key, null, DataProtectionScope.CurrentUser)), Data, valueKind);
+                        var value = RegistryValueHandler.RegistrySetValue(Data, valueKind);
+                        key.SetValue(Encoding.UTF8.GetString(ProtectedData.Unprotect(Key, null, DataProtectionScope.CurrentUser)), value, valueKind);
                     }
                 }
 
