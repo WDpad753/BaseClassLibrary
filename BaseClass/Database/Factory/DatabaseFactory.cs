@@ -18,7 +18,7 @@ namespace BaseClass.Database.Factory
             {
                 DatabaseMode.SQLServer => new SQLServer(settings),
                 DatabaseMode.SQLite => new SQLite(settings),
-                DatabaseMode.PostGresSQL => new PostGresSQL(settings),
+                //DatabaseMode.PostGresSQL => new PostGresSQL(settings),
                 _ => throw new ArgumentException("Invalid mode", nameof(mode))
             };
         }

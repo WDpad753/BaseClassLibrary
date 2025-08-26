@@ -60,6 +60,8 @@ namespace BaseLogger
             watcher.Changed += ConfigOnChanged;
             //watcher.Renamed += ConfigOnChanged;
             //watcher.Created += ConfigOnChanged;
+
+            sb = new StringBuilder();
         }
 
         public void LogInfo(string message) => LogWrite(message, FuncName.GetMethodName(), MessageLevels.Info);
@@ -108,7 +110,6 @@ namespace BaseLogger
         private void LogWrite(string message, string func, MessageLevels Messagelvl)
         {
             // Initialising variables:
-            sb = new StringBuilder();
             DebugState debugLevel = debugState != null ? (DebugState)debugState : DebugState.Inactive;
             baseMsg = FuncName.GetCallingClassName();
 

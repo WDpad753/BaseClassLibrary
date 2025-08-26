@@ -37,9 +37,13 @@ namespace BaseClass.Base
         public IDatabase? Database { get; set; }
         public IEncryption? Encryption { get; set; }
         public string? EncryptPathType { get; set; }
+        public string? DBServer { get; set; }
+        public string? DBName { get; set; }
+        public string? DBUser { get; set; }
+        public string? DBPassword { get; set; }
+        public string? DBPath { get; set; }
 
         public BaseSettings()
-        {
-        }
+        { }
     }
 }
