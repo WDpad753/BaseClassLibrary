@@ -19,6 +19,9 @@ namespace BaseLogger.Models
                 var type = method?.DeclaringType;
                 if (type != null && !type.FullName.StartsWith("BaseLogger.Logger") && !type.FullName.StartsWith("BaseLogger.Models"))
                 {
+                    if (method?.Name == ".ctor")
+                        return method?.DeclaringType.Name;
+
                     return method?.Name;
                 }
             }
