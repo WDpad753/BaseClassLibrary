@@ -25,6 +25,8 @@ namespace BaseLogger
 
         public Logger(string configPath, string logfilePath)
         {
+            sb = new StringBuilder();
+
             _fileMap = new ExeConfigurationFileMap
             {
                 ExeConfigFilename = configPath,
@@ -60,8 +62,6 @@ namespace BaseLogger
             watcher.Changed += ConfigOnChanged;
             //watcher.Renamed += ConfigOnChanged;
             //watcher.Created += ConfigOnChanged;
-
-            sb = new StringBuilder();
         }
 
         public void LogInfo(string message) => LogWrite(message, FuncName.GetMethodName(), MessageLevels.Info);
