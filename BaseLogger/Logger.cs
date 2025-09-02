@@ -18,15 +18,12 @@ namespace BaseLogger
         private string? baseMsg;
         private string logFilePath;
         private FileSystemWatcher watcher;
-        private loggerSettings _configLoggerSettingsSection;
-        private StringBuilder sb;
+        private loggerSettings? _configLoggerSettingsSection;
         private static readonly object _lockObj = new object();
 
 
         public Logger(string configPath, string logfilePath)
         {
-            sb = new StringBuilder();
-
             _fileMap = new ExeConfigurationFileMap
             {
                 ExeConfigFilename = configPath,
@@ -80,20 +77,17 @@ namespace BaseLogger
         {
             try
             {
-                sb = new StringBuilder();
-
                 string filenamepath = Path.Combine(logFilePath, appName+".log");
 
                 Debug.WriteLine($"[Watcher] Event: {e.ChangeType} on {e.FullPath} at {DateTime.Now:HH:mm:ss.fff}");
 
                 if(debugState == 0)
                 {
-                    sb.Append($"[Watcher] Event: {e.ChangeType} on {e.FullPath} at {DateTime.Now:HH:mm:ss.fff}");
+                    string logtext = $"[Watcher] Event: {e.ChangeType} on {e.FullPath} at {DateTime.Now:HH:mm:ss.fff}";
                     lock (_lockObj)
                     {
-                        File.AppendAllText(filenamepath, sb.ToString() + Environment.NewLine);
+                        File.AppendAllText(filenamepath, logtext + Environment.NewLine);
                     }
-                    sb.Clear();
                 }
 
                 // existing reload logic...
@@ -133,33 +127,31 @@ namespace BaseLogger
             {
                 logtext = $"{appName}: {datetimenw} Level{Messagelvl.ToString().Substring(0, 1)}: {baseMsg}::{func} - {message}";
 
-                sb.Append(logtext);
-
                 // Displaying the logs into the Console and Debug Section:
-                Debug.WriteLine(sb.ToString());
-                Console.WriteLine(sb.ToString());
-                sb.Clear();
+                Debug.WriteLine(logtext + Environment.NewLine);
+                ConsoleLogWriter(appName, datetimenw, Messagelvl, baseMsg, func, message);
+                //Console.WriteLine(logtext + Environment.NewLine);
             }
             else
             {
                 if (loggingLvl > (int)Enum.GetValues(typeof(MessageLevels)).Cast<MessageLevels>().Last())
                 {
-                    logtext = $"{appName}: {datetimenw} LevelX: {baseMsg}::{func} - Unknown Log Level, Please change the log level.";
-
-                    sb.Append(logtext);
+                    string faultmessage = "Unknown Log Level, Please change the log level.";
+                    logtext = $"{appName}: {datetimenw} Level{MessageLevels.XNull.ToString().Substring(0, 1)}: {baseMsg}::{func} - {faultmessage}";
 
                     if (debugState == 0)
                     {
                         // Saving the logs into the textfile:
                         lock (_lockObj)
                         {
-                            File.AppendAllText(filenamepath, sb.ToString() + Environment.NewLine);
+                            File.AppendAllText(filenamepath, logtext + Environment.NewLine);
                         }
                     }
 
-                    Debug.WriteLine(sb.ToString());
-                    Console.WriteLine(sb.ToString());
-                    sb.Clear();
+                    // Displaying the logs into the Console and Debug Section:
+                    Debug.WriteLine(logtext + Environment.NewLine);
+                    ConsoleLogWriter(appName, datetimenw, MessageLevels.XNull, baseMsg, func, faultmessage);
+                    //Console.WriteLine(logtext + Environment.NewLine);
                     return;
                 }
 
@@ -167,25 +159,20 @@ namespace BaseLogger
                 {
                     logtext = $"{appName}: {datetimenw} Level{Messagelvl.ToString().Substring(0, 1)}: {baseMsg}::{func} - {message}";
 
-                    sb.Append(logtext);
-
                     // Saving the logs into the textfile:
                     lock (_lockObj)
                     {
-                        File.AppendAllText(filenamepath, sb.ToString() + Environment.NewLine);
+                        File.AppendAllText(filenamepath, logtext + Environment.NewLine);
                     }
-                    sb.Clear();
                 }
                 else
                 {
                     logtext = $"{appName}: {datetimenw} Level{Messagelvl.ToString().Substring(0, 1)}: {baseMsg}::{func} - {message}";
-
-                    sb.Append(logtext);
-
+                    
                     // Displaying the logs into the Console and Debug Section:
-                    Debug.WriteLine(sb.ToString());
-                    Console.WriteLine(sb.ToString());
-                    sb.Clear();
+                    Debug.WriteLine(logtext + Environment.NewLine);
+                    ConsoleLogWriter(appName, datetimenw, Messagelvl, baseMsg, func, message);
+                    //Console.WriteLine(logtext + Environment.NewLine);
                 }
             }
         }
@@ -219,6 +206,38 @@ namespace BaseLogger
             catch (Exception ex)
             {
                 throw new Exception(string.Format($"Config key:{path} was expected to be of type {expectedType} but was not."), ex);
+            }
+        }
+
+        private void ConsoleLogWriter(string? AppName, string? DatetimeNow, MessageLevels MessageLvl, string? BaseMessage, string? Function, string? Message)
+        {
+            string FirstSec = $"{AppName}: {DatetimeNow} ";
+            string LevelTag = $"Level{MessageLvl.ToString().Substring(0, 1)}";
+            string SecondSec = $": {BaseMessage}::{Function} - {Message}";
+
+            Console.Write(FirstSec);
+            Console.ForegroundColor = SetConsoleColor(MessageLvl);
+            Console.Write(LevelTag);
+            Console.ResetColor();
+            Console.WriteLine(SecondSec);
+        }
+
+        private ConsoleColor SetConsoleColor(MessageLevels messageLevel)
+        {
+            switch (messageLevel)
+            {
+                case MessageLevels.Fatal:
+                    return ConsoleColor.DarkRed;
+                case MessageLevels.Base:
+                    return ConsoleColor.Red;
+                case MessageLevels.Alert:
+                    return ConsoleColor.Yellow;
+                case MessageLevels.Debug:
+                    return ConsoleColor.Magenta;
+                case MessageLevels.Info:
+                    return ConsoleColor.Cyan;
+                default:
+                    return ConsoleColor.White;
             }
         }
     }

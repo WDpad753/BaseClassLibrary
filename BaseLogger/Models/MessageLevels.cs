@@ -18,11 +18,12 @@ namespace BaseLogger.Models
     
     public enum MessageLevels
     {
-        Fatal = 0,
+        XNull = 0,
+        Fatal = 1,
         //Error = 0,
-        Base = 1,
-        Alert = 2,
-        Debug = 3,
-        Info = 4
+        Base = 2,
+        Alert = 3,
+        Debug = 4,
+        Info = 5
     }
 }
