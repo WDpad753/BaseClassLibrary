@@ -20,8 +20,6 @@ namespace BaseLogger
         private FileSystemWatcher watcher;
         private loggerSettings? _configLoggerSettingsSection;
         private static readonly object _lockObj = new object();
-
-
         public Logger(string configPath, string logfilePath)
         {
             _fileMap = new ExeConfigurationFileMap
@@ -217,7 +215,16 @@ namespace BaseLogger
 
             Console.Write(FirstSec);
             Console.ForegroundColor = SetConsoleColor(MessageLvl);
-            Console.Write(LevelTag);
+            bool IsFault = SetConsoleBackground(MessageLvl);
+            if (IsFault)
+            {
+                Console.BackgroundColor = ConsoleColor.Red;
+                Console.Write(LevelTag);
+            }
+            else
+            {
+                Console.Write(LevelTag);
+            }
             Console.ResetColor();
             Console.WriteLine(SecondSec);
         }
@@ -238,6 +245,18 @@ namespace BaseLogger
                     return ConsoleColor.Cyan;
                 default:
                     return ConsoleColor.White;
+            }
+        }
+
+        private bool SetConsoleBackground(MessageLevels messageLevel)
+        {
+            if (messageLevel == MessageLevels.Fatal || messageLevel == MessageLevels.XNull)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
     }
