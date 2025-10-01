@@ -7,8 +7,6 @@ using BaseClass.Encryption.Interface;
 using BaseClass.Helper;
 using BaseClass.JSON;
 using BaseLogger;
-using CustomMessageBox.MVVM.Views.ErrorMessageBox;
-using CustomMessageBox.MVVM.Views.MessageBox;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,8 +18,6 @@ namespace BaseClass.Base.Interface
     public interface IBase
     {
         public ILogger? Logger { get; set; }
-        public BaseMessageBox? Messagebox { get; set; }
-        public BaseErrorMessageBox? ErrorMessagebox { get; set; }
         public JSONFileHandler? JSONFileHandler { get; set; }
         public ConfigHandler? ConfigHandler { get; set; }
         public XmlHandler? XmlHandler { get; set; }

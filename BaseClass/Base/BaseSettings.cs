@@ -6,8 +6,6 @@ using BaseClass.Encryption.Interface;
 using BaseClass.Helper;
 using BaseClass.JSON;
 using BaseLogger;
-using CustomMessageBox.MVVM.Views.ErrorMessageBox;
-using CustomMessageBox.MVVM.Views.MessageBox;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,8 +22,6 @@ namespace BaseClass.Base
         public string? ConfigPath { get; set; }
         public string? LoggedOnUser { get; set; }
         public string? LoggedOnUserGroup { get; set; }
-        public BaseMessageBox? Messagebox { get; set; }
-        public BaseErrorMessageBox? ErrorMessagebox { get; set; }
         public Uri? BaseUrlAddress { get; set; }
         public string? FilePath { get; set; }
         public JSONFileHandler? JSONFileHandler { get; set; }
