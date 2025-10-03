@@ -20,20 +20,20 @@ namespace BaseClass.Base
         /// <param name="instance">The concrete instance to register.</param>
         /// <exception cref="InvalidOperationException">Thrown if the type <typeparamref name="T"/> has already been registered.
         /// </exception>
-        public void RegisterInstance<T>(T instance)
-        {
-            if (_items.ContainsKey(typeof(T)))
-                throw new InvalidOperationException($"{typeof(T)} is already registered.");
+        public void RegisterInstance<T>(T instance) => Register<T>(BaseLifetime.Singleton, instance: instance, implementationType: typeof(T));
+        //{
+        //    if (_items.ContainsKey(typeof(T)))
+        //        throw new InvalidOperationException($"{typeof(T)} is already registered.");
 
-            _items[typeof(T)] = new BaseDescriptor
-            {
-                BaseType = typeof(T),
-                Lifetime = BaseLifetime.Singleton,
-                Instance = instance
-            };
+        //    _items[typeof(T)] = new BaseDescriptor
+        //    {
+        //        BaseType = typeof(T),
+        //        Lifetime = BaseLifetime.Singleton,
+        //        Instance = instance
+        //    };
 
-            _singletonItems[typeof(T)] = instance!;
-        }
+        //    _singletonItems[typeof(T)] = instance!;
+        //}
 
         /// <summary>
         /// Registers a type as Transient: a new instance is created every time it is requested.
@@ -42,14 +42,14 @@ namespace BaseClass.Base
         /// <typeparam name="TInterface">The interface or base type to register (if applicable).</typeparam>
         /// <typeparam name="TImplementation">The concrete implementation type.</typeparam>
         //public void RegisterTransient<TInterface, TImplementation>() where TImplementation : class, TInterface => Register<TInterface, TImplementation>(BaseLifetime.Transient);
-        public void RegisterTransient<TInterface, TImplementation>() where TImplementation : class, TInterface => Register<TInterface>(BaseLifetime.Transient, typeof(TImplementation));
+        public void RegisterTransient<TInterface, TImplementation>() where TImplementation : class, TInterface => Register<TInterface>(BaseLifetime.Transient, implementationType: typeof(TImplementation));
 
         /// <summary>
         /// Registers a type as Transient: a new instance is created every time it is requested.
         /// Ideal for lightweight, stateless items.
         /// </summary>
         /// <typeparam name="TImplementation">The concrete implementation type.</typeparam>
-        public void RegisterTransient<TImplementation>() where TImplementation : class => Register<TImplementation>(BaseLifetime.Transient, typeof(TImplementation));
+        public void RegisterTransient<TImplementation>() where TImplementation : class => Register<TImplementation>(BaseLifetime.Transient, implementationType: typeof(TImplementation));
 
 
         /// <summary>
@@ -58,13 +58,13 @@ namespace BaseClass.Base
         /// <typeparam name="TInterface">The interface or base type to register (if applicable).</typeparam>
         /// <typeparam name="TImplementation">The concrete implementation type.</typeparam>
         //public void RegisterSingleton<TInterface, TImplementation>() where TImplementation : class, TInterface => Register<TInterface, TImplementation>(BaseLifetime.Singleton);
-        public void RegisterSingleton<TInterface, TImplementation>() where TImplementation : class, TInterface => Register<TInterface>(BaseLifetime.Singleton, typeof(TImplementation));
+        public void RegisterSingleton<TInterface, TImplementation>() where TImplementation : class, TInterface => Register<TInterface>(BaseLifetime.Singleton, implementationType: typeof(TImplementation));
 
         /// <summary>
         /// Registers a type as Singleton: a single instance is created and reused throughout the application lifetime.
         /// </summary>
         /// <typeparam name="TImplementation">The concrete implementation type.</typeparam>
-        public void RegisterSingleton<TImplementation>() where TImplementation : class => Register<TImplementation>(BaseLifetime.Singleton, typeof(TImplementation));
+        public void RegisterSingleton<TImplementation>() where TImplementation : class => Register<TImplementation>(BaseLifetime.Singleton, implementationType: typeof(TImplementation));
 
         /// <summary>
         /// Registers a factory method for creating instances of a type with the specified lifetime.
@@ -102,16 +102,17 @@ namespace BaseClass.Base
         //        Lifetime = lifetime
         //    };
         //}
-        private void Register<TInterface>(BaseLifetime lifetime, Type? implementationType = null, Func<IBaseProvider, object>? factory = null)
+        private void Register<TInterface>(BaseLifetime lifetime, TInterface? instance = default, Type? implementationType = null, Func<IBaseProvider, object>? factory = null)
         {
-            if (_items.ContainsKey(typeof(TInterface)))
-                throw new InvalidOperationException($"{typeof(TInterface)} is already registered.");
+            //if (_items.ContainsKey(typeof(TInterface)))
+            //    throw new InvalidOperationException($"{typeof(TInterface)} is already registered.");
 
             _items[typeof(TInterface)] = new BaseDescriptor
             {
                 BaseType = typeof(TInterface),
                 ImplementationType = implementationType,
                 Lifetime = lifetime,
+                Instance = instance != null ? instance : null,
                 Factory = factory != null ? c => factory(c) : null,
             };
         }

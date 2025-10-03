@@ -33,7 +33,9 @@ namespace BaseClass.Database.Interface
         // --------- Query Multiple Rows
         IEnumerable<T?> Query<T>(string sql, object? param = null, int? commandTimeout = null);
         Task<IEnumerable<T?>> QueryAsync<T>(string sql, CancellationToken cancellationToken = default, object? param = null, int? commandTimeout = null);
+        #endregion
 
+        #region Verification
         // --------- DB Check
         DateTime? GetCurrentDateTime();
         #endregion
