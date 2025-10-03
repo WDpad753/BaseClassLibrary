@@ -1,13 +1,12 @@
-﻿using BaseClass.Base.Interface;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BaseClass.Base
+namespace BaseClass.Base.Interface
 {
-    public class BaseSettings : IBaseSettings
+    public interface IBaseSettings
     {
         public string? EncryptPathType { get; set; }
         public string? ConfigPath { get; set; }

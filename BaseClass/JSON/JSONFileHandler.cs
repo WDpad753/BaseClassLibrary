@@ -17,16 +17,16 @@ namespace BaseClass.JSON
 {
     public class JSONFileHandler
     {
-        private readonly IBase? baseConfig;
+        private readonly IBaseProvider? baseConfig;
         private ILogger? _logWriter;
 
         //public JSONFileHandler(LogWriter Logger) 
         //{
         //    _logWriter = Logger;
         //}
-        public JSONFileHandler(IBase? baseConfig) 
+        public JSONFileHandler(ILogger? Logger) 
         {
-            _logWriter = baseConfig.Logger;
+            _logWriter = Logger;
         }
 
         public void SaveJson<T>(T json, string targetfilepath)

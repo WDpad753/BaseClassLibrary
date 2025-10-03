@@ -1,4 +1,5 @@
 ﻿using BaseClass.API.Interface;
+using BaseClass.Base.Interface;
 using BaseClass.Helper;
 using BaseClass.Model;
 using BaseLogger;
@@ -30,9 +31,9 @@ namespace BaseClass.API.Client
         private readonly ILogger? _logWriter;
         private readonly ClientProvider<TEntryPoint>? _clientProvider;
 
-        public APIClient(Logger Logger, ClientProvider<TEntryPoint>? clientProvider = null)
+        public APIClient(IBaseProvider provider, ClientProvider<TEntryPoint>? clientProvider = null)
         {
-            _logWriter = Logger;
+            _logWriter = provider.GetItem<ILogger>();
             //_strHandler = new(Logger);
             _clientProvider = clientProvider;
         }
@@ -73,7 +74,8 @@ namespace BaseClass.API.Client
                     Task.WaitAll(taskcol);
                     if (taskcol.IsFaulted)
                     {
-                        Console.WriteLine(taskcol.Exception.ToString());
+                        //Console.WriteLine(taskcol.Exception.ToString());
+                        //_logWriter.LogError($"Error in acquiring response from url {apiURL}: {taskcol.Exception.ToString()}");
                         System.Diagnostics.Debug.WriteLine($@"Here is the Content of the Error Message: {taskcol.Exception.ToString()}");
                         _logWriter.LogError($"Error in acquiring response from url {apiURL}: {taskcol.Exception.ToString()}");
                     }
@@ -150,7 +152,7 @@ namespace BaseClass.API.Client
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.ToString());
+                    //Console.WriteLine(ex.ToString());
                     System.Diagnostics.Debug.WriteLine($@"Here is the Content of the Error Message: {ex.ToString()}");
                     return null;
                 }

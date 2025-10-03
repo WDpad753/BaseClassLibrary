@@ -15,7 +15,8 @@ namespace BaseClass.Helper
 {
     public class XmlHandler
     {
-        private readonly IBase baseConfig;
+        //private readonly IBaseProvider baseConfig;
+        private readonly IBaseSettings? baseSettings;
         private ILogger? _logWriter;
         private string? _filePath;
         private List<string> fileExtensions = new List<string>() { ".xml", ".config" };
@@ -25,22 +26,22 @@ namespace BaseClass.Helper
         //    _logWriter = Logger;
         //    _filePath = FilePath;
         //}
-        public XmlHandler(IBase? BaseConfig) 
+        public XmlHandler(ILogger? Logger, IBaseSettings? settings) 
         {
-            baseConfig = BaseConfig;
-            _logWriter = BaseConfig.Logger;
+            _logWriter = Logger;
+            baseSettings = settings;
 
-            if(BaseConfig.FilePath != null && fileExtensions.Contains(Path.GetExtension(BaseConfig.FilePath)))
+            if (baseSettings.FilePath != null && fileExtensions.Contains(Path.GetExtension(baseSettings.FilePath)))
             {
-                _filePath = BaseConfig.FilePath;
+                _filePath = baseSettings.FilePath;
             }
-            else if(BaseConfig.ConfigPath != null && fileExtensions.Contains(Path.GetExtension(BaseConfig.ConfigPath)))
+            else if(baseSettings.ConfigPath != null && fileExtensions.Contains(Path.GetExtension(baseSettings.ConfigPath)))
             {
-                _filePath = BaseConfig.ConfigPath;
+                _filePath = baseSettings.ConfigPath;
             }
-            else if(BaseConfig.FilePath == null && BaseConfig.ConfigPath != null && fileExtensions.Contains(Path.GetExtension(BaseConfig.ConfigPath)))
+            else if(baseSettings.FilePath == null && baseSettings.ConfigPath != null && fileExtensions.Contains(Path.GetExtension(baseSettings.ConfigPath)))
             {
-                _filePath = BaseConfig.ConfigPath;
+                _filePath = baseSettings.ConfigPath;
             }
             else
             {
@@ -54,7 +55,7 @@ namespace BaseClass.Helper
             try
             {
                 if(_filePath == null)
-                    _filePath = baseConfig.FilePath;
+                    _filePath = baseSettings.FilePath;
 
                 if (!File.Exists(_filePath) && (!string.Equals(Path.GetExtension(_filePath), ".xml", StringComparison.OrdinalIgnoreCase) || !fileExtensions.Contains(Path.GetExtension(_filePath))))
                 {

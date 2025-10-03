@@ -17,9 +17,9 @@ namespace BaseClass.Database.Databases
 {
     public class SQLite : IDatabase
     {
-        private readonly IBase baseClass;
+        private readonly IBaseSettings baseClass;
         
-        public SQLite(IBase BaseClass) 
+        public SQLite(IBaseSettings BaseClass) 
         {
             baseClass = BaseClass;
         }

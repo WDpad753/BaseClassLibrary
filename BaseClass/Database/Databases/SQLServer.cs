@@ -16,9 +16,9 @@ namespace BaseClass.Database.Databases
 {
     public class SQLServer : IDatabase
     {
-        private readonly IBase baseClass;
+        private readonly IBaseSettings baseClass;
 
-        public SQLServer(IBase BaseClass)
+        public SQLServer(IBaseSettings BaseClass)
         {
             baseClass = BaseClass;
 

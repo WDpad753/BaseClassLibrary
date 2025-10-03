@@ -1,4 +1,5 @@
 ﻿using BaseClass.API.Interface;
+using BaseClass.Base.Interface;
 using BaseLogger;
 using BaseLogger.Models;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -21,9 +22,9 @@ namespace BaseClass.API
         public string? appName { get; set; }
 
 
-        public ClientProvider(Logger Logger, WebApplicationFactory<T>? factory = null)
+        public ClientProvider(IBaseProvider provider, WebApplicationFactory<T>? factory = null)
         {
-            _logWriter = Logger;
+            _logWriter = provider.GetItem<ILogger>();
             _factory = factory;
         }
 

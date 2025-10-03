@@ -17,7 +17,7 @@ namespace BaseClass.Config
 {
     public class ConfigHandler
     {
-        private readonly IBase? baseConfig;
+        private readonly IBaseProvider? baseConfig;
         private ExeConfigurationFileMap? _fileMap;
         private EnvFileHandler? _envFileReader;
         private XmlHandler? _xmlHandler;
@@ -30,22 +30,25 @@ namespace BaseClass.Config
         private string? _targetSection;
         private static readonly Mutex ConfigFileMutex = new Mutex(false, "Global\\MyApp_ConfigFileMutex");
 
-        public ConfigHandler(IBase baseSettings)
+        public ConfigHandler(ILogger Logger, IBaseSettings settings, XmlHandler xml, EnvFileHandler env)
         {
-            baseConfig = baseSettings;
-
-            _logWriter = baseSettings.Logger;
+            //baseConfig = BaseConfig;
+            _logWriter =Logger;
 
             _fileMap = new ExeConfigurationFileMap
             {
-                ExeConfigFilename = baseSettings.ConfigPath,
+                ExeConfigFilename = settings.ConfigPath,
             };
 
-            _envFileReader = new(baseSettings);
-            //_xmlHandler = new(Logger, filepath);
-            _xmlHandler = new(baseSettings);
-            baseSettings.EnvFileHandler = _envFileReader;
-            baseSettings.XmlHandler = _xmlHandler;
+            _envFileReader = env;
+            _xmlHandler = xml;
+            //_envFileReader = BaseConfig.GetItem<EnvFileHandler>();
+            //_xmlHandler = BaseConfig.GetItem<XmlHandler>();
+            //_envFileReader = new(BaseConfig);
+            ////_xmlHandler = new(Logger, filepath);
+            //_xmlHandler = new(BaseConfig);
+            //baseSettings.EnvFileHandler = _envFileReader;
+            //baseSettings.XmlHandler = _xmlHandler;
         }
 
         public void SaveInfo(string data, string path, string? section = null)

@@ -12,7 +12,7 @@ namespace BaseClass.Database.Factory
 {
     public static class DatabaseFactory
     {
-        public static IDatabase GetDatabase(DatabaseMode mode, IBase settings)
+        public static IDatabase GetDatabase(DatabaseMode mode, IBaseSettings settings)
         {
             return mode switch
             {

@@ -18,11 +18,11 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace BaseClass.BaseRegistry
+namespace BaseClass.RegistryBase
 {
     public class RegistryHandler
     {
-        private readonly IBase? baseConfig;
+        private readonly IBaseProvider? baseProvider;
         private readonly ILogger? _logWriter;
         private readonly ConfigHandler? _configHandler;
         private readonly EnvHandler? _envHandler;
@@ -31,24 +31,26 @@ namespace BaseClass.BaseRegistry
         private readonly string? _configPath;
         private readonly EncryptionModel? _encModel;
 
-        public RegistryHandler(IBase? BaseConfig, EncryptionModel? EncModel)
+        public RegistryHandler(IBaseProvider? BaseConfig, EncryptionModel? EncModel)
         {
-            baseConfig = BaseConfig;
-            _logWriter = BaseConfig?.Logger;
-            _configHandler = BaseConfig?.ConfigHandler;
-            _envHandler = BaseConfig?.EnvHandler;
+            baseProvider = BaseConfig;
+            _logWriter = BaseConfig?.GetItem<ILogger>();
+            _configHandler = BaseConfig?.GetItem<ConfigHandler>();
+            _envHandler = BaseConfig?.GetItem<EnvHandler>();
 
-            if (Path.GetExtension(baseConfig?.ConfigPath).ToString().Contains("config"))
+            string? configPath = BaseConfig?.GetItem<IBaseSettings>().ConfigPath;
+
+            if (Path.GetExtension(configPath).ToString().Contains("config"))
             {
                 // Setting the constructor for the ExeConfig FilePath:
                 _fileMap = new ExeConfigurationFileMap
                 {
-                    ExeConfigFilename = BaseConfig?.ConfigPath,
+                    ExeConfigFilename = configPath,
                 };
             }
             else
             {
-                _configPath = BaseConfig?.ConfigPath;
+                _configPath = configPath;
             }
 
             _encModel=EncModel;

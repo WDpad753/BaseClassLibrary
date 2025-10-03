@@ -13,19 +13,20 @@ namespace BaseClass.Helper
 {
     public class EnvHandler
     {
-        private readonly IBase baseConfig;
+        private readonly IBaseProvider baseConfig;
         private EnvFileHandler _envFileHandler;
         private ILogger? _logWriter;
         public bool _ConfigRead = false;
 
-        public EnvHandler(IBase baseSettings)
+        public EnvHandler(IBaseProvider baseProvider)
         {
-            baseConfig = baseSettings;
+            baseConfig = baseProvider;
 
-            _logWriter = baseSettings.Logger;
+            _logWriter = baseProvider.GetItem<ILogger>();
 
-            _envFileHandler = new(baseSettings);
-            baseSettings.EnvFileHandler = _envFileHandler;
+            _envFileHandler = baseProvider.GetItem<EnvFileHandler>();
+            //_envFileHandler = new(baseProvider);
+            //baseSettings.EnvFileHandler = _envFileHandler;
         }
 
         public string? EnvRead(string path, EnvAccessMode? mode = null, string? envpath = null, string? envkeyname = null)
@@ -97,7 +98,7 @@ namespace BaseClass.Helper
                 }
                 else if (mode == EnvAccessMode.File)
                 {
-                    baseConfig.FilePath = envpath;
+                    baseConfig.GetItem<IBaseSettings>().FilePath = envpath;
                     _envFileHandler.EnvFileSave(envpath, path, envkeyname, data);
                 }
                 else if (mode == EnvAccessMode.User)

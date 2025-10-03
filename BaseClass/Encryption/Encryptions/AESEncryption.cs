@@ -1,5 +1,5 @@
 ﻿using BaseClass.Base.Interface;
-using BaseClass.BaseRegistry;
+using BaseClass.RegistryBase;
 using BaseClass.Encryption.Interface;
 using BaseClass.Helper;
 using BaseClass.Model;
@@ -20,7 +20,7 @@ namespace BaseClass.Encryption.Encryptions
 {
     public class AESEncryption : IEncryption
     {
-        private readonly IBase? baseConfig;
+        private readonly IBaseProvider? baseConfig;
         private readonly EncryptionModel? _encModel;
         private ILogger? _logger;
         private RegistryHandler? _regHandler;
@@ -37,11 +37,11 @@ namespace BaseClass.Encryption.Encryptions
         public bool IsDecrypted { get; set; }
         public bool IsEncrypted { get; set; }
 
-        public AESEncryption(IBase? BaseConfig, EncryptionModel? EncModel, ConfigAccessMode? AccessMode) 
+        public AESEncryption(IBaseProvider? BaseConfig, EncryptionModel? EncModel, ConfigAccessMode? AccessMode) 
         {
             baseConfig = BaseConfig;
             _encModel = EncModel;
-            _logger = BaseConfig?.Logger;
+            _logger = BaseConfig?.GetItem<ILogger>();
 
             AESCng = new AesCng();
 

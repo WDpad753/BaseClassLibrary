@@ -21,17 +21,17 @@ namespace BaseClass.Helper
 {
     public class EnvFileHandler
     {
-        private readonly IBase? baseConfig;
+        private readonly IBaseProvider? baseConfig;
         private string? _filepath;
         private ILogger? _writer;
         private JsonSerializer? _serializer;
         private XmlHandler? _handler;
         private string? result;
 
-        public EnvFileHandler(IBase? BaseConfig) 
+        public EnvFileHandler(ILogger? Logger) 
         {
-            baseConfig = BaseConfig;
-            _writer = BaseConfig?.Logger;
+            //baseConfig = BaseConfig;
+            _writer = Logger;
             _serializer = new();
         }
 
@@ -234,7 +234,7 @@ namespace BaseClass.Helper
                 if(data != null)
                 {
                     //_handler = new(_writer, _filepath);
-                    _handler = new(baseConfig);
+                    //_handler = new(baseConfig);
 
                     _handler.XmlWrite(mainKey,key, data);
                 }

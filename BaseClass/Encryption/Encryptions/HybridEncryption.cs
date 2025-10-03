@@ -12,16 +12,16 @@ namespace BaseClass.Encryption.Encryptions
 {
     public class HybridEncryption : IEncryption
     {
-        private readonly IBase? baseConfig;
+        private readonly IBaseProvider? baseConfig;
         private ILogger? _logWriter;
 
         public bool IsDecrypted { get; set; }
         public bool IsEncrypted { get; set; }
 
-        public HybridEncryption(IBase? BaseConfig, EncryptionModel? EncModel, ConfigAccessMode? AccessMode)
+        public HybridEncryption(IBaseProvider? BaseConfig, EncryptionModel? EncModel, ConfigAccessMode? AccessMode)
         {
             baseConfig = BaseConfig;
-            _logWriter = BaseConfig?.Logger;
+            _logWriter = BaseConfig?.GetItem<ILogger>();
         }
 
         public string Decrypt(string data)
