@@ -69,7 +69,7 @@ namespace BaseClass.Service
         }
 
         public abstract bool CanStart();
-        public async Task Start(CancellationToken cancellationToken)
+        public virtual async Task Start(CancellationToken cancellationToken)
         {
             CancellationToken = cancellationToken;
             await StartupTasks();

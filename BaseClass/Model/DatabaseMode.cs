@@ -8,8 +8,8 @@ namespace BaseClass.Model
 {
     public enum DatabaseMode
     {
+        None,
         SQLite,
         SQLServer,
-        PostGresSQL
     }
 }

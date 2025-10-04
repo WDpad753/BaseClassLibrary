@@ -47,7 +47,7 @@ namespace BaseClass.ConsoleAppBase
             dbMode = _provider.GetValue<DatabaseMode>("DatabaseMode");
 
             Logger.LogAlert($"{new string('=', 30)}");
-            Logger.LogAlert($" - entry {ConsoleAppName}");
+            Logger.LogAlert($"entry {ConsoleAppName}");
 
             if(dbMode != null)
             {
@@ -59,14 +59,23 @@ namespace BaseClass.ConsoleAppBase
                 {
                     CreateLiteDatabase();
                 }
+                else if (dbMode == DatabaseMode.None)
+                { }
                 else
                 {
-                    throw new BaseConfigException("Selected Database Mode does not Exist.");
+                    throw new BaseConfigException("Selected Database Mode does not exist.");
                 }
             }
         }
 
-        
+        public abstract bool CanStart();
+        public async Task Start(CancellationToken cancellationToken)
+        {
+            CancellationToken = cancellationToken;
+            await StartupTasks();
+        }
+        public abstract Task StartupTasks();
+
         [MemberNotNull(nameof(DB))]
         protected void CreateServerDatabase()
         {

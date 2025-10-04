@@ -166,6 +166,7 @@ namespace BaseClass.Base
         public T? GetValue<T>(string name)
         {
             var valCollector = GetItem<ValueCollector<T>>();
+            
             if (valCollector != null)
             {
                 if (valCollector.ValName == name)
