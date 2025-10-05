@@ -19,5 +19,6 @@ namespace BaseClass.Base.Interface
         public T? GetValue<T>(string name);
         public T GetItem<T>();
         public object GetItem(Type type);
+        public void Dispose(); 
     }
 }
