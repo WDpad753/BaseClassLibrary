@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
+using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,8 +27,20 @@ namespace BaseLogger.Models
 
                 if (!fullName.StartsWith("BaseLogger.Logger") && !fullName.StartsWith("BaseLogger.Models"))
                 {
+                    string? methodName = method?.DeclaringType.Name;
+
                     if (method?.Name == ".ctor")
-                        return method?.DeclaringType.Name;
+                        return methodName;
+
+                    if (methodName.StartsWith("<") && methodName.Contains(">"))
+                    {
+                        //var realType = methodName;
+                        int indexStart = methodName.IndexOf("<");
+                        int indexEnd = methodName.IndexOf(">");
+                        int length = indexEnd - (indexStart+1);
+
+                        return methodName.Substring((indexStart + 1), length);
+                    }
 
                     return method?.Name;
                 }
@@ -53,8 +67,20 @@ namespace BaseLogger.Models
                     if (type.Name.StartsWith("<") && type.Name.Contains(">"))
                     {
                         var realType = type.DeclaringType;
+                        
                         if (realType != null)
-                            return realType.Name;
+                        {
+                            string typeName = realType.Name;
+
+                            if (typeName.Contains("`"))
+                            {
+                                int index = typeName.IndexOf("`");
+                                typeName = typeName.Substring(0, index);
+                            }
+
+                            return typeName;
+                        }
+
                     }
 
                     return type?.Name;
