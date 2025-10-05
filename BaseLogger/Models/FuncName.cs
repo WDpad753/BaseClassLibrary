@@ -17,7 +17,13 @@ namespace BaseLogger.Models
             {
                 var method = frame?.GetMethod();
                 var type = method?.DeclaringType;
-                if (type != null && !type.FullName.StartsWith("BaseLogger.Logger") && !type.FullName.StartsWith("BaseLogger.Models"))
+
+                if (type == null)
+                    continue;
+
+                var fullName = type.FullName;
+
+                if (!fullName.StartsWith("BaseLogger.Logger") && !fullName.StartsWith("BaseLogger.Models"))
                 {
                     if (method?.Name == ".ctor")
                         return method?.DeclaringType.Name;
@@ -36,8 +42,21 @@ namespace BaseLogger.Models
             {
                 var method = frame?.GetMethod();
                 var type = method?.DeclaringType;
-                if (type != null && !type.FullName.StartsWith("BaseLogger.Logger") && !type.FullName.StartsWith("BaseLogger.Models"))
+
+                if (type == null)
+                    continue;
+
+                var fullName = type.FullName;
+
+                if (!fullName.StartsWith("BaseLogger.Logger") && !fullName.StartsWith("BaseLogger.Models"))
                 {
+                    if (type.Name.StartsWith("<") && type.Name.Contains(">"))
+                    {
+                        var realType = type.DeclaringType;
+                        if (realType != null)
+                            return realType.Name;
+                    }
+
                     return type?.Name;
                 }
             }

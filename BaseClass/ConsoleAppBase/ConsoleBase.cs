@@ -37,6 +37,7 @@ namespace BaseClass.ConsoleAppBase
         protected IBaseSettings Settings { get; private set; }
         protected IDatabase? DB { get; private set; }
         protected IDatabase? DBLite { get; private set; }
+        public bool IsOneTimeRun { get; set; }
 
         protected ConsoleBase(IBaseProvider provider)
         {
@@ -46,7 +47,7 @@ namespace BaseClass.ConsoleAppBase
             ConsoleAppName = _provider?.GetValue<string>("ConsoleName") ?? throw new BaseConfigException("Console Name is not Configured");
             dbMode = _provider.GetValue<DatabaseMode>("DatabaseMode");
 
-            Logger.LogAlert($"{new string('=', 30)}");
+            Logger.LogAlert($"{new string('=', 100)}");
             Logger.LogAlert($"entry {ConsoleAppName}");
 
             if(dbMode != null)

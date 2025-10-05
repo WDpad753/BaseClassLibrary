@@ -234,7 +234,7 @@ namespace BaseLogger
             switch (messageLevel)
             {
                 case MessageLevels.Fatal:
-                    return ConsoleColor.DarkRed;
+                    return ConsoleColor.White;
                 case MessageLevels.Base:
                     return ConsoleColor.Red;
                 case MessageLevels.Alert:

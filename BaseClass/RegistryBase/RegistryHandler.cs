@@ -31,14 +31,13 @@ namespace BaseClass.RegistryBase
         private readonly string? _configPath;
         private readonly EncryptionModel? _encModel;
 
-        public RegistryHandler(IBaseProvider? BaseConfig, EncryptionModel? EncModel)
+        public RegistryHandler(ILogger? Logger, IBaseSettings settings, ConfigHandler config, EnvHandler env, EncryptionModel? EncModel)
         {
-            baseProvider = BaseConfig;
-            _logWriter = BaseConfig?.GetItem<ILogger>();
-            _configHandler = BaseConfig?.GetItem<ConfigHandler>();
-            _envHandler = BaseConfig?.GetItem<EnvHandler>();
+            _logWriter = Logger;
+            _configHandler = config;
+            _envHandler = env;
 
-            string? configPath = BaseConfig?.GetItem<IBaseSettings>().ConfigPath;
+            string? configPath = settings.ConfigPath;
 
             if (Path.GetExtension(configPath).ToString().Contains("config"))
             {

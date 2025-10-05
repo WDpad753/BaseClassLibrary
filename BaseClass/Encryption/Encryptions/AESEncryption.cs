@@ -1,8 +1,9 @@
 ﻿using BaseClass.Base.Interface;
-using BaseClass.RegistryBase;
+using BaseClass.Config;
 using BaseClass.Encryption.Interface;
 using BaseClass.Helper;
 using BaseClass.Model;
+using BaseClass.RegistryBase;
 using BaseLogger;
 using BaseLogger.Models;
 using Microsoft.Win32;
@@ -37,11 +38,10 @@ namespace BaseClass.Encryption.Encryptions
         public bool IsDecrypted { get; set; }
         public bool IsEncrypted { get; set; }
 
-        public AESEncryption(IBaseProvider? BaseConfig, EncryptionModel? EncModel, ConfigAccessMode? AccessMode) 
+        public AESEncryption(ILogger? Logger, RegistryHandler? registry, EnvHandler? env, EncryptionModel? EncModel, ConfigAccessMode? AccessMode) 
         {
-            baseConfig = BaseConfig;
             _encModel = EncModel;
-            _logger = BaseConfig?.GetItem<ILogger>();
+            _logger = Logger;
 
             AESCng = new AesCng();
 
@@ -52,11 +52,11 @@ namespace BaseClass.Encryption.Encryptions
 
             if (AccessMode.HasValue && AccessMode.Value == ConfigAccessMode.Registry)
             {
-                _regHandler = new(BaseConfig,EncModel);
+                _regHandler = registry;
             }
             else if (AccessMode.HasValue && AccessMode.Value == ConfigAccessMode.Environment)
             {
-                _envHandler = new(BaseConfig);
+                _envHandler = env;
             }
             //else if (AccessMode.HasValue && (AccessMode.Value == ConfigAccessMode.EnvironmentFile || AccessMode.Value == ConfigAccessMode.JSONFile))
             //{

@@ -33,7 +33,7 @@ namespace BaseClass.Config
         public ConfigHandler(ILogger Logger, IBaseSettings settings, XmlHandler xml, EnvFileHandler env)
         {
             //baseConfig = BaseConfig;
-            _logWriter =Logger;
+            _logWriter = Logger;
 
             _fileMap = new ExeConfigurationFileMap
             {
@@ -169,7 +169,10 @@ namespace BaseClass.Config
                 {
                     string? data = _configAppSettingsSection.CurrentConfiguration.AppSettings.Settings[path]?.Value;
 
-                    _logWriter.LogDebug($"{data} was collected from {path} Key in Config File.");
+                    if(data != null)
+                    {
+                        _logWriter.LogDebug($"{data} was collected from {path} Key in Config File.");
+                    }
 
                     return data;
                 }
@@ -177,7 +180,10 @@ namespace BaseClass.Config
                 {
                     string? data = _configLoggerSettingsSection.LoggerSettings[path]?.value;
 
-                    _logWriter.LogDebug($"{data} was collected from {path} Key in Config File.");
+                    if (data != null)
+                    {
+                        _logWriter.LogDebug($"{data} was collected from {path} Key in Config File.");
+                    }
 
                     return data;
                 }
@@ -185,7 +191,10 @@ namespace BaseClass.Config
                 {
                     string? data = _configChangeLogSettingsSection.ChangeLogSettings[path]?.value;
 
-                    _logWriter.LogDebug($"{data} was collected from {path} Key in Config File.");
+                    if (data != null)
+                    {
+                        _logWriter.LogDebug($"{data} was collected from {path} Key in Config File.");
+                    }
 
                     return data;
                 }
