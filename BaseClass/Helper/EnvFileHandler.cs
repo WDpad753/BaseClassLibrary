@@ -28,11 +28,12 @@ namespace BaseClass.Helper
         private XmlHandler? _handler;
         private string? result;
 
-        public EnvFileHandler(ILogger? Logger) 
+        public EnvFileHandler(ILogger? Logger, IBaseSettings settings) 
         {
             //baseConfig = BaseConfig;
             _writer = Logger;
             _serializer = new();
+            _handler = new(Logger, settings);
         }
 
         public string? EnvFileRead(string? filepath, string? key, string? mainkey)

@@ -14,14 +14,15 @@ namespace BaseClass.Helper
     public class EnvHandler
     {
         private readonly IBaseProvider? baseConfig;
+        private readonly IBaseSettings? Settings;
         private EnvFileHandler _envFileHandler;
         private ILogger? _logWriter;
         public bool _ConfigRead = false;
 
-        public EnvHandler(ILogger Logger, EnvFileHandler envFileHandler)
+        public EnvHandler(ILogger Logger, IBaseSettings settings, EnvFileHandler envFileHandler)
         {
             _logWriter = Logger;
-
+            Settings = settings;
             _envFileHandler = envFileHandler;
         }
 
@@ -94,7 +95,7 @@ namespace BaseClass.Helper
                 }
                 else if (mode == EnvAccessMode.File)
                 {
-                    baseConfig.GetItem<IBaseSettings>().FilePath = envpath;
+                    Settings.FilePath = envpath;
                     _envFileHandler.EnvFileSave(envpath, path, envkeyname, data);
                 }
                 else if (mode == EnvAccessMode.User)
