@@ -18,18 +18,11 @@ namespace BaseClass.Service.BaseWorker
             host = Host;
         }
 
-        public virtual async Task ExecuteTaskAsync(CancellationToken stoppingToken) => await ExecuteAsync(stoppingToken);
+        protected abstract Task ExecuteTaskAsync(CancellationToken stoppingToken);
 
-        //{
-        //    if (serviceBase.CanStart())
-        //    {
-        //        await serviceBase.Start(stoppingToken);
-        //    }
-        //    else
-        //    {
-        //        host.StopApplication();
-        //        await StopAsync(host.ApplicationStopping);
-        //    }
-        //}
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            await ExecuteTaskAsync(stoppingToken);
+        }
     }
 }

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BaseClass.Model
+namespace BaseClass.Model.ConfigModels
 {
     public class changelogSettings : ConfigurationSection
     {

@@ -1,9 +1,10 @@
 ﻿using BaseClass.Base.Interface;
 using BaseClass.Helper;
 using BaseClass.JSON;
-using BaseClass.Model;
+using BaseClass.Model.ConfigModels;
 using BaseLogger;
 using BaseLogger.Models;
+using BaseClass.Model.ConfigModels;
 using System;
 using System.Collections.Generic;
 using System.Configuration;

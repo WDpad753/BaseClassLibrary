@@ -29,7 +29,7 @@ namespace BaseClass.Service
         private readonly DatabaseMode? dbMode;
         private bool _disposedValue;
 
-        protected string? ConsoleAppName { get; set; }
+        protected string? ServiceName { get; set; }
         protected CancellationToken CancellationToken { get; set; }
         protected ILogger? Logger { get; private set; }
         protected IBaseSettings Settings { get; private set; }
@@ -41,13 +41,13 @@ namespace BaseClass.Service
             _provider = provider;
             Logger = _provider?.GetItem<ILogger>() ?? throw new BaseConfigException("Logger Not Configured");
             Settings = _provider?.GetItem<IBaseSettings>() ?? throw new BaseConfigException("Settings Not Configured");
-            ConsoleAppName = _provider?.GetValue<string>("ConsoleName") ?? throw new BaseConfigException("Console Name is not Configured");
+            ServiceName = _provider?.GetValue<string>("ServiceName") ?? throw new BaseConfigException("Console Name is not Configured");
             dbMode = _provider.GetValue<DatabaseMode>("DatabaseMode");
 
-            Logger.LogAlert($"{new string('=', 30)}");
-            Logger.LogAlert($" - entry {ConsoleAppName}");
+            Logger.LogAlert($"{new string('=', 100)}");
+            Logger.LogAlert($"entry {ServiceName}");
 
-            if (dbMode != null)
+            if (dbMode != null && dbMode != DatabaseMode.None)
             {
                 if (dbMode == DatabaseMode.SQLServer)
                 {
@@ -64,7 +64,7 @@ namespace BaseClass.Service
             }
             else
             {
-                Logger.LogInfo($" - Database Access is not setup.");
+                Logger.LogInfo($"Database Access is not setup.");
             }
         }
 
