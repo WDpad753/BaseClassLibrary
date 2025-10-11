@@ -88,15 +88,15 @@ namespace BaseClass.RegistryBase
 
                     if (configvalue == null)
                     {
-                        _logWriter?.LogError("Unable to find the Registry");
+                        _logWriter?.Error("Unable to find the Registry");
                         return null;
                     }
                 }
 
                 if (configvalue != null)
                 {
-                    _logWriter?.LogBase("There is Registry Path");
-                    _logWriter?.LogDebug($"RegistryKey Value = {configvalue}");
+                    _logWriter?.Base("There is Registry Path");
+                    _logWriter?.Debug($"RegistryKey Value = {configvalue}");
 
                     string? keyval = null;
                     bool keyValVer = StringHandler.IsValidBase64(configvalue, true);
@@ -125,19 +125,19 @@ namespace BaseClass.RegistryBase
                     }
                     else
                     {
-                        _logWriter?.LogError("Element does not exist in file.");
+                        _logWriter?.Error("Element does not exist in file.");
                         return null;
                     }
                 }
                 else
                 {
-                    _logWriter?.LogAlert("There is no registry path in the Configuration file.");
+                    _logWriter?.Alert("There is no registry path in the Configuration file.");
                     return null;
                 }
             }
             catch (Exception ex)
             {
-                _logWriter?.LogError($"Path does not exist. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
+                _logWriter?.Error($"Path does not exist. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
                 return null;
             }
             finally
@@ -205,7 +205,7 @@ namespace BaseClass.RegistryBase
                     }
                     else
                     {
-                        _logWriter?.LogError("Element does not exist in file.");
+                        _logWriter?.Error("Element does not exist in file.");
                     }
                 }
                 else if (keyValVer == false)
@@ -226,7 +226,7 @@ namespace BaseClass.RegistryBase
             }
             catch (Exception ex)
             {
-                _logWriter?.LogError($"Path does not exist. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
+                _logWriter?.Error($"Path does not exist. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
             }
             finally
             {
@@ -244,7 +244,7 @@ namespace BaseClass.RegistryBase
             {
                 string RegistyKeyName = RegistryRead(_encModel?.ConfigKey, _encModel?.Key);
 
-                _logWriter?.LogDebug($"Actual Registry Path Value => {RegistryRead(_encModel?.ConfigKey)}");
+                _logWriter?.Debug($"Actual Registry Path Value => {RegistryRead(_encModel?.ConfigKey)}");
 
                 foreach (var Key in _encModel?.Keys)
                 {
@@ -279,7 +279,7 @@ namespace BaseClass.RegistryBase
             }
             catch (Exception ex)
             {
-                _logWriter?.LogError($"Key was not saved. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
+                _logWriter?.Error($"Key was not saved. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
             }
         }
 
@@ -291,7 +291,7 @@ namespace BaseClass.RegistryBase
             {
                 List<byte[]> list = new List<byte[]>();
 
-                _logWriter?.LogDebug($"Actual Registry Path Value => {RegistryRead(_encModel?.ConfigKey)}");
+                _logWriter?.Debug($"Actual Registry Path Value => {RegistryRead(_encModel?.ConfigKey)}");
 
                 foreach(var Key in _encModel?.Keys)
                 {
@@ -328,7 +328,7 @@ namespace BaseClass.RegistryBase
             }
             catch (Exception ex)
             {
-                _logWriter?.LogError($"Key was not saved. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
+                _logWriter?.Error($"Key was not saved. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
                 return null;
             }
         }

@@ -47,7 +47,7 @@ namespace BaseClass.JSON
             }
             catch (Exception ex)
             {
-                _logWriter.LogError("Error saving data to file: " + ex.Message);
+                _logWriter.Error("Error saving data to file: " + ex.Message);
                 return;
             }
         }
@@ -64,7 +64,7 @@ namespace BaseClass.JSON
 
                 if (!File.Exists(targetfilepath))
                 {
-                    _logWriter.LogDebug($"File not found: {targetfilepath}");
+                    _logWriter.Debug($"File not found: {targetfilepath}");
                     return default;  
                 }
 
@@ -77,7 +77,7 @@ namespace BaseClass.JSON
             }
             catch (Exception ex)
             {
-                _logWriter.LogError("Error reading data to file: " + ex.Message);
+                _logWriter.Error("Error reading data to file: " + ex.Message);
                 return default;
             }
         }
@@ -95,11 +95,11 @@ namespace BaseClass.JSON
 
                 if(JsonSearch.Any())
                 {
-                    _logWriter.LogDebug($"Found some matches based on the given Key ({KeyName}). Matches Count: {JsonSearch.Count()}");
+                    _logWriter.Debug($"Found some matches based on the given Key ({KeyName}). Matches Count: {JsonSearch.Count()}");
                 }
                 else
                 {
-                    _logWriter.LogError($"Unable to find any entries that ties to the inserted Key ({KeyName}).");
+                    _logWriter.Error($"Unable to find any entries that ties to the inserted Key ({KeyName}).");
                     return Enumerable.Empty<JProperty>();
                 }
 
@@ -107,7 +107,7 @@ namespace BaseClass.JSON
             }
             catch (Exception ex)
             {
-                _logWriter.LogError("Error searching for value in the input JSON: " + ex.Message);
+                _logWriter.Error("Error searching for value in the input JSON: " + ex.Message);
                 return Enumerable.Empty<JProperty>();
             }
         }

@@ -44,8 +44,8 @@ namespace BaseClass.Service
             ServiceName = _provider?.GetValue<string>("ServiceName") ?? throw new BaseConfigException("Console Name is not Configured");
             dbMode = _provider.GetValue<DatabaseMode>("DatabaseMode");
 
-            Logger.LogAlert($"{new string('=', 100)}");
-            Logger.LogAlert($"entry {ServiceName}");
+            Logger.Alert($"{new string('=', 100)}");
+            Logger.Alert($"entry {ServiceName}");
 
             if (dbMode != null && dbMode != DatabaseMode.None)
             {
@@ -64,7 +64,7 @@ namespace BaseClass.Service
             }
             else
             {
-                Logger.LogInfo($"Database Access is not setup.");
+                Logger.Info($"Database Access is not setup.");
             }
         }
 

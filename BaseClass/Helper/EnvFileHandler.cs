@@ -57,7 +57,7 @@ namespace BaseClass.Helper
                     data = result;
                     break;
                 default:
-                    _writer.LogError($"Exception Occured. Exception: Unspported Environment File Extension, Exiting the Method.");
+                    _writer.Error($"Exception Occured. Exception: Unspported Environment File Extension, Exiting the Method.");
                     return null;
             }
 
@@ -81,7 +81,7 @@ namespace BaseClass.Helper
                     XmlEnvFileReader(key, mainkey, data);
                     break;
                 default:
-                    _writer.LogError($"Exception Occured. Exception: Unspported Environment File Extension, Exiting the Method.");
+                    _writer.Error($"Exception Occured. Exception: Unspported Environment File Extension, Exiting the Method.");
                     return;
             }
 
@@ -147,7 +147,7 @@ namespace BaseClass.Helper
             }
             catch (Exception ex)
             {
-                _writer.LogError($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
+                _writer.Error($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
                 return;
             }
         }
@@ -161,7 +161,7 @@ namespace BaseClass.Helper
 
                 if (!File.Exists(filePath))
                 {
-                    _writer.LogError($"The file '{filePath}' does not exist.");
+                    _writer.Error($"The file '{filePath}' does not exist.");
                     return;
                 }
 
@@ -208,13 +208,13 @@ namespace BaseClass.Helper
                 }
 
                 if(res == null)
-                    _writer.LogAlert($"Key '{Key}' not found in the environment file '{filePath}'.");
+                    _writer.Alert($"Key '{Key}' not found in the environment file '{filePath}'.");
 
                 return;
             }
             catch (Exception ex)
             {
-                _writer.LogError($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
+                _writer.Error($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
                 return;
             }
         }
@@ -228,7 +228,7 @@ namespace BaseClass.Helper
 
                 if (!File.Exists(_filepath) && !string.Equals(Path.GetExtension(_filepath), ".xml", StringComparison.OrdinalIgnoreCase))
                 {
-                    _writer.LogAlert($"The file '{_filepath}' does not exist.");
+                    _writer.Alert($"The file '{_filepath}' does not exist.");
                     return;
                 }
 
@@ -278,7 +278,7 @@ namespace BaseClass.Helper
             }
             catch (Exception ex)
             {
-                _writer.LogError($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
+                _writer.Error($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
                 return;
             }
         }

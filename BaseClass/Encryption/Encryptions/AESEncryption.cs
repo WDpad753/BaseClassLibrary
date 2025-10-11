@@ -105,7 +105,7 @@ namespace BaseClass.Encryption.Encryptions
             }
             catch (Exception ex)
             {
-                _logger?.LogError($"Key does not exist in the container. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
+                _logger?.Error($"Key does not exist in the container. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
             }
         }
 
@@ -146,7 +146,7 @@ namespace BaseClass.Encryption.Encryptions
             }
             catch (Exception ex)
             {
-                _logger?.LogError($"Key was not generated and saved. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
+                _logger?.Error($"Key was not generated and saved. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
             }
         }
 
@@ -194,7 +194,7 @@ namespace BaseClass.Encryption.Encryptions
                     else if ((myByte1.Length == 0 || mybyte2.Length != 0) && myByte1.Length != 0 && mybyte2.Length == 0)
                     {
                         keysGenerated = false;
-                        _logger?.LogDebug($"Keys did not generate correctly.");
+                        _logger?.Debug($"Keys did not generate correctly.");
                     }
                     else
                     {
@@ -203,13 +203,13 @@ namespace BaseClass.Encryption.Encryptions
                 }
                 else
                 {
-                    _logger?.LogAlert("Value/s does not exist");
+                    _logger?.Alert("Value/s does not exist");
                     keysGenerated = false;
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogError($"Key verification had failed. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
+                _logger?.Error($"Key verification had failed. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
             }
 
             return keysGenerated;

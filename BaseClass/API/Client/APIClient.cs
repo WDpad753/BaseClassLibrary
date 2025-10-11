@@ -75,9 +75,9 @@ namespace BaseClass.API.Client
                     if (taskcol.IsFaulted)
                     {
                         //Console.WriteLine(taskcol.Exception.ToString());
-                        //_logWriter.LogError($"Error in acquiring response from url {apiURL}: {taskcol.Exception.ToString()}");
+                        //_logWriter.Error($"Error in acquiring response from url {apiURL}: {taskcol.Exception.ToString()}");
                         System.Diagnostics.Debug.WriteLine($@"Here is the Content of the Error Message: {taskcol.Exception.ToString()}");
-                        _logWriter.LogError($"Error in acquiring response from url {apiURL}: {taskcol.Exception.ToString()}");
+                        _logWriter.Error($"Error in acquiring response from url {apiURL}: {taskcol.Exception.ToString()}");
                     }
                     else
                     {
@@ -102,14 +102,14 @@ namespace BaseClass.API.Client
                 {
                     //Console.WriteLine(ex.ToString());
                     System.Diagnostics.Debug.WriteLine($@"Here is the Content of the Error Message: {ex.ToString()}");
-                    _logWriter.LogError("Error in De-Serializing the JSON Object: " + ex);
+                    _logWriter.Error("Error in De-Serializing the JSON Object: " + ex);
                     return null;
                 }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($@"Here is the Content of the Error Message: {ex.ToString()}");
-                _logWriter.LogError("Error in De-Serializing the JSON Object: " + ex);
+                _logWriter.Error("Error in De-Serializing the JSON Object: " + ex);
                 return null;
             }
         }
@@ -159,7 +159,7 @@ namespace BaseClass.API.Client
             }
             catch (Exception ex)
             {
-                _logWriter.LogError("Error saving data to file: " + ex);
+                _logWriter.Error("Error saving data to file: " + ex);
                 return null;
             }
         }

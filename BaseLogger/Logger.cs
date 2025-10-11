@@ -1,6 +1,6 @@
 ﻿using BaseLogger.Models;
 using System.Configuration;
-using System.Diagnostics;
+using SysDebug = System.Diagnostics.Debug;
 using System.Globalization;
 using System.Reflection;
 using System.Reflection.Metadata;
@@ -38,7 +38,7 @@ namespace BaseLogger
                 lock(_lockObj)
                 {
                     //LogWrite("Log directory does not exist, created directory to save log files.", this.GetType().Name, nameof(LogWriter), MessageLevels.Verbose);
-                    LogAlert("Log directory does not exist, created directory to save log files.");
+                    Alert("Log directory does not exist, created directory to save log files.");
                 }
             }
             else
@@ -59,15 +59,15 @@ namespace BaseLogger
             //watcher.Created += ConfigOnChanged;
         }
 
-        public void LogInfo(string message) => LogWrite(message, FuncName.GetMethodName(), MessageLevels.Info);
+        public void Info(string message) => LogWrite(message, FuncName.GetMethodName(), MessageLevels.Info);
 
-        public void LogAlert(string message) => LogWrite(message, FuncName.GetMethodName(), MessageLevels.Alert);
+        public void Alert(string message) => LogWrite(message, FuncName.GetMethodName(), MessageLevels.Alert);
 
-        public void LogError(string message) => LogWrite(message, FuncName.GetMethodName(), MessageLevels.Fatal);
+        public void Error(string message) => LogWrite(message, FuncName.GetMethodName(), MessageLevels.Fatal);
 
-        public void LogDebug(string message) => LogWrite(message, FuncName.GetMethodName(), MessageLevels.Debug);
+        public void Debug(string message) => LogWrite(message, FuncName.GetMethodName(), MessageLevels.Debug);
 
-        public void LogBase(string message) => LogWrite(message, FuncName.GetMethodName(), MessageLevels.Base);
+        public void Base(string message) => LogWrite(message, FuncName.GetMethodName(), MessageLevels.Base);
 
         public void Log(string message, string func, MessageLevels level) => LogWrite(message, FuncName.GetMethodName(), level);
 
@@ -77,7 +77,7 @@ namespace BaseLogger
             {
                 string filenamepath = Path.Combine(logFilePath, appName+".log");
 
-                Debug.WriteLine($"[Watcher] Event: {e.ChangeType} on {e.FullPath} at {DateTime.Now:HH:mm:ss.fff}");
+                SysDebug.WriteLine($"[Watcher] Event: {e.ChangeType} on {e.FullPath} at {DateTime.Now:HH:mm:ss.fff}");
 
                 if(debugState == 0)
                 {
@@ -95,7 +95,7 @@ namespace BaseLogger
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[Watcher] Exception in handler: {ex}");
+                SysDebug.WriteLine($"[Watcher] Exception in handler: {ex}");
             }
         }
 
@@ -126,7 +126,7 @@ namespace BaseLogger
                 logtext = $"{appName}: {datetimenw} Level{Messagelvl.ToString().Substring(0, 1)}: {baseMsg}::{func} - {message}";
 
                 // Displaying the logs into the Console and Debug Section:
-                Debug.WriteLine(logtext + Environment.NewLine);
+                SysDebug.WriteLine(logtext + Environment.NewLine);
                 ConsoleLogWriter(appName, datetimenw, Messagelvl, baseMsg, func, message);
                 //Console.WriteLine(logtext + Environment.NewLine);
             }
@@ -147,7 +147,7 @@ namespace BaseLogger
                     }
 
                     // Displaying the logs into the Console and Debug Section:
-                    Debug.WriteLine(logtext + Environment.NewLine);
+                    SysDebug.WriteLine(logtext + Environment.NewLine);
                     ConsoleLogWriter(appName, datetimenw, MessageLevels.XNull, baseMsg, func, faultmessage);
                     //Console.WriteLine(logtext + Environment.NewLine);
                     return;
@@ -166,9 +166,9 @@ namespace BaseLogger
                 else
                 {
                     logtext = $"{appName}: {datetimenw} Level{Messagelvl.ToString().Substring(0, 1)}: {baseMsg}::{func} - {message}";
-                    
+
                     // Displaying the logs into the Console and Debug Section:
-                    Debug.WriteLine(logtext + Environment.NewLine);
+                    SysDebug.WriteLine(logtext + Environment.NewLine);
                     ConsoleLogWriter(appName, datetimenw, Messagelvl, baseMsg, func, message);
                     //Console.WriteLine(logtext + Environment.NewLine);
                 }

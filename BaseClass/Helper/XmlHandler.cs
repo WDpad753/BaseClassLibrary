@@ -76,7 +76,7 @@ namespace BaseClass.Helper
 
                 if (!File.Exists(_filePath) && (!string.Equals(Path.GetExtension(_filePath), ".xml", StringComparison.OrdinalIgnoreCase) || !fileExtensions.Contains(Path.GetExtension(_filePath))))
                 {
-                    _logWriter.LogError($"XML File does not exist in the given path. Path => {_filePath}");
+                    _logWriter.Error($"XML File does not exist in the given path. Path => {_filePath}");
                     return;
                 }
 
@@ -85,7 +85,7 @@ namespace BaseClass.Helper
                 XElement targetNode = xdoc.Descendants(mainKey).FirstOrDefault();
                 if (targetNode == null)
                 {
-                    _logWriter.LogError($"No element named '{mainKey}' found.");
+                    _logWriter.Error($"No element named '{mainKey}' found.");
                     return;
                 }
 
@@ -107,7 +107,7 @@ namespace BaseClass.Helper
                     {
                         found.SetAttributeValue("value", value);
                     }
-                    _logWriter.LogDebug($"Updated <{found.Name} key=\"{key}\"> under <{mainKey}> to value=\"{value}\".");
+                    _logWriter.Debug($"Updated <{found.Name} key=\"{key}\"> under <{mainKey}> to value=\"{value}\".");
                 }
                 else
                 {
@@ -122,14 +122,14 @@ namespace BaseClass.Helper
                         targetNode.Add(newElem);
                     }
 
-                    _logWriter.LogDebug($"Added <add key=\"{key}\" value=\"{value}\"/> under <{mainKey}>.");
+                    _logWriter.Debug($"Added <add key=\"{key}\" value=\"{value}\"/> under <{mainKey}>.");
                 }
 
                 xdoc.Save(_filePath);
             }
             catch (Exception ex)
             {
-                _logWriter.LogError($"Exception Occurred: {ex.Message}");
+                _logWriter.Error($"Exception Occurred: {ex.Message}");
             }
         }
     }

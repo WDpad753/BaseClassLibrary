@@ -47,8 +47,8 @@ namespace BaseClass.ConsoleAppBase
             ConsoleAppName = _provider?.GetValue<string>("ConsoleName") ?? throw new BaseConfigException("Console Name is not Configured");
             dbMode = _provider.GetValue<DatabaseMode>("DatabaseMode");
 
-            Logger.LogAlert($"{new string('=', 100)}");
-            Logger.LogAlert($"entry {ConsoleAppName}");
+            Logger.Alert($"{new string('=', 100)}");
+            Logger.Alert($"entry {ConsoleAppName}");
 
             if(dbMode != null)
             {

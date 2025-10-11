@@ -10,11 +10,11 @@ namespace BaseLogger
     public interface ILogger
     {
         public void Log(string message, string func, MessageLevels Messagelvl);
-        public void LogBase(string message);
-        public void LogAlert(string message);
-        public void LogDebug(string message);
-        public void LogInfo(string message);
-        public void LogError(string message);
+        public void Base(string message);
+        public void Alert(string message);
+        public void Debug(string message);
+        public void Info(string message);
+        public void Error(string message);
     }
 
     //public interface ILogger<T> : ILogger { }

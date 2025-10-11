@@ -34,8 +34,8 @@ namespace BaseClass.Helper
             {
                 if (string.IsNullOrEmpty(path))
                 {
-                    _logWriter?.LogBase("Was not able to obtain value from given path.");
-                    _logWriter?.LogDebug($"Was not able to obtain value from given path. Submitted path => {path}");
+                    _logWriter?.Base("Was not able to obtain value from given path.");
+                    _logWriter?.Debug($"Was not able to obtain value from given path. Submitted path => {path}");
                     return null;
                 }
 
@@ -59,20 +59,20 @@ namespace BaseClass.Helper
 
                 if (data == null)
                 {
-                    _logWriter?.LogError($"Unable to obtain value from given path => {path}.");
+                    _logWriter?.Error($"Unable to obtain value from given path => {path}.");
 
                     return null;
                 }
                 else
                 {
-                    _logWriter?.LogInfo($"Obtained following value {data} from given path => {path}.");
+                    _logWriter?.Info($"Obtained following value {data} from given path => {path}.");
 
                     return data;
                 }
             }
             catch (Exception ex)
             {
-                _logWriter?.LogError($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
+                _logWriter?.Error($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
                 return null;
             }
         }
@@ -83,8 +83,8 @@ namespace BaseClass.Helper
             {
                 if (string.IsNullOrEmpty(path) || string.IsNullOrEmpty(data))
                 {
-                    _logWriter?.LogAlert($"Was not able to obtain value from given path.");
-                    _logWriter?.LogDebug($"Was not able to obtain value from given path. Submitted path => {path}");
+                    _logWriter?.Alert($"Was not able to obtain value from given path.");
+                    _logWriter?.Debug($"Was not able to obtain value from given path. Submitted path => {path}");
                     return;
                 }
 
@@ -107,11 +107,11 @@ namespace BaseClass.Helper
                     Environment.SetEnvironmentVariable(path, data, EnvironmentVariableTarget.Machine);
                 }
 
-                _logWriter?.LogDebug($"Saved following value {data} from given path => {path}.");
+                _logWriter?.Debug($"Saved following value {data} from given path => {path}.");
             }
             catch (Exception ex)
             {
-                _logWriter?.LogError($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
+                _logWriter?.Error($"Exception Occured. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
                 return;
             }
         }

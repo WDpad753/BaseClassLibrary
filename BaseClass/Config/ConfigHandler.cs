@@ -78,7 +78,7 @@ namespace BaseClass.Config
                 else
                 {
                     _ConfigRead = false;
-                    _logWriter.LogError("Unknown Config Section");
+                    _logWriter.Error("Unknown Config Section");
                     return;
                 }
 
@@ -92,9 +92,9 @@ namespace BaseClass.Config
                     //Refresh the section
                     ConfigurationManager.RefreshSection("appSettings");
 
-                    _logWriter.LogDebug($"{data} was saved in Config File.");
+                    _logWriter.Debug($"{data} was saved in Config File.");
 
-                    _logWriter.LogInfo($"{data} was saved in {path} Key in Config File.");
+                    _logWriter.Info($"{data} was saved in {path} Key in Config File.");
                 }
                 else if (_configLoggerSettingsSection != null && _targetSection == "loggerSettings")
                 {
@@ -104,9 +104,9 @@ namespace BaseClass.Config
                     // Mark the section as modified and save:
                     ConfigurationManager.RefreshSection("loggerSettings");
 
-                    _logWriter.LogDebug($"{data} was saved in Config File.");
+                    _logWriter.Debug($"{data} was saved in Config File.");
 
-                    _logWriter.LogInfo($"{data} was saved in {path} Key in Config File.");
+                    _logWriter.Info($"{data} was saved in {path} Key in Config File.");
                 }
                 else if (_configChangeLogSettingsSection != null && _targetSection == "changelogSettings")
                 {
@@ -115,18 +115,18 @@ namespace BaseClass.Config
                     // Mark the section as modified and save:
                     ConfigurationManager.RefreshSection("changelogSettings");
 
-                    _logWriter.LogDebug($"{data} was saved in Config File.");
+                    _logWriter.Debug($"{data} was saved in Config File.");
 
-                    _logWriter.LogInfo($"{data} was saved in {path} Key in Config File.");
+                    _logWriter.Info($"{data} was saved in {path} Key in Config File.");
                 }
                 else
                 {
-                    _logWriter.LogError("Unable to save the data in the config file.");
+                    _logWriter.Error("Unable to save the data in the config file.");
                 }
             }
             catch (Exception ex)
             {
-                _logWriter.LogError($"Path does not exist. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
+                _logWriter.Error($"Path does not exist. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
             }
             finally
             {
@@ -162,7 +162,7 @@ namespace BaseClass.Config
                 }
                 else
                 {
-                    _logWriter.LogError("Unknown Config Section");
+                    _logWriter.Error("Unknown Config Section");
                     return null;
                 }
 
@@ -172,7 +172,7 @@ namespace BaseClass.Config
 
                     if(data != null)
                     {
-                        _logWriter.LogDebug($"{data} was collected from {path} Key in Config File.");
+                        _logWriter.Debug($"{data} was collected from {path} Key in Config File.");
                     }
 
                     return data;
@@ -183,7 +183,7 @@ namespace BaseClass.Config
 
                     if (data != null)
                     {
-                        _logWriter.LogDebug($"{data} was collected from {path} Key in Config File.");
+                        _logWriter.Debug($"{data} was collected from {path} Key in Config File.");
                     }
 
                     return data;
@@ -194,20 +194,20 @@ namespace BaseClass.Config
 
                     if (data != null)
                     {
-                        _logWriter.LogDebug($"{data} was collected from {path} Key in Config File.");
+                        _logWriter.Debug($"{data} was collected from {path} Key in Config File.");
                     }
 
                     return data;
                 }
                 else
                 {
-                    _logWriter.LogError("Unable to save the data in the config file.");
+                    _logWriter.Error("Unable to save the data in the config file.");
                     return null;
                 }
             }
             catch (Exception ex)
             {
-                _logWriter.LogError($"Path does not exist. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
+                _logWriter.Error($"Path does not exist. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
                 return null;
             }
             finally
