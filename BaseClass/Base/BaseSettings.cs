@@ -9,6 +9,7 @@ namespace BaseClass.Base
 {
     public class BaseSettings : IBaseSettings
     {
+        public bool FilePathExist { get; set; }
         public string? EncryptPathType { get; set; }
         public string? ConfigPath { get; set; }
         public string? LoggedOnUser { get; set; }

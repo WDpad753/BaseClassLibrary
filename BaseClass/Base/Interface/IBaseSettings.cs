@@ -8,6 +8,7 @@ namespace BaseClass.Base.Interface
 {
     public interface IBaseSettings
     {
+        public bool FilePathExist { get; set; }
         public string? EncryptPathType { get; set; }
         public string? ConfigPath { get; set; }
         public string? LoggedOnUser { get; set; }

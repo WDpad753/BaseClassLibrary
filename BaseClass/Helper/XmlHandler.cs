@@ -31,22 +31,22 @@ namespace BaseClass.Helper
             _logWriter = Logger;
             baseSettings = settings;
 
-            if (baseSettings.FilePath != null && fileExtensions.Contains(Path.GetExtension(baseSettings.FilePath)))
-            {
-                _filePath = baseSettings.FilePath;
-            }
-            else if(baseSettings.ConfigPath != null && fileExtensions.Contains(Path.GetExtension(baseSettings.ConfigPath)))
-            {
-                _filePath = baseSettings.ConfigPath;
-            }
-            else if(baseSettings.FilePath == null && baseSettings.ConfigPath != null && fileExtensions.Contains(Path.GetExtension(baseSettings.ConfigPath)))
-            {
-                _filePath = baseSettings.ConfigPath;
-            }
-            else
-            {
-                throw new ArgumentException("File type is unknown will be stopping the process. Entered Path => {}");
-            }
+            //if (baseSettings.FilePath != null && fileExtensions.Contains(Path.GetExtension(baseSettings.FilePath)))
+            //{
+            //    _filePath = baseSettings.FilePath;
+            //}
+            //else if(baseSettings.ConfigPath != null && fileExtensions.Contains(Path.GetExtension(baseSettings.ConfigPath)))
+            //{
+            //    _filePath = baseSettings.ConfigPath;
+            //}
+            //else if(baseSettings.FilePath == null && baseSettings.ConfigPath != null && fileExtensions.Contains(Path.GetExtension(baseSettings.ConfigPath)))
+            //{
+            //    _filePath = baseSettings.ConfigPath;
+            //}
+            //else
+            //{
+            //    throw new ArgumentException("File type is unknown will be stopping the process. Entered Path => {}");
+            //}
             //_filePath = BaseConfig.FilePath == null;
         }
 
@@ -54,8 +54,25 @@ namespace BaseClass.Helper
         {
             try
             {
-                if(_filePath == null)
+                //if(_filePath == null)
+                //    _filePath = baseSettings.FilePath;
+
+                if (baseSettings.FilePath != null && fileExtensions.Contains(Path.GetExtension(baseSettings.FilePath)))
+                {
                     _filePath = baseSettings.FilePath;
+                }
+                else if (baseSettings.ConfigPath != null && fileExtensions.Contains(Path.GetExtension(baseSettings.ConfigPath)))
+                {
+                    _filePath = baseSettings.ConfigPath;
+                }
+                else if (baseSettings.FilePath == null && baseSettings.ConfigPath != null && fileExtensions.Contains(Path.GetExtension(baseSettings.ConfigPath)))
+                {
+                    _filePath = baseSettings.ConfigPath;
+                }
+                else
+                {
+                    throw new ArgumentException("File type is unknown will be stopping the process. Entered Path => {}");
+                }
 
                 if (!File.Exists(_filePath) && (!string.Equals(Path.GetExtension(_filePath), ".xml", StringComparison.OrdinalIgnoreCase) || !fileExtensions.Contains(Path.GetExtension(_filePath))))
                 {
