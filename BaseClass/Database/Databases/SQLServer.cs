@@ -23,7 +23,7 @@ namespace BaseClass.Database.Databases
             baseClass = BaseClass;
 
             Username = BaseClass.DBUser;
-            Password = ConvertToSecureString(BaseClass.DBPassword.ToCharArray());
+            Password = ConvertToSecureString(BaseClass.DBPassword?.ToCharArray());
             //DBName = BaseClass.DBName;
             //Server = BaseClass.DBServer;
         }
@@ -146,7 +146,7 @@ namespace BaseClass.Database.Databases
         #endregion
 
         #region Misc
-        private SecureString ConvertToSecureString(char[] value)
+        private SecureString ConvertToSecureString(char[]? value)
         {
             if (value == null || value.Length == 0)
                 throw new ArgumentNullException(nameof(value));

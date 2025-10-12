@@ -2,6 +2,7 @@
 using BaseClass.Database.Interface;
 using Dapper;
 using Microsoft.Data.Sqlite;
+using Newtonsoft.Json.Linq;
 using SQLitePCL;
 using System;
 using System.Collections.Generic;
@@ -25,11 +26,30 @@ namespace BaseClass.Database.Databases
         }
 
         public string? ConnectionString => baseClass.DBPath;
+        public string? Password => baseClass.DBPassword;
 
         private IDbConnection CreateSqlConnection()
         {
+            string? connectionString = null;
             Batteries.Init();
-            return new SqliteConnection(ConnectionString);
+
+            if(Password != null)
+            {
+                connectionString = new SqliteConnectionStringBuilder(ConnectionString)
+                {
+                    Mode = SqliteOpenMode.ReadWriteCreate,
+                    Password = Password
+                }.ToString();
+            }
+            else
+            {
+                connectionString = ConnectionString;
+            }
+
+            if (connectionString == null)
+                throw new ArgumentNullException($"Connection string can not be null.{nameof(connectionString)}");
+
+            return new SqliteConnection(connectionString);
         }
 
         public bool ConnectionOpen()

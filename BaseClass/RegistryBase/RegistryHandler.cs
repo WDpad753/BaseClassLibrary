@@ -5,6 +5,7 @@ using BaseClass.Model;
 using BaseLogger;
 using BaseLogger.Models;
 using Microsoft.Win32;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -30,6 +31,10 @@ namespace BaseClass.RegistryBase
         private ExeConfigurationFileMap? _fileMap;
         private readonly string? _configPath;
         private readonly EncryptionModel? _encModel;
+
+        /* TODO: Aftering Finalisinig the class, customise class again to allow the developer to choose whether the data needs to be
+         * encrypted or not.
+         */
 
         public RegistryHandler(ILogger? Logger, IBaseSettings settings, ConfigHandler config, EnvHandler env, EncryptionModel? EncModel)
         {
@@ -297,8 +302,6 @@ namespace BaseClass.RegistryBase
                 {
                     if (Encoding.UTF8.GetString(ProtectedData.Unprotect(_encModel?.RegType, null, DataProtectionScope.CurrentUser)).Equals(RegPath.User.ToString()))
                     {
-                        //key = Registry.CurrentUser.OpenSubKey(RegistyKeyName, true);
-                        //var da = Encoding.UTF8.GetString(ProtectedData.Unprotect(Encoding.UTF8.GetBytes(RegistyKeyName), null, DataProtectionScope.CurrentUser));
                         Debug.WriteLine($"[{RegistryRead(_encModel?.ConfigKey)}]");
                         key = Registry.CurrentUser.OpenSubKey(RegistryRead(_encModel?.ConfigKey), false);
                     }
@@ -330,6 +333,39 @@ namespace BaseClass.RegistryBase
             {
                 _logWriter?.Error($"Key was not saved. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
                 return null;
+            }
+        }
+
+        public T? ValueConvertor<T>(byte[] val)
+        {
+            try
+            {
+                string? value = null;
+
+                if (val.GetType() == typeof(byte))
+                {
+                    value = Convert.ToBase64String(val);
+                }
+                else if (val.GetType() == typeof(string))
+                {
+                    value = val.ToString();
+                }
+
+                bool keyValVer = StringHandler.IsValidBase64(value, true);
+
+                //if (keyValVer)
+                //{
+                //}
+                //else
+                //{
+                //    int number = (int)Convert.ChangeType(numberString, typeof(int));
+                //}
+                return default;
+            }
+            catch (Exception ex)
+            {
+                _logWriter?.Error($"Path does not exist. Exception:{ex.InnerException}; Stack: {ex.StackTrace}; Message: {ex.Message}; Data: {ex.Data}; Source: {ex.Source}");
+                return default;
             }
         }
     }
